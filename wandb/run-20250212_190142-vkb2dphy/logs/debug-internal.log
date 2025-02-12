@@ -1,0 +1,21 @@
+{"time":"2025-02-12T19:01:43.616927229+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250212_190142-vkb2dphy/logs/debug-core.log"}
+{"time":"2025-02-12T19:01:43.73887907+01:00","level":"INFO","msg":"created new stream","id":"vkb2dphy"}
+{"time":"2025-02-12T19:01:43.738960836+01:00","level":"INFO","msg":"stream: started","id":"vkb2dphy"}
+{"time":"2025-02-12T19:01:43.73909912+01:00","level":"INFO","msg":"sender: started","stream_id":"vkb2dphy"}
+{"time":"2025-02-12T19:01:43.739091443+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"vkb2dphy"}
+{"time":"2025-02-12T19:01:43.739318394+01:00","level":"INFO","msg":"handler: started","stream_id":"vkb2dphy"}
+{"time":"2025-02-12T19:01:44.251091931+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-12T19:02:44.919001127+01:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/files/rguilcas-university-of-bergen/el-testo/vkb2dphy/file_stream"}
+{"time":"2025-02-12T19:02:44.919425593+01:00","level":"ERROR+4","msg":"filestream: fatal error: filestream: failed to upload: 404 Not Found path=files/rguilcas-university-of-bergen/el-testo/vkb2dphy/file_stream: {\"error\":\"run el-testo/vkb2dphy not found while streaming file\"}"}
+{"time":"2025-02-12T19:02:45.676528765+01:00","level":"INFO","msg":"stream: closing","id":"vkb2dphy"}
+{"time":"2025-02-12T19:02:45.67660354+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-12T19:02:45.67777792+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-12T19:02:45.85598308+01:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-02-12T19:02:45.856059381+01:00","level":"ERROR","msg":"runfiles: CreateRunFiles returned error: returned error 404 Not Found: {\"errors\":[{\"message\":\"run el-testo/vkb2dphy not found during createRunFiles\",\"path\":[\"createRunFiles\"]}],\"data\":{\"createRunFiles\":null}}"}
+{"time":"2025-02-12T19:02:45.939184633+01:00","level":"INFO","msg":"api: retrying HTTP error","status":409,"url":"https://api.wandb.ai/graphql","body":"{\"errors\":[{\"message\":\"run vkb2dphy was previously created and deleted; try a new run name\",\"path\":[\"upsertBucket\"]}],\"data\":{\"upsertBucket\":null}}"}
+{"time":"2025-02-12T19:02:45.978438187+01:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-02-12T19:02:45.978522886+01:00","level":"ERROR","msg":"runfiles: CreateRunFiles returned error: returned error 404 Not Found: {\"errors\":[{\"message\":\"run el-testo/vkb2dphy not found during createRunFiles\",\"path\":[\"createRunFiles\"]}],\"data\":{\"createRunFiles\":null}}"}
+{"time":"2025-02-12T19:02:48.20564885+01:00","level":"INFO","msg":"api: retrying HTTP error","status":409,"url":"https://api.wandb.ai/graphql","body":"{\"errors\":[{\"message\":\"run vkb2dphy was previously created and deleted; try a new run name\",\"path\":[\"upsertBucket\"]}],\"data\":{\"upsertBucket\":null}}"}
+{"time":"2025-02-12T19:02:53.108440477+01:00","level":"INFO","msg":"api: retrying HTTP error","status":409,"url":"https://api.wandb.ai/graphql","body":"{\"errors\":[{\"message\":\"run vkb2dphy was previously created and deleted; try a new run name\",\"path\":[\"upsertBucket\"]}],\"data\":{\"upsertBucket\":null}}"}
+{"time":"2025-02-12T19:03:02.802206102+01:00","level":"INFO","msg":"api: retrying HTTP error","status":409,"url":"https://api.wandb.ai/graphql","body":"{\"errors\":[{\"message\":\"run vkb2dphy was previously created and deleted; try a new run name\",\"path\":[\"upsertBucket\"]}],\"data\":{\"upsertBucket\":null}}"}
+{"time":"2025-02-12T19:03:19.767230421+01:00","level":"INFO","msg":"api: retrying HTTP error","status":409,"url":"https://api.wandb.ai/graphql","body":"{\"errors\":[{\"message\":\"run vkb2dphy was previously created and deleted; try a new run name\",\"path\":[\"upsertBucket\"]}],\"data\":{\"upsertBucket\":null}}"}

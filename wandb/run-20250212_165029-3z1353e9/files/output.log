@@ -1,0 +1,8 @@
+Imports done
+Data ready
+Traceback (most recent call last):
+  File "/shared_netapp3_home/home/rogui7909/code/predict_rain_norway/rain_lighting.py", line 145, in <module>
+    trainer = L.Trainer(limit_train_batches=100, max_epochs=num_epochs, logger=wandb_logger, log_every_n_steps=1, default_root_dir="lightning_checkpoints/")
+                                                                               ^^^^^^^^^^^^
+NameError: name 'wandb_logger' is not defined. Did you mean: 'WandbLogger'?
+[0m

@@ -5,3 +5,5 @@
 {"time":"2025-02-12T16:02:32.02518981+01:00","level":"INFO","msg":"handler: started","stream_id":"khj4gx71"}
 {"time":"2025-02-12T16:02:32.025288973+01:00","level":"INFO","msg":"sender: started","stream_id":"khj4gx71"}
 {"time":"2025-02-12T16:02:32.521822881+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-12T16:52:03.208447095+01:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/files/rguilcas-university-of-bergen/el-testo/khj4gx71/file_stream"}
+{"time":"2025-02-12T16:52:03.208539171+01:00","level":"ERROR+4","msg":"filestream: fatal error: filestream: failed to upload: 404 Not Found path=files/rguilcas-university-of-bergen/el-testo/khj4gx71/file_stream: {\"error\":\"run el-testo/khj4gx71 not found while streaming file\"}"}

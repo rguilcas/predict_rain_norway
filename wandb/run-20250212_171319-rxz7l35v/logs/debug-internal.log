@@ -1,0 +1,15 @@
+{"time":"2025-02-12T17:13:20.18222092+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250212_171319-rxz7l35v/logs/debug-core.log"}
+{"time":"2025-02-12T17:13:20.297396826+01:00","level":"INFO","msg":"created new stream","id":"rxz7l35v"}
+{"time":"2025-02-12T17:13:20.297483871+01:00","level":"INFO","msg":"stream: started","id":"rxz7l35v"}
+{"time":"2025-02-12T17:13:20.297624126+01:00","level":"INFO","msg":"handler: started","stream_id":"rxz7l35v"}
+{"time":"2025-02-12T17:13:20.297614988+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"rxz7l35v"}
+{"time":"2025-02-12T17:13:20.297702286+01:00","level":"INFO","msg":"sender: started","stream_id":"rxz7l35v"}
+{"time":"2025-02-12T17:13:20.870390518+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-12T17:14:00.911818048+01:00","level":"INFO","msg":"stream: closing","id":"rxz7l35v"}
+{"time":"2025-02-12T17:14:00.911888053+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-12T17:14:00.913052572+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-12T17:14:01.539394041+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-12T17:14:01.80493134+01:00","level":"INFO","msg":"handler: closed","stream_id":"rxz7l35v"}
+{"time":"2025-02-12T17:14:01.804984767+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"rxz7l35v"}
+{"time":"2025-02-12T17:14:01.80501678+01:00","level":"INFO","msg":"sender: closed","stream_id":"rxz7l35v"}
+{"time":"2025-02-12T17:14:01.806326503+01:00","level":"INFO","msg":"stream: closed","id":"rxz7l35v"}

@@ -1,0 +1,17 @@
+{"time":"2025-02-12T16:49:57.688417884+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"/shared_netapp3_home/home/rogui7909/code/predict_rain_norway/wandb/run-20250212_164957-ndusnyhf/logs/debug-core.log"}
+{"time":"2025-02-12T16:49:57.81592693+01:00","level":"INFO","msg":"created new stream","id":"ndusnyhf"}
+{"time":"2025-02-12T16:49:57.815984986+01:00","level":"INFO","msg":"stream: started","id":"ndusnyhf"}
+{"time":"2025-02-12T16:49:57.81610137+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"ndusnyhf"}
+{"time":"2025-02-12T16:49:57.816166833+01:00","level":"INFO","msg":"handler: started","stream_id":"ndusnyhf"}
+{"time":"2025-02-12T16:49:57.816222383+01:00","level":"INFO","msg":"sender: started","stream_id":"ndusnyhf"}
+{"time":"2025-02-12T16:49:58.012942816+01:00","level":"ERROR","msg":"HTTP error","status":403,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-02-12T16:49:58.013095992+01:00","level":"ERROR","msg":"sender: upsertRun:","error":"failed to upsert bucket: returned error 403 Forbidden: {\"errors\":[{\"message\":\"permission denied\",\"path\":[\"upsertBucket\"],\"extensions\":{\"code\":\"PERMISSION_ERROR\"}}],\"data\":{\"upsertBucket\":null}}"}
+{"time":"2025-02-12T16:49:58.057016372+01:00","level":"INFO","msg":"stream: closing","id":"ndusnyhf"}
+{"time":"2025-02-12T16:49:58.057289683+01:00","level":"ERROR","msg":"sender: upsertConfig: RunRecord is nil"}
+{"time":"2025-02-12T16:49:58.241448214+01:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/graphql"}
+{"time":"2025-02-12T16:49:58.24155541+01:00","level":"ERROR","msg":"runfiles: CreateRunFiles returned error: returned error 404 Not Found: {\"errors\":[{\"message\":\"project coucou/el-testo not found during createRunFiles\",\"path\":[\"createRunFiles\"]}],\"data\":{\"createRunFiles\":null}}"}
+{"time":"2025-02-12T16:49:58.243080733+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-12T16:49:58.243152363+01:00","level":"INFO","msg":"handler: closed","stream_id":"ndusnyhf"}
+{"time":"2025-02-12T16:49:58.243180218+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"ndusnyhf"}
+{"time":"2025-02-12T16:49:58.243231773+01:00","level":"INFO","msg":"sender: closed","stream_id":"ndusnyhf"}
+{"time":"2025-02-12T16:49:58.244608379+01:00","level":"INFO","msg":"stream: closed","id":"ndusnyhf"}

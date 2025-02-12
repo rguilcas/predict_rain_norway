@@ -1,0 +1,53 @@
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+
+  | Name  | Type     | Params | Mode
+-------------------------------------------
+0 | model | Wang2024 | 2.4 M  | train
+-------------------------------------------
+2.4 M     Trainable params
+0         Non-trainable params
+2.4 M     Total params
+9.480     Total estimated model params size (MB)
+8         Modules in train mode
+0         Modules in eval mode
+Epoch 1: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 79/79 [00:04<00:00, 19.54it/s, v_num=saed]
+Testing DataLoader 0: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 25/25 [00:00<00:00, 121.08it/s][tensor(1, device='cuda:0'), tensor(7, device='cuda:0'), tensor(5, device='cuda:0'), tensor(3, device='cuda:0'), tensor(2, device='cuda:0'), tensor(6, device='cuda:0'), tensor(7, device='cuda:0'), tensor(0, device='cuda:0'), tensor(9, device='cuda:0'), tensor(1, device='cuda:0'), tensor(3, device='cuda:0'), tensor(6, device='cuda:0'), tensor(1, device='cuda:0'), tensor(1, device='cuda:0'), tensor(0, device='cuda:0'), tensor(1, device='cuda:0'), tensor(5, device='cuda:0'), tensor(7, device='cuda:0'), tensor(0, device='cuda:0'), tensor(5, device='cuda:0'), tensor(7, device='cuda:0'), tensor(1, device='cuda:0'), tensor(1, device='cuda:0'), tensor(4, device='cuda:0'), tensor(8, device='cuda:0'), tensor(0, device='cuda:0'), tensor(8, device='cuda:0'), tensor(8, device='cuda:0'), tensor(3, device='cuda:0'), tensor(6, device='cuda:0'), tensor(9, device='cuda:0'), tensor(8, device='cuda:0'), tensor(2, device='cuda:0'), tensor(6, device='cuda:0'), tensor(4, device='cuda:0'), tensor(5, device='cuda:0'), tensor(6, device='cuda:0'), tensor(5, device='cuda:0'), tensor(0, device='cuda:0'), tensor(6, device='cuda:0'), tensor(0, device='cuda:0'), tensor(6, device='cuda:0'), tensor(1, device='cuda:0'), tensor(7, device='cuda:0'), tensor(6, device='cuda:0'), tensor(7, device='cuda:0'), tensor(5, device='cuda:0'), tensor(3, device='cuda:0'), tensor(4, device='cuda:0'), tensor(5, device='cuda:0'), tensor(5, device='cuda:0'), tensor(8, device='cuda:0'), tensor(4, device='cuda:0'), tensor(8, device='cuda:0'), tensor(3, device='cuda:0'), tensor(1, device='cuda:0'), tensor(5, device='cuda:0'), tensor(3, device='cuda:0'), tensor(2, device='cuda:0'), tensor(5, device='cuda:0'), tensor(7, device='cuda:0'), tensor(1, device='cuda:0'), tensor(5, device='cuda:0'), tensor(5, device='cuda:0'), tensor(2, device='cuda:0'), tensor(7, device='cuda:0'), tensor(7, device='cuda:0'), tensor(3, device='cuda:0'), tensor(0, device='cuda:0'), tensor(2, device='cuda:0'), tensor(3, device='cuda:0'), tensor(1, device='cuda:0'), tensor(8, device='cuda:0'), tensor(5, device='cuda:0'), tensor(6, device='cuda:0'), tensor(3, device='cuda:0'), tensor(3, device='cuda:0'), tensor(1, device='cuda:0'), tensor(1, device='cuda:0'), tensor(5, device='cuda:0'), tensor(0, device='cuda:0'), tensor(2, device='cuda:0'), tensor(3, device='cuda:0'), tensor(9, device='cuda:0'), tensor(8, device='cuda:0'), tensor(2, device='cuda:0'), tensor(1, device='cuda:0'), tensor(9, device='cuda:0'), tensor(7, device='cuda:0'), tensor(2, device='cuda:0'), tensor(2, device='cuda:0'), tensor(5, device='cuda:0'), tensor(6, device='cuda:0'), tensor(2, device='cuda:0'), tensor(0, device='cuda:0'), tensor(4, device='cuda:0'), tensor(3, device='cuda:0'), tensor(1, device='cuda:0'), tensor(8, device='cuda:0'), tensor(5, device='cuda:0'), tensor(7, device='cuda:0'), tensor(4, device='cuda:0'), tensor(9, device='cuda:0'), tensor(0, device='cuda:0'), tensor(5, device='cuda:0'), tensor(2, device='cuda:0'), tensor(5, device='cuda:0'), tensor(7, device='cuda:0'), tensor(9, device='cuda:0'), tensor(2, device='cuda:0'), tensor(3, device='cuda:0'), tensor(7, device='cuda:0'), tensor(9, device='cuda:0'), tensor(5, device='cuda:0'), tensor(5, device='cuda:0'), tensor(0, device='cuda:0'), tensor(6, device='cuda:0'), tensor(4, device='cuda:0'), tensor(3, device='cuda:0'), tensor(8, device='cuda:0'), tensor(5, device='cuda:0'), tensor(3, device='cuda:0'), tensor(7, device='cuda:0'), tensor(1, device='cuda:0'), tensor(4, device='cuda:0'), tensor(7, device='cuda:0'), tensor(6, device='cuda:0'), tensor(4, device='cuda:0'), tensor(3, device='cuda:0'), tensor(0, device='cuda:0'), tensor(3, device='cuda:0'), tensor(4, device='cuda:0'), tensor(7, device='cuda:0'), tensor(7, device='cuda:0'), tensor(6, device='cuda:0'), tensor(7, device='cuda:0'), tensor(4, device='
+`Trainer.fit` stopped: `max_epochs=2` reached.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+Traceback (most recent call last):
+  File "/shared_netapp3_home/home/rogui7909/code/predict_rain_norway/rain_lighting.py", line 206, in <module>
+    trainer.test(model, dataloaders=test_loader)
+  File "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/trainer.py", line 749, in test
+    return call._call_and_handle_interrupt(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/call.py", line 47, in _call_and_handle_interrupt
+    return trainer_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/trainer.py", line 789, in _test_impl
+    results = self._run(model, ckpt_path=ckpt_path)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/trainer.py", line 982, in _run
+    results = self._run_stage()
+              ^^^^^^^^^^^^^^^^^
+  File "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/trainer.py", line 1019, in _run_stage
+    return self._evaluation_loop.run()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/utilities.py", line 179, in _decorator
+    return loop_run(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/evaluation_loop.py", line 151, in run
+    return self.on_run_end()
+           ^^^^^^^^^^^^^^^^^
+  File "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/evaluation_loop.py", line 305, in on_run_end
+    self._on_evaluation_end()
+  File "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/evaluation_loop.py", line 350, in _on_evaluation_end
+    call._call_callback_hooks(trainer, hook_name, *args, **kwargs)
+  File "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/call.py", line 222, in _call_callback_hooks
+    fn(trainer, trainer.lightning_module, *args, **kwargs)
+  File "/shared_netapp3_home/home/rogui7909/code/predict_rain_norway/rain_lighting.py", line 60, in on_test_end
+    wandb.log({"conf_mat" : wandb.plot.confusion_matrix(probs=None,
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/wandb/plot/confusion_matrix.py", line 156, in confusion_matrix
+    class_mapping = {val: i for i, val in enumerate(sorted(list(class_idx)))}
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Boolean value of Tensor with more than one value is ambiguous

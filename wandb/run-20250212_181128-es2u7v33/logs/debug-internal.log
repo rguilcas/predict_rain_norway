@@ -1,0 +1,9 @@
+{"time":"2025-02-12T18:11:29.188269823+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250212_181128-es2u7v33/logs/debug-core.log"}
+{"time":"2025-02-12T18:11:29.319666047+01:00","level":"INFO","msg":"created new stream","id":"es2u7v33"}
+{"time":"2025-02-12T18:11:29.319730073+01:00","level":"INFO","msg":"stream: started","id":"es2u7v33"}
+{"time":"2025-02-12T18:11:29.319818909+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"es2u7v33"}
+{"time":"2025-02-12T18:11:29.319882858+01:00","level":"INFO","msg":"sender: started","stream_id":"es2u7v33"}
+{"time":"2025-02-12T18:11:29.319931002+01:00","level":"INFO","msg":"handler: started","stream_id":"es2u7v33"}
+{"time":"2025-02-12T18:11:29.788036932+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-12T18:46:45.456646405+01:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/files/rguilcas-university-of-bergen/el-testo/es2u7v33/file_stream"}
+{"time":"2025-02-12T18:46:45.456971771+01:00","level":"ERROR+4","msg":"filestream: fatal error: filestream: failed to upload: 404 Not Found path=files/rguilcas-university-of-bergen/el-testo/es2u7v33/file_stream: {\"error\":\"run el-testo/es2u7v33 not found while streaming file\"}"}

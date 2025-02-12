@@ -1,0 +1,15 @@
+{"time":"2025-02-12T18:59:15.955264712+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250212_185915-brui9evh/logs/debug-core.log"}
+{"time":"2025-02-12T18:59:16.077491257+01:00","level":"INFO","msg":"created new stream","id":"brui9evh"}
+{"time":"2025-02-12T18:59:16.077541629+01:00","level":"INFO","msg":"stream: started","id":"brui9evh"}
+{"time":"2025-02-12T18:59:16.077682171+01:00","level":"INFO","msg":"handler: started","stream_id":"brui9evh"}
+{"time":"2025-02-12T18:59:16.077664434+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"brui9evh"}
+{"time":"2025-02-12T18:59:16.077787952+01:00","level":"INFO","msg":"sender: started","stream_id":"brui9evh"}
+{"time":"2025-02-12T18:59:16.59396137+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-12T19:00:49.937662751+01:00","level":"INFO","msg":"stream: closing","id":"brui9evh"}
+{"time":"2025-02-12T19:00:49.937735078+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-12T19:00:49.938863316+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-12T19:00:50.538149871+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-12T19:00:50.749570335+01:00","level":"INFO","msg":"handler: closed","stream_id":"brui9evh"}
+{"time":"2025-02-12T19:00:50.749618557+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"brui9evh"}
+{"time":"2025-02-12T19:00:50.749651113+01:00","level":"INFO","msg":"sender: closed","stream_id":"brui9evh"}
+{"time":"2025-02-12T19:00:50.750725545+01:00","level":"INFO","msg":"stream: closed","id":"brui9evh"}

@@ -1,0 +1,25 @@
+2025-02-12 16:49:57,353 INFO    MainThread:293049 [wandb_setup.py:_flush():68] Current SDK version is 0.19.6
+2025-02-12 16:49:57,354 INFO    MainThread:293049 [wandb_setup.py:_flush():68] Configure stats pid to 293049
+2025-02-12 16:49:57,354 INFO    MainThread:293049 [wandb_setup.py:_flush():68] Loading settings from /home/rogui7909/.config/wandb/settings
+2025-02-12 16:49:57,354 INFO    MainThread:293049 [wandb_setup.py:_flush():68] Loading settings from /shared_netapp3_home/home/rogui7909/code/predict_rain_norway/wandb/settings
+2025-02-12 16:49:57,354 INFO    MainThread:293049 [wandb_setup.py:_flush():68] Loading settings from environment variables
+2025-02-12 16:49:57,354 INFO    MainThread:293049 [wandb_init.py:setup_run_log_directory():637] Logging user logs to /shared_netapp3_home/home/rogui7909/code/predict_rain_norway/wandb/run-20250212_164957-ndusnyhf/logs/debug.log
+2025-02-12 16:49:57,354 INFO    MainThread:293049 [wandb_init.py:setup_run_log_directory():638] Logging internal logs to /shared_netapp3_home/home/rogui7909/code/predict_rain_norway/wandb/run-20250212_164957-ndusnyhf/logs/debug-internal.log
+2025-02-12 16:49:57,355 INFO    MainThread:293049 [wandb_init.py:init():756] calling init triggers
+2025-02-12 16:49:57,355 INFO    MainThread:293049 [wandb_init.py:init():761] wandb.init called with sweep_config: {}
+config: {'hidden_layer_sizes': [32, 64], 'kernel_sizes': [3], 'activation': 'ReLU', 'pool_sizes': [2], 'dropout': 0.5, 'num_classes': 10, 'input_variable': ['z500'], '_wandb': {}}
+2025-02-12 16:49:57,355 INFO    MainThread:293049 [wandb_init.py:init():789] starting backend
+2025-02-12 16:49:57,639 INFO    MainThread:293049 [wandb_init.py:init():793] sending inform_init request
+2025-02-12 16:49:57,678 INFO    MainThread:293049 [backend.py:_multiprocessing_setup():97] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2025-02-12 16:49:57,679 INFO    MainThread:293049 [wandb_init.py:init():808] backend started and connected
+2025-02-12 16:49:57,686 INFO    MainThread:293049 [wandb_init.py:init():901] updated telemetry
+2025-02-12 16:49:57,707 INFO    MainThread:293049 [wandb_init.py:init():936] communicating run to backend with 90.0 second timeout
+2025-02-12 16:49:58,015 ERROR   MainThread:293049 [wandb_init.py:init():1481] error in wandb.init()
+Traceback (most recent call last):
+  File "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/wandb/sdk/wandb_init.py", line 1471, in init
+    return wi.init(run_settings, run_config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/wandb/sdk/wandb_init.py", line 967, in init
+    raise error
+wandb.errors.errors.CommError: failed to upsert bucket: returned error 403 Forbidden: {"errors":[{"message":"permission denied","path":["upsertBucket"],"extensions":{"code":"PERMISSION_ERROR"}}],"data":{"upsertBucket":null}}
+2025-02-12 16:49:58,057 WARNING MsgRouterThr:293049 [router.py:message_loop():75] message_loop has been closed

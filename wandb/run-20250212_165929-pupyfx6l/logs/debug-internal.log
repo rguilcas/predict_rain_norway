@@ -1,0 +1,15 @@
+{"time":"2025-02-12T16:59:29.378996933+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"/shared_netapp3_home/home/rogui7909/code/predict_rain_norway/wandb/run-20250212_165929-pupyfx6l/logs/debug-core.log"}
+{"time":"2025-02-12T16:59:29.504116672+01:00","level":"INFO","msg":"created new stream","id":"pupyfx6l"}
+{"time":"2025-02-12T16:59:29.504201834+01:00","level":"INFO","msg":"stream: started","id":"pupyfx6l"}
+{"time":"2025-02-12T16:59:29.504228367+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"pupyfx6l"}
+{"time":"2025-02-12T16:59:29.504312987+01:00","level":"INFO","msg":"sender: started","stream_id":"pupyfx6l"}
+{"time":"2025-02-12T16:59:29.504327831+01:00","level":"INFO","msg":"handler: started","stream_id":"pupyfx6l"}
+{"time":"2025-02-12T16:59:29.749098077+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-12T17:04:18.098480643+01:00","level":"INFO","msg":"stream: closing","id":"pupyfx6l"}
+{"time":"2025-02-12T17:04:18.098638191+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-12T17:04:18.099751507+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-12T17:04:18.853140804+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-12T17:04:19.176296103+01:00","level":"INFO","msg":"handler: closed","stream_id":"pupyfx6l"}
+{"time":"2025-02-12T17:04:19.176314114+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"pupyfx6l"}
+{"time":"2025-02-12T17:04:19.176358068+01:00","level":"INFO","msg":"sender: closed","stream_id":"pupyfx6l"}
+{"time":"2025-02-12T17:04:23.055173905+01:00","level":"INFO","msg":"stream: closed","id":"pupyfx6l"}
