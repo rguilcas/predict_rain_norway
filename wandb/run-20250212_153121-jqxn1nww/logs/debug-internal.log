@@ -1,0 +1,15 @@
+{"time":"2025-02-12T15:31:22.089233067+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"/shared_netapp3_home/home/rogui7909/code/predict_rain_norway/wandb/run-20250212_153121-jqxn1nww/logs/debug-core.log"}
+{"time":"2025-02-12T15:31:22.213895285+01:00","level":"INFO","msg":"created new stream","id":"jqxn1nww"}
+{"time":"2025-02-12T15:31:22.213989665+01:00","level":"INFO","msg":"stream: started","id":"jqxn1nww"}
+{"time":"2025-02-12T15:31:22.21401878+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"jqxn1nww"}
+{"time":"2025-02-12T15:31:22.21404431+01:00","level":"INFO","msg":"handler: started","stream_id":"jqxn1nww"}
+{"time":"2025-02-12T15:31:22.214052016+01:00","level":"INFO","msg":"sender: started","stream_id":"jqxn1nww"}
+{"time":"2025-02-12T15:31:22.491044135+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-12T15:31:37.549764825+01:00","level":"INFO","msg":"stream: closing","id":"jqxn1nww"}
+{"time":"2025-02-12T15:31:37.549973938+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-12T15:31:37.551146442+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-12T15:31:38.173360609+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-12T15:31:38.452669348+01:00","level":"INFO","msg":"handler: closed","stream_id":"jqxn1nww"}
+{"time":"2025-02-12T15:31:38.452743952+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"jqxn1nww"}
+{"time":"2025-02-12T15:31:38.452778183+01:00","level":"INFO","msg":"sender: closed","stream_id":"jqxn1nww"}
+{"time":"2025-02-12T15:31:38.453855641+01:00","level":"INFO","msg":"stream: closed","id":"jqxn1nww"}

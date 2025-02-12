@@ -1,0 +1,24 @@
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+
+  | Name  | Type       | Params | Mode
+---------------------------------------------
+0 | model | Sequential | 525 K  | train
+---------------------------------------------
+525 K     Trainable params
+0         Non-trainable params
+525 K     Total params
+2.100     Total estimated model params size (MB)
+4         Modules in train mode
+0         Modules in eval mode
+Epoch 9: 100%|█████████████████████████████████████████████████████████████████| 49/49 [00:11<00:00,  4.33it/s, v_num=mkrd]
+`Trainer.fit` stopped: `max_epochs=10` reached.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:476: Your `test_dataloader`'s sampler has shuffling enabled, it is strongly recommended that you turn shuffling off for val/test dataloaders.
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:216: Using `DistributedSampler` with the dataloaders. During `trainer.test()`, it is recommended to use `Trainer(devices=1, num_nodes=1)` to ensure each sample/batch gets evaluated exactly once. Otherwise, multi-device settings use `DistributedSampler` that replicates some samples to make sure all devices have same batch size in case of uneven inputs.
+Testing DataLoader 0: 100%|████████████████████████████████████████████████████████████████| 13/13 [00:00<00:00, 32.20it/s]
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/logger_connector/result.py:434: It is recommended to use `self.log('train/loss', ..., sync_dist=True)` when logging on epoch level in distributed setting to accumulate the metric across devices.
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       train/loss           2.1226372718811035
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────

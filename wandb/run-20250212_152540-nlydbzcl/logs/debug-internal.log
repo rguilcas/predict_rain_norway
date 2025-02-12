@@ -1,0 +1,15 @@
+{"time":"2025-02-12T15:25:40.414730331+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"/shared_netapp3_home/home/rogui7909/code/predict_rain_norway/wandb/run-20250212_152540-nlydbzcl/logs/debug-core.log"}
+{"time":"2025-02-12T15:25:40.537715899+01:00","level":"INFO","msg":"created new stream","id":"nlydbzcl"}
+{"time":"2025-02-12T15:25:40.537769329+01:00","level":"INFO","msg":"stream: started","id":"nlydbzcl"}
+{"time":"2025-02-12T15:25:40.537802353+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"nlydbzcl"}
+{"time":"2025-02-12T15:25:40.537853716+01:00","level":"INFO","msg":"handler: started","stream_id":"nlydbzcl"}
+{"time":"2025-02-12T15:25:40.53783729+01:00","level":"INFO","msg":"sender: started","stream_id":"nlydbzcl"}
+{"time":"2025-02-12T15:25:40.796740551+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-12T15:27:42.749899685+01:00","level":"INFO","msg":"stream: closing","id":"nlydbzcl"}
+{"time":"2025-02-12T15:27:42.750026317+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-12T15:27:42.7511468+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-12T15:27:43.534453063+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-12T15:27:43.763400616+01:00","level":"INFO","msg":"handler: closed","stream_id":"nlydbzcl"}
+{"time":"2025-02-12T15:27:43.763446618+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"nlydbzcl"}
+{"time":"2025-02-12T15:27:43.763482711+01:00","level":"INFO","msg":"sender: closed","stream_id":"nlydbzcl"}
+{"time":"2025-02-12T15:27:43.764631691+01:00","level":"INFO","msg":"stream: closed","id":"nlydbzcl"}

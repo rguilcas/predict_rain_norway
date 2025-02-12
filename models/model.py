@@ -48,28 +48,17 @@ class Wang2024(nn.Module):
         self.fc3 = nn.Linear(48, num_classes)
 
     def forward(self, x):
-        # print(x)
         x = self.conv1(x)
         x = nn.ReLU()(x)
-        # print(x)
         x = self.pool1(x)
-        # print(x)
         x = self.conv2(x)
-        # print(x)
         x = nn.ReLU()(x)
         x = self.pool2(x)
-        # print(x)
         x = x.view((-1,self.linear_size))
-        # print(x)
         x = self.fc1(x)
         x = nn.ReLU()(x)
         x = nn.Dropout()(x)
-
         x = self.fc2(x)
         x = nn.ReLU()(x)
-        x = nn.Dropout()(x)
-
-        x = self.fc3(x)
-        # x = nn.ReLU()(x)
-        
+        x = self.fc3(x)        
         return x

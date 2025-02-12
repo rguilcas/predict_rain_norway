@@ -1,0 +1,11 @@
+Imports done
+Model init
+Data ready
+Initializing distributed: GLOBAL_RANK: 1, MEMBER: 2/2
+LOCAL_RANK: 1 - CUDA_VISIBLE_DEVICES: [0,1]
+[rank1]: Traceback (most recent call last):
+[rank1]:   File "/shared_netapp3_home/home/rogui7909/code/predict_rain_norway/rain_lighting.py", line 108, in <module>
+[rank1]:     writer.flush()
+[rank1]:     ^^^^^^
+[rank1]: NameError: name 'writer' is not defined. Did you mean: 'iter'?
+[0m

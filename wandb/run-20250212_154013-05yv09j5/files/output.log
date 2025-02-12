@@ -1,0 +1,14 @@
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+
+  | Name  | Type       | Params | Mode
+---------------------------------------------
+0 | model | Sequential | 525 K  | train
+---------------------------------------------
+525 K     Trainable params
+0         Non-trainable params
+525 K     Total params
+2.100     Total estimated model params size (MB)
+4         Modules in train mode
+0         Modules in eval mode
+Epoch 9: 100%|█████████████████████████████████████████████████████████████████| 49/49 [00:09<00:00,  5.02it/s, v_num=09j5]
+`Trainer.fit` stopped: `max_epochs=10` reached.
