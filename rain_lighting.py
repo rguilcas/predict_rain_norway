@@ -28,11 +28,11 @@ def seed_everything(seed=42):
 
 seed_everything()
 
-learning_rate = 0.001
-batch_size = 128
-num_epochs = 10
+learning_rate = 0.0001
+batch_size = 256
+num_epochs = 20
 device = 'cuda:1'
-input_variable = ['v850', 'u850', 'z500']
+input_variable = ['z500','u850']
 
 config = {
     "hidden_layer_sizes": [32, 64],
@@ -40,6 +40,7 @@ config = {
     "activation": "ReLU",
     "pool_sizes": [2],
     "dropout": 0.5,
+    "batch_size": 256,
     "num_epochs": num_epochs,
     "num_classes": 10,
     "learning_rate":learning_rate,
@@ -48,16 +49,8 @@ config = {
 
 }
 
-wandb_logger = WandbLogger(project="el-testo", config=config, name='CNN')
+wandb_logger = WandbLogger(project="Predict-rain-WNorway", config=config, name='CNN-quantiles')
 
-# Pass the config dictionary when you initialize W&B
-# run = wandb.init(project="el-testo", config=config, name='recoucou')
-
-# start a new wandb run to track this script
-
-
-
-# linear = nn.Sequential(nn.Linear(128*64, 64), nn.ReLU(), nn.Linear(64,10))
 
 
 class MyCallback(Callback):
@@ -96,7 +89,7 @@ class LitCNN(L.LightningModule):
 
 
     def configure_optimizers(self):
-        optimizer = optim.Adam(self.parameters(), lr=1e-3)
+        optimizer = optim.Adam(self.parameters(), lr=config['learning_rate'])
         return optimizer
     
     def training_step(self, batch, batch_idx):
