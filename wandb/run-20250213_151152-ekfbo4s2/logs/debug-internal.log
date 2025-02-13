@@ -1,0 +1,15 @@
+{"time":"2025-02-13T15:11:53.25230637+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250213_151152-ekfbo4s2/logs/debug-core.log"}
+{"time":"2025-02-13T15:11:53.379014104+01:00","level":"INFO","msg":"created new stream","id":"ekfbo4s2"}
+{"time":"2025-02-13T15:11:53.379080661+01:00","level":"INFO","msg":"stream: started","id":"ekfbo4s2"}
+{"time":"2025-02-13T15:11:53.379138392+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"ekfbo4s2"}
+{"time":"2025-02-13T15:11:53.379214979+01:00","level":"INFO","msg":"handler: started","stream_id":"ekfbo4s2"}
+{"time":"2025-02-13T15:11:53.379303603+01:00","level":"INFO","msg":"sender: started","stream_id":"ekfbo4s2"}
+{"time":"2025-02-13T15:11:53.949847968+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-13T15:14:45.762292286+01:00","level":"INFO","msg":"stream: closing","id":"ekfbo4s2"}
+{"time":"2025-02-13T15:14:45.762413253+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-13T15:14:45.765219952+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-13T15:14:46.818532671+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-13T15:14:47.276876178+01:00","level":"INFO","msg":"handler: closed","stream_id":"ekfbo4s2"}
+{"time":"2025-02-13T15:14:47.276914009+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"ekfbo4s2"}
+{"time":"2025-02-13T15:14:47.276940221+01:00","level":"INFO","msg":"sender: closed","stream_id":"ekfbo4s2"}
+{"time":"2025-02-13T15:14:47.281488594+01:00","level":"INFO","msg":"stream: closed","id":"ekfbo4s2"}

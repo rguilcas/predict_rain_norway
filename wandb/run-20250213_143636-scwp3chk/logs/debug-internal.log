@@ -1,0 +1,15 @@
+{"time":"2025-02-13T14:36:36.715099865+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250213_143636-scwp3chk/logs/debug-core.log"}
+{"time":"2025-02-13T14:36:36.838636414+01:00","level":"INFO","msg":"created new stream","id":"scwp3chk"}
+{"time":"2025-02-13T14:36:36.838711617+01:00","level":"INFO","msg":"stream: started","id":"scwp3chk"}
+{"time":"2025-02-13T14:36:36.838764453+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"scwp3chk"}
+{"time":"2025-02-13T14:36:36.838841855+01:00","level":"INFO","msg":"handler: started","stream_id":"scwp3chk"}
+{"time":"2025-02-13T14:36:36.838977851+01:00","level":"INFO","msg":"sender: started","stream_id":"scwp3chk"}
+{"time":"2025-02-13T14:36:37.495573179+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-13T14:40:03.379317142+01:00","level":"INFO","msg":"stream: closing","id":"scwp3chk"}
+{"time":"2025-02-13T14:40:03.379430722+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-13T14:40:03.380620749+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-13T14:40:04.302300454+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-13T14:40:04.520037404+01:00","level":"INFO","msg":"handler: closed","stream_id":"scwp3chk"}
+{"time":"2025-02-13T14:40:04.520084987+01:00","level":"INFO","msg":"sender: closed","stream_id":"scwp3chk"}
+{"time":"2025-02-13T14:40:04.520075699+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"scwp3chk"}
+{"time":"2025-02-13T14:40:04.521164252+01:00","level":"INFO","msg":"stream: closed","id":"scwp3chk"}

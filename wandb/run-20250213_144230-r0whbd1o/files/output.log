@@ -1,0 +1,329 @@
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+
+  | Name  | Type     | Params | Mode
+-------------------------------------------
+0 | model | Wang2024 | 7.4 M  | train
+-------------------------------------------
+7.4 M     Trainable params
+0         Non-trainable params
+7.4 M     Total params
+29.534    Total estimated model params size (MB)
+8         Modules in train mode
+0         Modules in eval mode
+Sanity Checking DataLoader 0:   0%|                                                                                    | 0/2 [00:00<?, ?it/s][0;31m---------------------------------------------------------------------------[0m
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+[0;31mRuntimeError[0m                              Traceback (most recent call last)
+File [0;32m/shared_netapp3_home/home/rogui7909/code/predict_rain_norway/rain_lighting.py:183[0m
+[1;32m    177[0m model [38;5;241m=[39m LitCNN(CNN)
+[1;32m    182[0m [38;5;28mprint[39m([38;5;124m'[39m[38;5;124mModel init[39m[38;5;124m'[39m)
+[0;32m--> 183[0m [43mtrainer[49m[38;5;241;43m.[39;49m[43mfit[49m[43m([49m[43mmodel[49m[43m,[49m[43m [49m[43mtrain_loader[49m[43m,[49m[43m [49m[43mvalid_loader[49m[43m)[49m
+[1;32m    186[0m model[38;5;241m.[39meval()
+[1;32m    187[0m [38;5;28;01mwith[39;00m torch[38;5;241m.[39mno_grad():
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/trainer.py:539[0m, in [0;36mTrainer.fit[0;34m(self, model, train_dataloaders, val_dataloaders, datamodule, ckpt_path)[0m
+[1;32m    537[0m [38;5;28mself[39m[38;5;241m.[39mstate[38;5;241m.[39mstatus [38;5;241m=[39m TrainerStatus[38;5;241m.[39mRUNNING
+[1;32m    538[0m [38;5;28mself[39m[38;5;241m.[39mtraining [38;5;241m=[39m [38;5;28;01mTrue[39;00m
+[0;32m--> 539[0m [43mcall[49m[38;5;241;43m.[39;49m[43m_call_and_handle_interrupt[49m[43m([49m
+[1;32m    540[0m [43m    [49m[38;5;28;43mself[39;49m[43m,[49m[43m [49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_fit_impl[49m[43m,[49m[43m [49m[43mmodel[49m[43m,[49m[43m [49m[43mtrain_dataloaders[49m[43m,[49m[43m [49m[43mval_dataloaders[49m[43m,[49m[43m [49m[43mdatamodule[49m[43m,[49m[43m [49m[43mckpt_path[49m
+[1;32m    541[0m [43m[49m[43m)[49m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/call.py:47[0m, in [0;36m_call_and_handle_interrupt[0;34m(trainer, trainer_fn, *args, **kwargs)[0m
+[1;32m     45[0m     [38;5;28;01mif[39;00m trainer[38;5;241m.[39mstrategy[38;5;241m.[39mlauncher [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m:
+[1;32m     46[0m         [38;5;28;01mreturn[39;00m trainer[38;5;241m.[39mstrategy[38;5;241m.[39mlauncher[38;5;241m.[39mlaunch(trainer_fn, [38;5;241m*[39margs, trainer[38;5;241m=[39mtrainer, [38;5;241m*[39m[38;5;241m*[39mkwargs)
+[0;32m---> 47[0m     [38;5;28;01mreturn[39;00m [43mtrainer_fn[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+[1;32m     49[0m [38;5;28;01mexcept[39;00m _TunerExitException:
+[1;32m     50[0m     _call_teardown_hook(trainer)
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/trainer.py:575[0m, in [0;36mTrainer._fit_impl[0;34m(self, model, train_dataloaders, val_dataloaders, datamodule, ckpt_path)[0m
+[1;32m    568[0m [38;5;28;01massert[39;00m [38;5;28mself[39m[38;5;241m.[39mstate[38;5;241m.[39mfn [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m
+[1;32m    569[0m ckpt_path [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39m_checkpoint_connector[38;5;241m.[39m_select_ckpt_path(
+[1;32m    570[0m     [38;5;28mself[39m[38;5;241m.[39mstate[38;5;241m.[39mfn,
+[1;32m    571[0m     ckpt_path,
+[1;32m    572[0m     model_provided[38;5;241m=[39m[38;5;28;01mTrue[39;00m,
+[1;32m    573[0m     model_connected[38;5;241m=[39m[38;5;28mself[39m[38;5;241m.[39mlightning_module [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m,
+[1;32m    574[0m )
+[0;32m--> 575[0m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_run[49m[43m([49m[43mmodel[49m[43m,[49m[43m [49m[43mckpt_path[49m[38;5;241;43m=[39;49m[43mckpt_path[49m[43m)[49m
+[1;32m    577[0m [38;5;28;01massert[39;00m [38;5;28mself[39m[38;5;241m.[39mstate[38;5;241m.[39mstopped
+[1;32m    578[0m [38;5;28mself[39m[38;5;241m.[39mtraining [38;5;241m=[39m [38;5;28;01mFalse[39;00m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/trainer.py:982[0m, in [0;36mTrainer._run[0;34m(self, model, ckpt_path)[0m
+[1;32m    977[0m [38;5;28mself[39m[38;5;241m.[39m_signal_connector[38;5;241m.[39mregister_signal_handlers()
+[1;32m    979[0m [38;5;66;03m# ----------------------------[39;00m
+[1;32m    980[0m [38;5;66;03m# RUN THE TRAINER[39;00m
+[1;32m    981[0m [38;5;66;03m# ----------------------------[39;00m
+[0;32m--> 982[0m results [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_run_stage[49m[43m([49m[43m)[49m
+[1;32m    984[0m [38;5;66;03m# ----------------------------[39;00m
+[1;32m    985[0m [38;5;66;03m# POST-Training CLEAN UP[39;00m
+[1;32m    986[0m [38;5;66;03m# ----------------------------[39;00m
+[1;32m    987[0m log[38;5;241m.[39mdebug([38;5;124mf[39m[38;5;124m"[39m[38;5;132;01m{[39;00m[38;5;28mself[39m[38;5;241m.[39m[38;5;18m__class__[39m[38;5;241m.[39m[38;5;18m__name__[39m[38;5;132;01m}[39;00m[38;5;124m: trainer tearing down[39m[38;5;124m"[39m)
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/trainer.py:1024[0m, in [0;36mTrainer._run_stage[0;34m(self)[0m
+[1;32m   1022[0m [38;5;28;01mif[39;00m [38;5;28mself[39m[38;5;241m.[39mtraining:
+[1;32m   1023[0m     [38;5;28;01mwith[39;00m isolate_rng():
+[0;32m-> 1024[0m         [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_run_sanity_check[49m[43m([49m[43m)[49m
+[1;32m   1025[0m     [38;5;28;01mwith[39;00m torch[38;5;241m.[39mautograd[38;5;241m.[39mset_detect_anomaly([38;5;28mself[39m[38;5;241m.[39m_detect_anomaly):
+[1;32m   1026[0m         [38;5;28mself[39m[38;5;241m.[39mfit_loop[38;5;241m.[39mrun()
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/trainer.py:1053[0m, in [0;36mTrainer._run_sanity_check[0;34m(self)[0m
+[1;32m   1050[0m call[38;5;241m.[39m_call_callback_hooks([38;5;28mself[39m, [38;5;124m"[39m[38;5;124mon_sanity_check_start[39m[38;5;124m"[39m)
+[1;32m   1052[0m [38;5;66;03m# run eval step[39;00m
+[0;32m-> 1053[0m [43mval_loop[49m[38;5;241;43m.[39;49m[43mrun[49m[43m([49m[43m)[49m
+[1;32m   1055[0m call[38;5;241m.[39m_call_callback_hooks([38;5;28mself[39m, [38;5;124m"[39m[38;5;124mon_sanity_check_end[39m[38;5;124m"[39m)
+[1;32m   1057[0m [38;5;66;03m# reset logger connector[39;00m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/utilities.py:179[0m, in [0;36m_no_grad_context.<locals>._decorator[0;34m(self, *args, **kwargs)[0m
+[1;32m    177[0m     context_manager [38;5;241m=[39m torch[38;5;241m.[39mno_grad
+[1;32m    178[0m [38;5;28;01mwith[39;00m context_manager():
+[0;32m--> 179[0m     [38;5;28;01mreturn[39;00m [43mloop_run[49m[43m([49m[38;5;28;43mself[39;49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/evaluation_loop.py:144[0m, in [0;36m_EvaluationLoop.run[0;34m(self)[0m
+[1;32m    142[0m     [38;5;28mself[39m[38;5;241m.[39mbatch_progress[38;5;241m.[39mis_last_batch [38;5;241m=[39m data_fetcher[38;5;241m.[39mdone
+[1;32m    143[0m     [38;5;66;03m# run step hooks[39;00m
+[0;32m--> 144[0m     [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_evaluation_step[49m[43m([49m[43mbatch[49m[43m,[49m[43m [49m[43mbatch_idx[49m[43m,[49m[43m [49m[43mdataloader_idx[49m[43m,[49m[43m [49m[43mdataloader_iter[49m[43m)[49m
+[1;32m    145[0m [38;5;28;01mexcept[39;00m [38;5;167;01mStopIteration[39;00m:
+[1;32m    146[0m     [38;5;66;03m# this needs to wrap the `*_step` call too (not just `next`) for `dataloader_iter` support[39;00m
+[1;32m    147[0m     [38;5;28;01mbreak[39;00m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/evaluation_loop.py:433[0m, in [0;36m_EvaluationLoop._evaluation_step[0;34m(self, batch, batch_idx, dataloader_idx, dataloader_iter)[0m
+[1;32m    427[0m hook_name [38;5;241m=[39m [38;5;124m"[39m[38;5;124mtest_step[39m[38;5;124m"[39m [38;5;28;01mif[39;00m trainer[38;5;241m.[39mtesting [38;5;28;01melse[39;00m [38;5;124m"[39m[38;5;124mvalidation_step[39m[38;5;124m"[39m
+[1;32m    428[0m step_args [38;5;241m=[39m (
+[1;32m    429[0m     [38;5;28mself[39m[38;5;241m.[39m_build_step_args_from_hook_kwargs(hook_kwargs, hook_name)
+[1;32m    430[0m     [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m using_dataloader_iter
+[1;32m    431[0m     [38;5;28;01melse[39;00m (dataloader_iter,)
+[1;32m    432[0m )
+[0;32m--> 433[0m output [38;5;241m=[39m [43mcall[49m[38;5;241;43m.[39;49m[43m_call_strategy_hook[49m[43m([49m[43mtrainer[49m[43m,[49m[43m [49m[43mhook_name[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[43mstep_args[49m[43m)[49m
+[1;32m    435[0m [38;5;28mself[39m[38;5;241m.[39mbatch_progress[38;5;241m.[39mincrement_processed()
+[1;32m    437[0m [38;5;28;01mif[39;00m using_dataloader_iter:
+[1;32m    438[0m     [38;5;66;03m# update the hook kwargs now that the step method might have consumed the iterator[39;00m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/call.py:323[0m, in [0;36m_call_strategy_hook[0;34m(trainer, hook_name, *args, **kwargs)[0m
+[1;32m    320[0m     [38;5;28;01mreturn[39;00m [38;5;28;01mNone[39;00m
+[1;32m    322[0m [38;5;28;01mwith[39;00m trainer[38;5;241m.[39mprofiler[38;5;241m.[39mprofile([38;5;124mf[39m[38;5;124m"[39m[38;5;124m[Strategy][39m[38;5;132;01m{[39;00mtrainer[38;5;241m.[39mstrategy[38;5;241m.[39m[38;5;18m__class__[39m[38;5;241m.[39m[38;5;18m__name__[39m[38;5;132;01m}[39;00m[38;5;124m.[39m[38;5;132;01m{[39;00mhook_name[38;5;132;01m}[39;00m[38;5;124m"[39m):
+[0;32m--> 323[0m     output [38;5;241m=[39m [43mfn[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+[1;32m    325[0m [38;5;66;03m# restore current_fx when nested context[39;00m
+[1;32m    326[0m pl_module[38;5;241m.[39m_current_fx_name [38;5;241m=[39m prev_fx_name
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/strategies/strategy.py:412[0m, in [0;36mStrategy.validation_step[0;34m(self, *args, **kwargs)[0m
+[1;32m    410[0m [38;5;28;01mif[39;00m [38;5;28mself[39m[38;5;241m.[39mmodel [38;5;241m!=[39m [38;5;28mself[39m[38;5;241m.[39mlightning_module:
+[1;32m    411[0m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m[38;5;241m.[39m_forward_redirection([38;5;28mself[39m[38;5;241m.[39mmodel, [38;5;28mself[39m[38;5;241m.[39mlightning_module, [38;5;124m"[39m[38;5;124mvalidation_step[39m[38;5;124m"[39m, [38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs)
+[0;32m--> 412[0m [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mlightning_module[49m[38;5;241;43m.[39;49m[43mvalidation_step[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m/shared_netapp3_home/home/rogui7909/code/predict_rain_norway/rain_lighting.py:159[0m, in [0;36mLitCNN.validation_step[0;34m(self, batch, batch_idx)[0m
+[1;32m    157[0m [38;5;66;03m# x = x.view(x.size(0), -1)[39;00m
+[1;32m    158[0m pred [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39mmodel(x)
+[0;32m--> 159[0m loss [38;5;241m=[39m [43mnn[49m[38;5;241;43m.[39;49m[43mCrossEntropyLoss[49m[43m([49m[43m)[49m[43m([49m[43mpred[49m[43m,[49m[43m [49m[43my[49m[43m)[49m
+[1;32m    160[0m [38;5;28mself[39m[38;5;241m.[39mlog([38;5;124m"[39m[38;5;124mval/loss[39m[38;5;124m"[39m, loss)
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/torch/nn/modules/module.py:1736[0m, in [0;36mModule._wrapped_call_impl[0;34m(self, *args, **kwargs)[0m
+[1;32m   1734[0m     [38;5;28;01mreturn[39;00m [38;5;28mself[39m[38;5;241m.[39m_compiled_call_impl([38;5;241m*[39margs, [38;5;241m*[39m[38;5;241m*[39mkwargs)  [38;5;66;03m# type: ignore[misc][39;00m
+[1;32m   1735[0m [38;5;28;01melse[39;00m:
+[0;32m-> 1736[0m     [38;5;28;01mreturn[39;00m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_call_impl[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/torch/nn/modules/module.py:1747[0m, in [0;36mModule._call_impl[0;34m(self, *args, **kwargs)[0m
+[1;32m   1742[0m [38;5;66;03m# If we don't have any hooks, we want to skip the rest of the logic in[39;00m
+[1;32m   1743[0m [38;5;66;03m# this function, and just call forward.[39;00m
+[1;32m   1744[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m ([38;5;28mself[39m[38;5;241m.[39m_backward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m[38;5;241m.[39m_backward_pre_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m[38;5;241m.[39m_forward_hooks [38;5;129;01mor[39;00m [38;5;28mself[39m[38;5;241m.[39m_forward_pre_hooks
+[1;32m   1745[0m         [38;5;129;01mor[39;00m _global_backward_pre_hooks [38;5;129;01mor[39;00m _global_backward_hooks
+[1;32m   1746[0m         [38;5;129;01mor[39;00m _global_forward_hooks [38;5;129;01mor[39;00m _global_forward_pre_hooks):
+[0;32m-> 1747[0m     [38;5;28;01mreturn[39;00m [43mforward_call[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+[1;32m   1749[0m result [38;5;241m=[39m [38;5;28;01mNone[39;00m
+[1;32m   1750[0m called_always_called_hooks [38;5;241m=[39m [38;5;28mset[39m()
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/torch/nn/modules/loss.py:1293[0m, in [0;36mCrossEntropyLoss.forward[0;34m(self, input, target)[0m
+[1;32m   1292[0m [38;5;28;01mdef[39;00m [38;5;21mforward[39m([38;5;28mself[39m, [38;5;28minput[39m: Tensor, target: Tensor) [38;5;241m-[39m[38;5;241m>[39m Tensor:
+[0;32m-> 1293[0m     [38;5;28;01mreturn[39;00m [43mF[49m[38;5;241;43m.[39;49m[43mcross_entropy[49m[43m([49m
+[1;32m   1294[0m [43m        [49m[38;5;28;43minput[39;49m[43m,[49m
+[1;32m   1295[0m [43m        [49m[43mtarget[49m[43m,[49m
+[1;32m   1296[0m [43m        [49m[43mweight[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mweight[49m[43m,[49m
+[1;32m   1297[0m [43m        [49m[43mignore_index[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mignore_index[49m[43m,[49m
+[1;32m   1298[0m [43m        [49m[43mreduction[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mreduction[49m[43m,[49m
+[1;32m   1299[0m [43m        [49m[43mlabel_smoothing[49m[38;5;241;43m=[39;49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mlabel_smoothing[49m[43m,[49m
+[1;32m   1300[0m [43m    [49m[43m)[49m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/torch/nn/functional.py:3479[0m, in [0;36mcross_entropy[0;34m(input, target, weight, size_average, ignore_index, reduce, reduction, label_smoothing)[0m
+[1;32m   3477[0m [38;5;28;01mif[39;00m size_average [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m [38;5;129;01mor[39;00m reduce [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m:
+[1;32m   3478[0m     reduction [38;5;241m=[39m _Reduction[38;5;241m.[39mlegacy_get_string(size_average, reduce)
+[0;32m-> 3479[0m [38;5;28;01mreturn[39;00m [43mtorch[49m[38;5;241;43m.[39;49m[43m_C[49m[38;5;241;43m.[39;49m[43m_nn[49m[38;5;241;43m.[39;49m[43mcross_entropy_loss[49m[43m([49m
+[1;32m   3480[0m [43m    [49m[38;5;28;43minput[39;49m[43m,[49m
+[1;32m   3481[0m [43m    [49m[43mtarget[49m[43m,[49m
+[1;32m   3482[0m [43m    [49m[43mweight[49m[43m,[49m
+[1;32m   3483[0m [43m    [49m[43m_Reduction[49m[38;5;241;43m.[39;49m[43mget_enum[49m[43m([49m[43mreduction[49m[43m)[49m[43m,[49m
+[1;32m   3484[0m [43m    [49m[43mignore_index[49m[43m,[49m
+[1;32m   3485[0m [43m    [49m[43mlabel_smoothing[49m[43m,[49m
+[1;32m   3486[0m [43m[49m[43m)[49m
+
+[0;31mRuntimeError[0m: "nll_loss_forward_reduce_cuda_kernel_2d_index" not implemented for 'Float'
+
+tensor([ 1.7750,  3.1762,  1.8375,  ...,  0.6954, 20.0781, 16.7039])
+
+'quantiles'
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+
+  | Name  | Type     | Params | Mode
+------------------------------------------
+0 | model | Wang2024 | 7.4 M  | eval
+------------------------------------------
+7.4 M     Trainable params
+0         Non-trainable params
+7.4 M     Total params
+29.534    Total estimated model params size (MB)
+0         Modules in train mode
+8         Modules in eval mode
+
+
+
+Epoch 10: 100%|███████████████████████████████████████████████████████████████████████████████| 100/100 [00:00<00:00, 176.16it/s, v_num=bd1o][0;31m---------------------------------------------------------------------------[0m
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+[0;31mKeyboardInterrupt[0m                         Traceback (most recent call last)                   | 672/3682 [00:01<00:07, 423.50it/s]
+
+Detected KeyboardInterrupt, attempting graceful shutdown ...
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/call.py:47[0m, in [0;36m_call_and_handle_interrupt[0;34m(trainer, trainer_fn, *args, **kwargs)[0m
+[1;32m     46[0m         [38;5;28;01mreturn[39;00m trainer[38;5;241m.[39mstrategy[38;5;241m.[39mlauncher[38;5;241m.[39mlaunch(trainer_fn, [38;5;241m*[39margs, trainer[38;5;241m=[39mtrainer, [38;5;241m*[39m[38;5;241m*[39mkwargs)
+[0;32m---> 47[0m     [38;5;28;01mreturn[39;00m [43mtrainer_fn[49m[43m([49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+[1;32m     49[0m [38;5;28;01mexcept[39;00m _TunerExitException:
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/trainer.py:575[0m, in [0;36mTrainer._fit_impl[0;34m(self, model, train_dataloaders, val_dataloaders, datamodule, ckpt_path)[0m
+[1;32m    569[0m ckpt_path [38;5;241m=[39m [38;5;28mself[39m[38;5;241m.[39m_checkpoint_connector[38;5;241m.[39m_select_ckpt_path(
+[1;32m    570[0m     [38;5;28mself[39m[38;5;241m.[39mstate[38;5;241m.[39mfn,
+[1;32m    571[0m     ckpt_path,
+[1;32m    572[0m     model_provided[38;5;241m=[39m[38;5;28;01mTrue[39;00m,
+[1;32m    573[0m     model_connected[38;5;241m=[39m[38;5;28mself[39m[38;5;241m.[39mlightning_module [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m,
+[1;32m    574[0m )
+[0;32m--> 575[0m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_run[49m[43m([49m[43mmodel[49m[43m,[49m[43m [49m[43mckpt_path[49m[38;5;241;43m=[39;49m[43mckpt_path[49m[43m)[49m
+[1;32m    577[0m [38;5;28;01massert[39;00m [38;5;28mself[39m[38;5;241m.[39mstate[38;5;241m.[39mstopped
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/trainer.py:982[0m, in [0;36mTrainer._run[0;34m(self, model, ckpt_path)[0m
+[1;32m    979[0m [38;5;66;03m# ----------------------------[39;00m
+[1;32m    980[0m [38;5;66;03m# RUN THE TRAINER[39;00m
+[1;32m    981[0m [38;5;66;03m# ----------------------------[39;00m
+[0;32m--> 982[0m results [38;5;241m=[39m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_run_stage[49m[43m([49m[43m)[49m
+[1;32m    984[0m [38;5;66;03m# ----------------------------[39;00m
+[1;32m    985[0m [38;5;66;03m# POST-Training CLEAN UP[39;00m
+[1;32m    986[0m [38;5;66;03m# ----------------------------[39;00m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/trainer.py:1026[0m, in [0;36mTrainer._run_stage[0;34m(self)[0m
+[1;32m   1025[0m [38;5;28;01mwith[39;00m torch[38;5;241m.[39mautograd[38;5;241m.[39mset_detect_anomaly([38;5;28mself[39m[38;5;241m.[39m_detect_anomaly):
+[0;32m-> 1026[0m     [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mfit_loop[49m[38;5;241;43m.[39;49m[43mrun[49m[43m([49m[43m)[49m
+[1;32m   1027[0m [38;5;28;01mreturn[39;00m [38;5;28;01mNone[39;00m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/fit_loop.py:216[0m, in [0;36m_FitLoop.run[0;34m(self)[0m
+[1;32m    215[0m [38;5;28mself[39m[38;5;241m.[39mon_advance_start()
+[0;32m--> 216[0m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43madvance[49m[43m([49m[43m)[49m
+[1;32m    217[0m [38;5;28mself[39m[38;5;241m.[39mon_advance_end()
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/fit_loop.py:455[0m, in [0;36m_FitLoop.advance[0;34m(self)[0m
+[1;32m    454[0m [38;5;28;01massert[39;00m [38;5;28mself[39m[38;5;241m.[39m_data_fetcher [38;5;129;01mis[39;00m [38;5;129;01mnot[39;00m [38;5;28;01mNone[39;00m
+[0;32m--> 455[0m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mepoch_loop[49m[38;5;241;43m.[39;49m[43mrun[49m[43m([49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_data_fetcher[49m[43m)[49m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/training_epoch_loop.py:151[0m, in [0;36m_TrainingEpochLoop.run[0;34m(self, data_fetcher)[0m
+[1;32m    150[0m     [38;5;28mself[39m[38;5;241m.[39madvance(data_fetcher)
+[0;32m--> 151[0m     [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mon_advance_end[49m[43m([49m[43mdata_fetcher[49m[43m)[49m
+[1;32m    152[0m [38;5;28;01mexcept[39;00m [38;5;167;01mStopIteration[39;00m:
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/training_epoch_loop.py:370[0m, in [0;36m_TrainingEpochLoop.on_advance_end[0;34m(self, data_fetcher)[0m
+[1;32m    368[0m     call[38;5;241m.[39m_call_lightning_module_hook([38;5;28mself[39m[38;5;241m.[39mtrainer, [38;5;124m"[39m[38;5;124mon_validation_model_zero_grad[39m[38;5;124m"[39m)
+[0;32m--> 370[0m [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43mval_loop[49m[38;5;241;43m.[39;49m[43mrun[49m[43m([49m[43m)[49m
+[1;32m    371[0m [38;5;28mself[39m[38;5;241m.[39mtrainer[38;5;241m.[39mtraining [38;5;241m=[39m [38;5;28;01mTrue[39;00m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/utilities.py:179[0m, in [0;36m_no_grad_context.<locals>._decorator[0;34m(self, *args, **kwargs)[0m
+[1;32m    178[0m [38;5;28;01mwith[39;00m context_manager():
+[0;32m--> 179[0m     [38;5;28;01mreturn[39;00m [43mloop_run[49m[43m([49m[38;5;28;43mself[39;49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[43margs[49m[43m,[49m[43m [49m[38;5;241;43m*[39;49m[38;5;241;43m*[39;49m[43mkwargs[49m[43m)[49m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/evaluation_loop.py:144[0m, in [0;36m_EvaluationLoop.run[0;34m(self)[0m
+[1;32m    143[0m     [38;5;66;03m# run step hooks[39;00m
+[0;32m--> 144[0m     [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_evaluation_step[49m[43m([49m[43mbatch[49m[43m,[49m[43m [49m[43mbatch_idx[49m[43m,[49m[43m [49m[43mdataloader_idx[49m[43m,[49m[43m [49m[43mdataloader_iter[49m[43m)[49m
+[1;32m    145[0m [38;5;28;01mexcept[39;00m [38;5;167;01mStopIteration[39;00m:
+[1;32m    146[0m     [38;5;66;03m# this needs to wrap the `*_step` call too (not just `next`) for `dataloader_iter` support[39;00m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/evaluation_loop.py:429[0m, in [0;36m_EvaluationLoop._evaluation_step[0;34m(self, batch, batch_idx, dataloader_idx, dataloader_iter)[0m
+[1;32m    427[0m hook_name [38;5;241m=[39m [38;5;124m"[39m[38;5;124mtest_step[39m[38;5;124m"[39m [38;5;28;01mif[39;00m trainer[38;5;241m.[39mtesting [38;5;28;01melse[39;00m [38;5;124m"[39m[38;5;124mvalidation_step[39m[38;5;124m"[39m
+[1;32m    428[0m step_args [38;5;241m=[39m (
+[0;32m--> 429[0m     [38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_build_step_args_from_hook_kwargs[49m[43m([49m[43mhook_kwargs[49m[43m,[49m[43m [49m[43mhook_name[49m[43m)[49m
+[1;32m    430[0m     [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m using_dataloader_iter
+[1;32m    431[0m     [38;5;28;01melse[39;00m (dataloader_iter,)
+[1;32m    432[0m )
+[1;32m    433[0m output [38;5;241m=[39m call[38;5;241m.[39m_call_strategy_hook(trainer, hook_name, [38;5;241m*[39mstep_args)
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/loops/evaluation_loop.py:487[0m, in [0;36m_EvaluationLoop._build_step_args_from_hook_kwargs[0;34m(self, hook_kwargs, step_hook_name)[0m
+[1;32m    486[0m step_hook_fx [38;5;241m=[39m [38;5;28mgetattr[39m([38;5;28mself[39m[38;5;241m.[39mtrainer[38;5;241m.[39mlightning_module, step_hook_name)
+[0;32m--> 487[0m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m [43mis_param_in_hook_signature[49m[43m([49m[43mstep_hook_fx[49m[43m,[49m[43m [49m[38;5;124;43m"[39;49m[38;5;124;43mbatch_idx[39;49m[38;5;124;43m"[39;49m[43m,[49m[43m [49m[43mmin_args[49m[38;5;241;43m=[39;49m[38;5;241;43m2[39;49m[43m)[49m:
+[1;32m    488[0m     kwargs[38;5;241m.[39mpop([38;5;124m"[39m[38;5;124mbatch_idx[39m[38;5;124m"[39m, [38;5;28;01mNone[39;00m)
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/utilities/signature_utils.py:31[0m, in [0;36mis_param_in_hook_signature[0;34m(hook_fx, param, explicit, min_args)[0m
+[1;32m     30[0m     hook_fx [38;5;241m=[39m hook_fx[38;5;241m.[39m__wrapped__
+[0;32m---> 31[0m parameters [38;5;241m=[39m [43minspect[49m[38;5;241;43m.[39;49m[43mgetfullargspec[49m[43m([49m[43mhook_fx[49m[43m)[49m
+[1;32m     32[0m args [38;5;241m=[39m parameters[38;5;241m.[39margs[[38;5;241m1[39m:]  [38;5;66;03m# ignore `self`[39;00m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/inspect.py:1384[0m, in [0;36mgetfullargspec[0;34m(func)[0m
+[1;32m   1367[0m [38;5;28;01mtry[39;00m:
+[1;32m   1368[0m     [38;5;66;03m# Re: `skip_bound_arg=False`[39;00m
+[1;32m   1369[0m     [38;5;66;03m#[39;00m
+[0;32m   (...)[0m
+[1;32m   1381[0m     [38;5;66;03m# getfullargspec() historically ignored __wrapped__ attributes,[39;00m
+[1;32m   1382[0m     [38;5;66;03m# so we ensure that remains the case in 3.3+[39;00m
+[0;32m-> 1384[0m     sig [38;5;241m=[39m [43m_signature_from_callable[49m[43m([49m[43mfunc[49m[43m,[49m
+[1;32m   1385[0m [43m                                   [49m[43mfollow_wrapper_chains[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m,[49m
+[1;32m   1386[0m [43m                                   [49m[43mskip_bound_arg[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m,[49m
+[1;32m   1387[0m [43m                                   [49m[43msigcls[49m[38;5;241;43m=[39;49m[43mSignature[49m[43m,[49m
+[1;32m   1388[0m [43m                                   [49m[43meval_str[49m[38;5;241;43m=[39;49m[38;5;28;43;01mFalse[39;49;00m[43m)[49m
+[1;32m   1389[0m [38;5;28;01mexcept[39;00m [38;5;167;01mException[39;00m [38;5;28;01mas[39;00m ex:
+[1;32m   1390[0m     [38;5;66;03m# Most of the times 'signature' will raise ValueError.[39;00m
+[1;32m   1391[0m     [38;5;66;03m# But, it can also raise AttributeError, and, maybe something[39;00m
+[1;32m   1392[0m     [38;5;66;03m# else. So to be fully backwards compatible, we catch all[39;00m
+[1;32m   1393[0m     [38;5;66;03m# possible exceptions here, and reraise a TypeError.[39;00m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/inspect.py:2496[0m, in [0;36m_signature_from_callable[0;34m(obj, follow_wrapper_chains, skip_bound_arg, globals, locals, eval_str, sigcls)[0m
+[1;32m   2493[0m [38;5;28;01mif[39;00m [38;5;28misinstance[39m(obj, types[38;5;241m.[39mMethodType):
+[1;32m   2494[0m     [38;5;66;03m# In this case we skip the first parameter of the underlying[39;00m
+[1;32m   2495[0m     [38;5;66;03m# function (usually `self` or `cls`).[39;00m
+[0;32m-> 2496[0m     sig [38;5;241m=[39m [43m_get_signature_of[49m[43m([49m[43mobj[49m[38;5;241;43m.[39;49m[38;5;18;43m__func__[39;49m[43m)[49m
+[1;32m   2498[0m     [38;5;28;01mif[39;00m skip_bound_arg:
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/inspect.py:2566[0m, in [0;36m_signature_from_callable[0;34m(obj, follow_wrapper_chains, skip_bound_arg, globals, locals, eval_str, sigcls)[0m
+[1;32m   2563[0m [38;5;28;01mif[39;00m isfunction(obj) [38;5;129;01mor[39;00m _signature_is_functionlike(obj):
+[1;32m   2564[0m     [38;5;66;03m# If it's a pure Python function, or an object that is duck type[39;00m
+[1;32m   2565[0m     [38;5;66;03m# of a Python function (Cython functions, for instance), then:[39;00m
+[0;32m-> 2566[0m     [38;5;28;01mreturn[39;00m [43m_signature_from_function[49m[43m([49m[43msigcls[49m[43m,[49m[43m [49m[43mobj[49m[43m,[49m
+[1;32m   2567[0m [43m                                    [49m[43mskip_bound_arg[49m[38;5;241;43m=[39;49m[43mskip_bound_arg[49m[43m,[49m
+[1;32m   2568[0m [43m                                    [49m[38;5;28;43mglobals[39;49m[38;5;241;43m=[39;49m[38;5;28;43mglobals[39;49m[43m,[49m[43m [49m[38;5;28;43mlocals[39;49m[38;5;241;43m=[39;49m[38;5;28;43mlocals[39;49m[43m,[49m[43m [49m[43meval_str[49m[38;5;241;43m=[39;49m[43meval_str[49m[43m)[49m
+[1;32m   2570[0m [38;5;28;01mif[39;00m _signature_is_builtin(obj):
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/inspect.py:2393[0m, in [0;36m_signature_from_function[0;34m(cls, func, skip_bound_arg, globals, locals, eval_str)[0m
+[1;32m   2392[0m keyword_only [38;5;241m=[39m arg_names[pos_count:pos_count [38;5;241m+[39m keyword_only_count]
+[0;32m-> 2393[0m annotations [38;5;241m=[39m [43mget_annotations[49m[43m([49m[43mfunc[49m[43m,[49m[43m [49m[38;5;28;43mglobals[39;49m[38;5;241;43m=[39;49m[38;5;28;43mglobals[39;49m[43m,[49m[43m [49m[38;5;28;43mlocals[39;49m[38;5;241;43m=[39;49m[38;5;28;43mlocals[39;49m[43m,[49m[43m [49m[43meval_str[49m[38;5;241;43m=[39;49m[43meval_str[49m[43m)[49m
+[1;32m   2394[0m defaults [38;5;241m=[39m func[38;5;241m.[39m[38;5;18m__defaults__[39m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/inspect.py:248[0m, in [0;36mget_annotations[0;34m(obj, globals, locals, eval_str)[0m
+[1;32m    244[0m [38;5;28;01melif[39;00m [38;5;28mcallable[39m(obj):
+[1;32m    245[0m     [38;5;66;03m# this includes types.Function, types.BuiltinFunctionType,[39;00m
+[1;32m    246[0m     [38;5;66;03m# types.BuiltinMethodType, functools.partial, functools.singledispatch,[39;00m
+[1;32m    247[0m     [38;5;66;03m# "class funclike" from Lib/test/test_inspect... on and on it goes.[39;00m
+[0;32m--> 248[0m     ann [38;5;241m=[39m [38;5;28;43mgetattr[39;49m[43m([49m[43mobj[49m[43m,[49m[43m [49m[38;5;124;43m'[39;49m[38;5;124;43m__annotations__[39;49m[38;5;124;43m'[39;49m[43m,[49m[43m [49m[38;5;28;43;01mNone[39;49;00m[43m)[49m
+[1;32m    249[0m     obj_globals [38;5;241m=[39m [38;5;28mgetattr[39m(obj, [38;5;124m'[39m[38;5;124m__globals__[39m[38;5;124m'[39m, [38;5;28;01mNone[39;00m)
+
+[0;31mKeyboardInterrupt[0m:
+
+During handling of the above exception, another exception occurred:
+
+[0;31mNameError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[6], line 1[0m
+[0;32m----> 1[0m [43mtrainer[49m[38;5;241;43m.[39;49m[43mfit[49m[43m([49m[43mmodel[49m[43m,[49m[43m [49m[43mtrain_loader[49m[43m,[49m[43m [49m[43mvalid_loader[49m[43m)[49m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/trainer.py:539[0m, in [0;36mTrainer.fit[0;34m(self, model, train_dataloaders, val_dataloaders, datamodule, ckpt_path)[0m
+[1;32m    537[0m [38;5;28mself[39m[38;5;241m.[39mstate[38;5;241m.[39mstatus [38;5;241m=[39m TrainerStatus[38;5;241m.[39mRUNNING
+[1;32m    538[0m [38;5;28mself[39m[38;5;241m.[39mtraining [38;5;241m=[39m [38;5;28;01mTrue[39;00m
+[0;32m--> 539[0m [43mcall[49m[38;5;241;43m.[39;49m[43m_call_and_handle_interrupt[49m[43m([49m
+[1;32m    540[0m [43m    [49m[38;5;28;43mself[39;49m[43m,[49m[43m [49m[38;5;28;43mself[39;49m[38;5;241;43m.[39;49m[43m_fit_impl[49m[43m,[49m[43m [49m[43mmodel[49m[43m,[49m[43m [49m[43mtrain_dataloaders[49m[43m,[49m[43m [49m[43mval_dataloaders[49m[43m,[49m[43m [49m[43mdatamodule[49m[43m,[49m[43m [49m[43mckpt_path[49m
+[1;32m    541[0m [43m[49m[43m)[49m
+
+File [0;32m/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/call.py:64[0m, in [0;36m_call_and_handle_interrupt[0;34m(trainer, trainer_fn, *args, **kwargs)[0m
+[1;32m     62[0m     [38;5;28;01mif[39;00m [38;5;28misinstance[39m(launcher, _SubprocessScriptLauncher):
+[1;32m     63[0m         launcher[38;5;241m.[39mkill(_get_sigkill_signal())
+[0;32m---> 64[0m     [43mexit[49m([38;5;241m1[39m)
+[1;32m     66[0m [38;5;28;01mexcept[39;00m [38;5;167;01mBaseException[39;00m [38;5;28;01mas[39;00m exception:
+[1;32m     67[0m     _interrupt(trainer, exception)
+
+[0;31mNameError[0m: name 'exit' is not defined
+
+[23;0t

@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/shared_netapp3_home/home/rogui7909/code/predict_rain_norway/rain_lighting.py", line 180, in <module>
+    wandb.stop
+AttributeError: module 'wandb' has no attribute 'stop'

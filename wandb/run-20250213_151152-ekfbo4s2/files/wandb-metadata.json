@@ -1,0 +1,46 @@
+{
+  "os":  "Linux-3.10.0-1160.119.1.el7.x86_64-x86_64-with-glibc2.17",
+  "python":  "CPython 3.12.3",
+  "startedAt":  "2025-02-13T14:11:53.245480Z",
+  "program":  "/shared_netapp3_home/home/rogui7909/code/predict_rain_norway/rain_lighting.py",
+  "codePath":  "rain_lighting.py",
+  "git":  {
+    "remote":  "https://github.com/rguilcas/predict_rain_norway.git",
+    "commit":  "bc53815be5da88d93f9aaf46075cdaab0c6242a1"
+  },
+  "email":  "r.guilcas@outlook.com",
+  "root":  ".",
+  "host":  "cyclone.uib.no",
+  "executable":  "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/bin/python",
+  "codePathLocal":  "rain_lighting.py",
+  "cpu_count":  36,
+  "cpu_count_logical":  72,
+  "gpu":  "Tesla P100-PCIE-12GB",
+  "gpu_count":  2,
+  "disk":  {
+    "/":  {
+      "total":  "116188512256",
+      "used":  "53749755904"
+    }
+  },
+  "memory":  {
+    "total":  "1621649862656"
+  },
+  "cpu":  {
+    "count":  36,
+    "countLogical":  72
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "Tesla P100-PCIE-12GB",
+      "memoryTotal":  "12790923264",
+      "architecture":  "Pascal"
+    },
+    {
+      "name":  "Tesla P100-PCIE-12GB",
+      "memoryTotal":  "12790923264",
+      "architecture":  "Pascal"
+    }
+  ],
+  "cudaVersion":  "11.2"
+}
