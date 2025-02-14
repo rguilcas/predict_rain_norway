@@ -1,0 +1,9 @@
+{"time":"2025-02-14T10:27:00.21790054+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250214_102656-b3j7exto/logs/debug-core.log"}
+{"time":"2025-02-14T10:27:00.711767747+01:00","level":"INFO","msg":"created new stream","id":"b3j7exto"}
+{"time":"2025-02-14T10:27:00.711837789+01:00","level":"INFO","msg":"stream: started","id":"b3j7exto"}
+{"time":"2025-02-14T10:27:00.711896878+01:00","level":"INFO","msg":"sender: started","stream_id":"b3j7exto"}
+{"time":"2025-02-14T10:27:00.71189578+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"b3j7exto"}
+{"time":"2025-02-14T10:27:00.711955568+01:00","level":"INFO","msg":"handler: started","stream_id":"b3j7exto"}
+{"time":"2025-02-14T10:27:01.281128849+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-14T10:43:16.962977584+01:00","level":"ERROR","msg":"HTTP error","status":404,"method":"POST","url":"https://api.wandb.ai/files/rguilcas-university-of-bergen/Predict-rain-WNorway/b3j7exto/file_stream"}
+{"time":"2025-02-14T10:43:16.965764747+01:00","level":"ERROR+4","msg":"filestream: fatal error: filestream: failed to upload: 404 Not Found path=files/rguilcas-university-of-bergen/Predict-rain-WNorway/b3j7exto/file_stream: {\"error\":\"run Predict-rain-WNorway/b3j7exto not found while streaming file\"}"}
