@@ -1,0 +1,29 @@
+{
+  "os":  "Linux-3.10.0-1160.119.1.el7.x86_64-x86_64-with-glibc2.17",
+  "python":  "CPython 3.12.3",
+  "startedAt":  "2025-02-14T18:25:56.389356Z",
+  "program":  "<python with no main file>",
+  "git":  {
+    "remote":  "https://github.com/rguilcas/predict_rain_norway.git",
+    "commit":  "1ad2ba9d38321b5cdd587b2308882b19f753a45c"
+  },
+  "email":  "r.guilcas@outlook.com",
+  "root":  "/shared_netapp3_home/home/rogui7909/code/predict_rain_norway",
+  "host":  "cyclone.uib.no",
+  "executable":  "/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/bin/python3.12",
+  "cpu_count":  36,
+  "cpu_count_logical":  72,
+  "disk":  {
+    "/":  {
+      "total":  "116188512256",
+      "used":  "54201016320"
+    }
+  },
+  "memory":  {
+    "total":  "1621649862656"
+  },
+  "cpu":  {
+    "count":  36,
+    "countLogical":  72
+  }
+}

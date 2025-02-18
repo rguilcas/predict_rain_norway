@@ -1,0 +1,15 @@
+{"time":"2025-02-17T15:04:36.708578704+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250217_150436-dl3aepgq/logs/debug-core.log"}
+{"time":"2025-02-17T15:04:36.835413689+01:00","level":"INFO","msg":"created new stream","id":"dl3aepgq"}
+{"time":"2025-02-17T15:04:36.83548577+01:00","level":"INFO","msg":"stream: started","id":"dl3aepgq"}
+{"time":"2025-02-17T15:04:36.835597863+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"dl3aepgq"}
+{"time":"2025-02-17T15:04:36.835675758+01:00","level":"INFO","msg":"handler: started","stream_id":"dl3aepgq"}
+{"time":"2025-02-17T15:04:36.835760695+01:00","level":"INFO","msg":"sender: started","stream_id":"dl3aepgq"}
+{"time":"2025-02-17T15:04:37.253258157+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-17T15:13:31.667760517+01:00","level":"INFO","msg":"stream: closing","id":"dl3aepgq"}
+{"time":"2025-02-17T15:13:31.667972019+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-17T15:13:31.67395733+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-17T15:13:32.349476295+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-17T15:13:32.674833351+01:00","level":"INFO","msg":"handler: closed","stream_id":"dl3aepgq"}
+{"time":"2025-02-17T15:13:32.674874324+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"dl3aepgq"}
+{"time":"2025-02-17T15:13:32.674893415+01:00","level":"INFO","msg":"sender: closed","stream_id":"dl3aepgq"}
+{"time":"2025-02-17T15:13:32.675829445+01:00","level":"INFO","msg":"stream: closed","id":"dl3aepgq"}

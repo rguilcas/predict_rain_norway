@@ -1,0 +1,15 @@
+{"time":"2025-02-17T17:40:54.786002109+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250217_174054-h2qpoawk/logs/debug-core.log"}
+{"time":"2025-02-17T17:40:54.931347609+01:00","level":"INFO","msg":"created new stream","id":"h2qpoawk"}
+{"time":"2025-02-17T17:40:54.931439104+01:00","level":"INFO","msg":"stream: started","id":"h2qpoawk"}
+{"time":"2025-02-17T17:40:54.931505717+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"h2qpoawk"}
+{"time":"2025-02-17T17:40:54.931517116+01:00","level":"INFO","msg":"sender: started","stream_id":"h2qpoawk"}
+{"time":"2025-02-17T17:40:54.931570197+01:00","level":"INFO","msg":"handler: started","stream_id":"h2qpoawk"}
+{"time":"2025-02-17T17:40:55.483278143+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-17T17:43:33.689529766+01:00","level":"INFO","msg":"stream: closing","id":"h2qpoawk"}
+{"time":"2025-02-17T17:43:33.689631555+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-17T17:43:33.691046182+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-17T17:43:35.259720375+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-17T17:43:35.71284125+01:00","level":"INFO","msg":"handler: closed","stream_id":"h2qpoawk"}
+{"time":"2025-02-17T17:43:35.712891475+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"h2qpoawk"}
+{"time":"2025-02-17T17:43:35.712930694+01:00","level":"INFO","msg":"sender: closed","stream_id":"h2qpoawk"}
+{"time":"2025-02-17T17:43:35.714695816+01:00","level":"INFO","msg":"stream: closed","id":"h2qpoawk"}

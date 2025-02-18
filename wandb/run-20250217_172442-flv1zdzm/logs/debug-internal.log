@@ -1,0 +1,15 @@
+{"time":"2025-02-17T17:24:42.57738632+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250217_172442-flv1zdzm/logs/debug-core.log"}
+{"time":"2025-02-17T17:24:42.698676776+01:00","level":"INFO","msg":"created new stream","id":"flv1zdzm"}
+{"time":"2025-02-17T17:24:42.698734969+01:00","level":"INFO","msg":"stream: started","id":"flv1zdzm"}
+{"time":"2025-02-17T17:24:42.698790104+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"flv1zdzm"}
+{"time":"2025-02-17T17:24:42.698877492+01:00","level":"INFO","msg":"handler: started","stream_id":"flv1zdzm"}
+{"time":"2025-02-17T17:24:42.698970445+01:00","level":"INFO","msg":"sender: started","stream_id":"flv1zdzm"}
+{"time":"2025-02-17T17:24:43.265273372+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-17T17:27:34.601310164+01:00","level":"INFO","msg":"stream: closing","id":"flv1zdzm"}
+{"time":"2025-02-17T17:27:34.60135971+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-17T17:27:34.602769837+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-17T17:27:36.162644228+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-17T17:27:36.586669433+01:00","level":"INFO","msg":"handler: closed","stream_id":"flv1zdzm"}
+{"time":"2025-02-17T17:27:36.586715165+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"flv1zdzm"}
+{"time":"2025-02-17T17:27:36.586733722+01:00","level":"INFO","msg":"sender: closed","stream_id":"flv1zdzm"}
+{"time":"2025-02-17T17:27:36.588610851+01:00","level":"INFO","msg":"stream: closed","id":"flv1zdzm"}

@@ -1,0 +1,29 @@
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+
+  | Name    | Type        | Params | Mode
+------------------------------------------------
+0 | model   | Wang2024    | 7.4 M  | train
+1 | loss_fn | DistribLoss | 0      | train
+------------------------------------------------
+7.4 M     Trainable params
+0         Non-trainable params
+7.4 M     Total params
+29.532    Total estimated model params size (MB)
+9         Modules in train mode
+0         Modules in eval mode
+Epoch 0: 100%|█████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:12<00:00,  8.31it/s, v_num=9fu1]
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+                                                                                                                                                     
+`Trainer.fit` stopped: `max_epochs=1` reached.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'test_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+Testing DataLoader 0: 100%|██████████████████████████████████████████████████████████████████████████████████████████| 36/36 [00:00<00:00, 41.24it/s]
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        test/loss            38.5322380065918
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[23;0t

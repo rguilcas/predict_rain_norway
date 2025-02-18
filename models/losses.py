@@ -100,7 +100,7 @@ class DistribLoss(nn.Module):
         predictions_sorted, _ = torch.sort(predictions)
         errors_cdf = torch.abs(targets_sorted - predictions_sorted)**2
         errors = torch.abs(targets - predictions)**2
-        loss = torch.mean(errors_cdf) + torch.mean(errors)
+        loss = (torch.mean(errors_cdf) + torch.mean(errors))/2
         return loss.mean()
 
 class QuantileLoss(nn.Module):

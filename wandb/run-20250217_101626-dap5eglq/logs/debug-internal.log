@@ -1,0 +1,15 @@
+{"time":"2025-02-17T10:16:26.650186926+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250217_101626-dap5eglq/logs/debug-core.log"}
+{"time":"2025-02-17T10:16:26.77189913+01:00","level":"INFO","msg":"created new stream","id":"dap5eglq"}
+{"time":"2025-02-17T10:16:26.771958251+01:00","level":"INFO","msg":"stream: started","id":"dap5eglq"}
+{"time":"2025-02-17T10:16:26.772160824+01:00","level":"INFO","msg":"sender: started","stream_id":"dap5eglq"}
+{"time":"2025-02-17T10:16:26.772076513+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"dap5eglq"}
+{"time":"2025-02-17T10:16:26.772293892+01:00","level":"INFO","msg":"handler: started","stream_id":"dap5eglq"}
+{"time":"2025-02-17T10:16:27.287368988+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-17T10:20:05.220297134+01:00","level":"INFO","msg":"stream: closing","id":"dap5eglq"}
+{"time":"2025-02-17T10:20:05.220425632+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-17T10:20:05.221693913+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-17T10:20:06.745741058+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-17T10:20:07.173811267+01:00","level":"INFO","msg":"handler: closed","stream_id":"dap5eglq"}
+{"time":"2025-02-17T10:20:07.173885041+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"dap5eglq"}
+{"time":"2025-02-17T10:20:07.17391819+01:00","level":"INFO","msg":"sender: closed","stream_id":"dap5eglq"}
+{"time":"2025-02-17T10:20:07.174656926+01:00","level":"INFO","msg":"stream: closed","id":"dap5eglq"}

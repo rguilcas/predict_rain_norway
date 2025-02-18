@@ -1,0 +1,15 @@
+{"time":"2025-02-14T18:42:39.593377528+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250214_184237-aop3mfai/logs/debug-core.log"}
+{"time":"2025-02-14T18:42:39.716962123+01:00","level":"INFO","msg":"created new stream","id":"aop3mfai"}
+{"time":"2025-02-14T18:42:39.717007439+01:00","level":"INFO","msg":"stream: started","id":"aop3mfai"}
+{"time":"2025-02-14T18:42:39.717145857+01:00","level":"INFO","msg":"handler: started","stream_id":"aop3mfai"}
+{"time":"2025-02-14T18:42:39.717108582+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"aop3mfai"}
+{"time":"2025-02-14T18:42:39.717271423+01:00","level":"INFO","msg":"sender: started","stream_id":"aop3mfai"}
+{"time":"2025-02-14T18:42:40.194963111+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-14T18:49:40.720155746+01:00","level":"INFO","msg":"stream: closing","id":"aop3mfai"}
+{"time":"2025-02-14T18:49:40.720213965+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-14T18:49:40.721350231+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-14T18:49:42.283962026+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-14T18:49:42.490082004+01:00","level":"INFO","msg":"handler: closed","stream_id":"aop3mfai"}
+{"time":"2025-02-14T18:49:42.490154801+01:00","level":"INFO","msg":"sender: closed","stream_id":"aop3mfai"}
+{"time":"2025-02-14T18:49:42.490145866+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"aop3mfai"}
+{"time":"2025-02-14T18:49:42.493236133+01:00","level":"INFO","msg":"stream: closed","id":"aop3mfai"}

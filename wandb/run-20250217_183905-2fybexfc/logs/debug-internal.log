@@ -1,0 +1,15 @@
+{"time":"2025-02-17T18:39:05.90821099+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250217_183905-2fybexfc/logs/debug-core.log"}
+{"time":"2025-02-17T18:39:06.030402804+01:00","level":"INFO","msg":"created new stream","id":"2fybexfc"}
+{"time":"2025-02-17T18:39:06.0304526+01:00","level":"INFO","msg":"stream: started","id":"2fybexfc"}
+{"time":"2025-02-17T18:39:06.030536898+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"2fybexfc"}
+{"time":"2025-02-17T18:39:06.030583854+01:00","level":"INFO","msg":"handler: started","stream_id":"2fybexfc"}
+{"time":"2025-02-17T18:39:06.030662685+01:00","level":"INFO","msg":"sender: started","stream_id":"2fybexfc"}
+{"time":"2025-02-17T18:39:06.580033784+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-17T18:40:16.227282054+01:00","level":"INFO","msg":"stream: closing","id":"2fybexfc"}
+{"time":"2025-02-17T18:40:16.227370173+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-17T18:40:16.228326569+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-17T18:40:16.823461004+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-17T18:40:17.265037824+01:00","level":"INFO","msg":"handler: closed","stream_id":"2fybexfc"}
+{"time":"2025-02-17T18:40:17.265083986+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"2fybexfc"}
+{"time":"2025-02-17T18:40:17.265116861+01:00","level":"INFO","msg":"sender: closed","stream_id":"2fybexfc"}
+{"time":"2025-02-17T18:40:17.267050288+01:00","level":"INFO","msg":"stream: closed","id":"2fybexfc"}

@@ -1,0 +1,15 @@
+{"time":"2025-02-18T12:31:25.833078266+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250218_123122-cpcwd78t/logs/debug-core.log"}
+{"time":"2025-02-18T12:31:25.958269835+01:00","level":"INFO","msg":"created new stream","id":"cpcwd78t"}
+{"time":"2025-02-18T12:31:25.958324216+01:00","level":"INFO","msg":"stream: started","id":"cpcwd78t"}
+{"time":"2025-02-18T12:31:25.958422423+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"cpcwd78t"}
+{"time":"2025-02-18T12:31:25.958532406+01:00","level":"INFO","msg":"handler: started","stream_id":"cpcwd78t"}
+{"time":"2025-02-18T12:31:25.958564789+01:00","level":"INFO","msg":"sender: started","stream_id":"cpcwd78t"}
+{"time":"2025-02-18T12:31:26.482707395+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-18T12:31:54.611526378+01:00","level":"INFO","msg":"stream: closing","id":"cpcwd78t"}
+{"time":"2025-02-18T12:31:54.611634223+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-18T12:31:54.613265502+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-18T12:31:56.76684213+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-18T12:31:57.297519426+01:00","level":"INFO","msg":"handler: closed","stream_id":"cpcwd78t"}
+{"time":"2025-02-18T12:31:57.297563414+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"cpcwd78t"}
+{"time":"2025-02-18T12:31:57.297607659+01:00","level":"INFO","msg":"sender: closed","stream_id":"cpcwd78t"}
+{"time":"2025-02-18T12:31:57.304556932+01:00","level":"INFO","msg":"stream: closed","id":"cpcwd78t"}

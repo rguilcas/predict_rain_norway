@@ -1,0 +1,15 @@
+{"time":"2025-02-17T10:12:32.132445737+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250217_101231-zum9051o/logs/debug-core.log"}
+{"time":"2025-02-17T10:12:32.257169495+01:00","level":"INFO","msg":"created new stream","id":"zum9051o"}
+{"time":"2025-02-17T10:12:32.257274232+01:00","level":"INFO","msg":"stream: started","id":"zum9051o"}
+{"time":"2025-02-17T10:12:32.25731252+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"zum9051o"}
+{"time":"2025-02-17T10:12:32.257345705+01:00","level":"INFO","msg":"handler: started","stream_id":"zum9051o"}
+{"time":"2025-02-17T10:12:32.257347563+01:00","level":"INFO","msg":"sender: started","stream_id":"zum9051o"}
+{"time":"2025-02-17T10:12:32.730545563+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-17T10:15:19.482300552+01:00","level":"INFO","msg":"stream: closing","id":"zum9051o"}
+{"time":"2025-02-17T10:15:19.482388126+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-17T10:15:19.483587994+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-17T10:15:21.020175539+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-17T10:15:21.229495648+01:00","level":"INFO","msg":"handler: closed","stream_id":"zum9051o"}
+{"time":"2025-02-17T10:15:21.229537989+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"zum9051o"}
+{"time":"2025-02-17T10:15:21.229581089+01:00","level":"INFO","msg":"sender: closed","stream_id":"zum9051o"}
+{"time":"2025-02-17T10:15:21.231437225+01:00","level":"INFO","msg":"stream: closed","id":"zum9051o"}

@@ -1,0 +1,19 @@
+{"time":"2025-02-18T12:56:47.9472568+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250218_125647-sgpandj9/logs/debug-core.log"}
+{"time":"2025-02-18T12:56:48.071825837+01:00","level":"INFO","msg":"created new stream","id":"sgpandj9"}
+{"time":"2025-02-18T12:56:48.071886574+01:00","level":"INFO","msg":"stream: started","id":"sgpandj9"}
+{"time":"2025-02-18T12:56:48.071938866+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"sgpandj9"}
+{"time":"2025-02-18T12:56:48.071982849+01:00","level":"INFO","msg":"handler: started","stream_id":"sgpandj9"}
+{"time":"2025-02-18T12:56:48.072033442+01:00","level":"INFO","msg":"sender: started","stream_id":"sgpandj9"}
+{"time":"2025-02-18T12:56:48.585839534+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-18T12:56:52.004120959+01:00","level":"ERROR","msg":"runconsolelogs: failed to write to file: close wandb/run-20250218_125647-sgpandj9/files/output.log: disk quota exceeded"}
+{"time":"2025-02-18T12:56:54.159740195+01:00","level":"INFO","msg":"stream: closing","id":"sgpandj9"}
+{"time":"2025-02-18T12:56:54.159785187+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-18T12:56:54.1610687+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-18T12:56:54.180871356+01:00","level":"ERROR","msg":"sender: failed to upload run summary: close wandb/run-20250218_125647-sgpandj9/files/wandb-summary.json: disk quota exceeded"}
+{"time":"2025-02-18T12:56:54.365716894+01:00","level":"ERROR","msg":"sender: failed to upload run config: close wandb/run-20250218_125647-sgpandj9/files/config.yaml: disk quota exceeded"}
+{"time":"2025-02-18T12:56:54.648343942+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-18T12:56:54.870246156+01:00","level":"INFO","msg":"handler: closed","stream_id":"sgpandj9"}
+{"time":"2025-02-18T12:56:54.870290762+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"sgpandj9"}
+{"time":"2025-02-18T12:56:54.870314419+01:00","level":"INFO","msg":"sender: closed","stream_id":"sgpandj9"}
+{"time":"2025-02-18T12:56:54.87659767+01:00","level":"ERROR","msg":"writer: startStore: error closing store: store: failed closing file: close ./wandb/run-20250218_125647-sgpandj9/run-sgpandj9.wandb: disk quota exceeded"}
+{"time":"2025-02-18T12:56:54.881224847+01:00","level":"INFO","msg":"stream: closed","id":"sgpandj9"}

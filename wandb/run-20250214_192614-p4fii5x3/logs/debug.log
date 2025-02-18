@@ -1,0 +1,7 @@
+2025-02-14 19:26:14,135 INFO    MainThread:256430 [wandb_init.py:setup_run_log_directory():637] Logging user logs to /shared_netapp3_home/home/rogui7909/code/predict_rain_norway/wandb/run-20250214_192614-p4fii5x3/logs/debug.log
+2025-02-14 19:26:14,135 INFO    MainThread:256430 [wandb_init.py:setup_run_log_directory():638] Logging internal logs to /shared_netapp3_home/home/rogui7909/code/predict_rain_norway/wandb/run-20250214_192614-p4fii5x3/logs/debug-internal.log
+2025-02-14 19:26:14,135 INFO    MainThread:256430 [wandb_init.py:init():756] calling init triggers
+2025-02-14 19:26:14,136 INFO    MainThread:256430 [wandb_init.py:init():761] wandb.init called with sweep_config: {}
+config: {'_wandb': {}}
+2025-02-14 19:26:14,136 INFO    MainThread:256430 [wandb_init.py:init():781] wandb.init() called when a run is still active
+2025-02-14 19:27:53,157 WARNING MsgRouterThr:256430 [router.py:message_loop():75] message_loop has been closed

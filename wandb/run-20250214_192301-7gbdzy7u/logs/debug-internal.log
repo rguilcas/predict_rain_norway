@@ -1,0 +1,16 @@
+{"time":"2025-02-14T19:23:03.087267928+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"/shared_netapp3_home/home/rogui7909/code/predict_rain_norway/wandb/run-20250214_192301-7gbdzy7u/logs/debug-core.log"}
+{"time":"2025-02-14T19:23:04.418317009+01:00","level":"INFO","msg":"created new stream","id":"7gbdzy7u"}
+{"time":"2025-02-14T19:23:04.418376331+01:00","level":"INFO","msg":"stream: started","id":"7gbdzy7u"}
+{"time":"2025-02-14T19:23:04.418392009+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"7gbdzy7u"}
+{"time":"2025-02-14T19:23:04.418410916+01:00","level":"INFO","msg":"handler: started","stream_id":"7gbdzy7u"}
+{"time":"2025-02-14T19:23:04.418513648+01:00","level":"INFO","msg":"sender: started","stream_id":"7gbdzy7u"}
+{"time":"2025-02-14T19:23:04.708298059+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-14T19:25:52.353027983+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-14T19:25:52.354363323+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-14T19:25:53.094952392+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-14T19:25:53.338272743+01:00","level":"INFO","msg":"handler: operation stats","stats":{}}
+{"time":"2025-02-14T19:25:54.348986957+01:00","level":"INFO","msg":"stream: closing","id":"7gbdzy7u"}
+{"time":"2025-02-14T19:25:54.349026015+01:00","level":"INFO","msg":"handler: closed","stream_id":"7gbdzy7u"}
+{"time":"2025-02-14T19:25:54.34904062+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"7gbdzy7u"}
+{"time":"2025-02-14T19:25:54.349083416+01:00","level":"INFO","msg":"sender: closed","stream_id":"7gbdzy7u"}
+{"time":"2025-02-14T19:25:54.349893394+01:00","level":"INFO","msg":"stream: closed","id":"7gbdzy7u"}

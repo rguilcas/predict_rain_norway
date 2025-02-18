@@ -1,0 +1,15 @@
+{"time":"2025-02-17T10:08:57.156484778+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.6","symlink path":"wandb/run-20250217_100856-r53kexgy/logs/debug-core.log"}
+{"time":"2025-02-17T10:08:57.281957684+01:00","level":"INFO","msg":"created new stream","id":"r53kexgy"}
+{"time":"2025-02-17T10:08:57.282071421+01:00","level":"INFO","msg":"stream: started","id":"r53kexgy"}
+{"time":"2025-02-17T10:08:57.282166124+01:00","level":"INFO","msg":"writer: Do: started","stream_id":"r53kexgy"}
+{"time":"2025-02-17T10:08:57.28225861+01:00","level":"INFO","msg":"handler: started","stream_id":"r53kexgy"}
+{"time":"2025-02-17T10:08:57.282366231+01:00","level":"INFO","msg":"sender: started","stream_id":"r53kexgy"}
+{"time":"2025-02-17T10:08:57.809271996+01:00","level":"INFO","msg":"Starting system monitor"}
+{"time":"2025-02-17T10:11:42.167499461+01:00","level":"INFO","msg":"stream: closing","id":"r53kexgy"}
+{"time":"2025-02-17T10:11:42.167533049+01:00","level":"INFO","msg":"Stopping system monitor"}
+{"time":"2025-02-17T10:11:42.16894601+01:00","level":"INFO","msg":"Stopped system monitor"}
+{"time":"2025-02-17T10:11:43.648800124+01:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2025-02-17T10:11:43.86035995+01:00","level":"INFO","msg":"handler: closed","stream_id":"r53kexgy"}
+{"time":"2025-02-17T10:11:43.860424732+01:00","level":"INFO","msg":"writer: Close: closed","stream_id":"r53kexgy"}
+{"time":"2025-02-17T10:11:43.860444525+01:00","level":"INFO","msg":"sender: closed","stream_id":"r53kexgy"}
+{"time":"2025-02-17T10:11:43.862348472+01:00","level":"INFO","msg":"stream: closed","id":"r53kexgy"}

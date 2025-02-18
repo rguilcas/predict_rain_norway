@@ -1,0 +1,23 @@
+2025-02-17 12:25:20,082 INFO    MainThread:248033 [wandb_setup.py:_flush():68] Current SDK version is 0.19.6
+2025-02-17 12:25:20,082 INFO    MainThread:248033 [wandb_setup.py:_flush():68] Configure stats pid to 248033
+2025-02-17 12:25:20,083 INFO    MainThread:248033 [wandb_setup.py:_flush():68] Loading settings from /home/rogui7909/.config/wandb/settings
+2025-02-17 12:25:20,083 INFO    MainThread:248033 [wandb_setup.py:_flush():68] Loading settings from /shared_netapp3_home/home/rogui7909/code/predict_rain_norway/wandb/settings
+2025-02-17 12:25:20,083 INFO    MainThread:248033 [wandb_setup.py:_flush():68] Loading settings from environment variables
+2025-02-17 12:25:20,083 INFO    MainThread:248033 [wandb_init.py:setup_run_log_directory():637] Logging user logs to ./wandb/run-20250217_122520-45nyju2d/logs/debug.log
+2025-02-17 12:25:20,083 INFO    MainThread:248033 [wandb_init.py:setup_run_log_directory():638] Logging internal logs to ./wandb/run-20250217_122520-45nyju2d/logs/debug-internal.log
+2025-02-17 12:25:20,083 INFO    MainThread:248033 [wandb_init.py:init():756] calling init triggers
+2025-02-17 12:25:20,083 INFO    MainThread:248033 [wandb_init.py:init():761] wandb.init called with sweep_config: {}
+config: {'hidden_layer_sizes': [32, 64], 'kernel_sizes': [3], 'activation': 'ReLU', 'pool_sizes': [2], 'dropout': 0.5, 'batch_size': 128, 'num_epochs': 20, 'num_classes': 1, 'learning_rate': 0.0001, 'input_variable': ['u850', 'v850'], 'groups': 2, 'region_predicted': 14, 'type_prediction': 'regression', 'loss_fn': 'distrib', '_wandb': {}}
+2025-02-17 12:25:20,084 INFO    MainThread:248033 [wandb_init.py:init():789] starting backend
+2025-02-17 12:25:20,315 INFO    MainThread:248033 [wandb_init.py:init():793] sending inform_init request
+2025-02-17 12:25:20,330 INFO    MainThread:248033 [backend.py:_multiprocessing_setup():97] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2025-02-17 12:25:20,331 INFO    MainThread:248033 [wandb_init.py:init():808] backend started and connected
+2025-02-17 12:25:20,340 INFO    MainThread:248033 [wandb_init.py:init():901] updated telemetry
+2025-02-17 12:25:20,359 INFO    MainThread:248033 [wandb_init.py:init():936] communicating run to backend with 90.0 second timeout
+2025-02-17 12:25:20,976 INFO    MainThread:248033 [wandb_init.py:init():994] starting run threads in backend
+2025-02-17 12:25:21,612 INFO    MainThread:248033 [wandb_run.py:_console_start():2385] atexit reg
+2025-02-17 12:25:21,612 INFO    MainThread:248033 [wandb_run.py:_redirect():2235] redirect: wrap_raw
+2025-02-17 12:25:21,612 INFO    MainThread:248033 [wandb_run.py:_redirect():2300] Wrapping output streams.
+2025-02-17 12:25:21,613 INFO    MainThread:248033 [wandb_run.py:_redirect():2325] Redirects installed.
+2025-02-17 12:25:21,618 INFO    MainThread:248033 [wandb_init.py:init():1036] run started, returning control to user process
+2025-02-17 12:28:58,276 WARNING MsgRouterThr:248033 [router.py:message_loop():75] message_loop has been closed

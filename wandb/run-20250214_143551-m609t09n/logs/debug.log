@@ -1,0 +1,23 @@
+2025-02-14 14:35:51,950 INFO    MainThread:171066 [wandb_setup.py:_flush():68] Current SDK version is 0.19.6
+2025-02-14 14:35:51,950 INFO    MainThread:171066 [wandb_setup.py:_flush():68] Configure stats pid to 171066
+2025-02-14 14:35:51,950 INFO    MainThread:171066 [wandb_setup.py:_flush():68] Loading settings from /home/rogui7909/.config/wandb/settings
+2025-02-14 14:35:51,951 INFO    MainThread:171066 [wandb_setup.py:_flush():68] Loading settings from /shared_netapp3_home/home/rogui7909/code/predict_rain_norway/wandb/settings
+2025-02-14 14:35:51,951 INFO    MainThread:171066 [wandb_setup.py:_flush():68] Loading settings from environment variables
+2025-02-14 14:35:51,951 INFO    MainThread:171066 [wandb_init.py:setup_run_log_directory():637] Logging user logs to ./wandb/run-20250214_143551-m609t09n/logs/debug.log
+2025-02-14 14:35:51,951 INFO    MainThread:171066 [wandb_init.py:setup_run_log_directory():638] Logging internal logs to ./wandb/run-20250214_143551-m609t09n/logs/debug-internal.log
+2025-02-14 14:35:51,951 INFO    MainThread:171066 [wandb_init.py:init():756] calling init triggers
+2025-02-14 14:35:51,951 INFO    MainThread:171066 [wandb_init.py:init():761] wandb.init called with sweep_config: {}
+config: {'hidden_layer_sizes': [32, 64], 'kernel_sizes': [3], 'activation': 'ReLU', 'pool_sizes': [2], 'dropout': 0.5, 'batch_size': 128, 'num_epochs': 5, 'num_classes': 1, 'learning_rate': 0.001, 'input_variable': ['z500'], 'groups': 1, 'region_predicted': 14, 'type_prediction': 'regression', '_wandb': {}}
+2025-02-14 14:35:51,951 INFO    MainThread:171066 [wandb_init.py:init():789] starting backend
+2025-02-14 14:35:52,188 INFO    MainThread:171066 [wandb_init.py:init():793] sending inform_init request
+2025-02-14 14:35:52,203 INFO    MainThread:171066 [backend.py:_multiprocessing_setup():97] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2025-02-14 14:35:52,203 INFO    MainThread:171066 [wandb_init.py:init():808] backend started and connected
+2025-02-14 14:35:52,212 INFO    MainThread:171066 [wandb_init.py:init():901] updated telemetry
+2025-02-14 14:35:52,234 INFO    MainThread:171066 [wandb_init.py:init():936] communicating run to backend with 90.0 second timeout
+2025-02-14 14:35:52,835 INFO    MainThread:171066 [wandb_init.py:init():994] starting run threads in backend
+2025-02-14 14:35:53,730 INFO    MainThread:171066 [wandb_run.py:_console_start():2385] atexit reg
+2025-02-14 14:35:53,730 INFO    MainThread:171066 [wandb_run.py:_redirect():2235] redirect: wrap_raw
+2025-02-14 14:35:53,731 INFO    MainThread:171066 [wandb_run.py:_redirect():2300] Wrapping output streams.
+2025-02-14 14:35:53,731 INFO    MainThread:171066 [wandb_run.py:_redirect():2325] Redirects installed.
+2025-02-14 14:35:53,736 INFO    MainThread:171066 [wandb_init.py:init():1036] run started, returning control to user process
+2025-02-14 14:43:41,743 WARNING MsgRouterThr:171066 [router.py:message_loop():75] message_loop has been closed

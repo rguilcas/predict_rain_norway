@@ -1,0 +1,17 @@
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+
+  | Name    | Type        | Params | Mode
+------------------------------------------------
+0 | model   | Wang2024    | 7.4 M  | train
+1 | loss_fn | DistribLoss | 0      | train
+------------------------------------------------
+7.4 M     Trainable params
+0         Non-trainable params
+7.4 M     Total params
+29.532    Total estimated model params size (MB)
+9         Modules in train mode
+0         Modules in eval mode
+Epoch 17:  61%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████                                                                       | 61/100 [00:08<00:05,  7.16it/s, v_num=38hz]
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+                                                                                                                                                                                                                                                  

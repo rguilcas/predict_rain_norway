@@ -1,0 +1,90 @@
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+
+  | Name    | Type     | Params | Mode
+---------------------------------------------
+0 | model   | Wang2024 | 7.4 M  | train
+1 | loss_fn | MSELoss  | 0      | train
+---------------------------------------------
+7.4 M     Trainable params
+0         Non-trainable params
+7.4 M     Total params
+29.532    Total estimated model params size (MB)
+9         Modules in train mode
+0         Modules in eval mode
+Epoch 0: 100%|█████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:09<00:00, 10.61it/s, v_num=6d2d]
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+Testing DataLoader 0: 100%|██████████████████████████████████████████████████████████████████████████████████████████| 36/36 [00:00<00:00, 39.41it/s]
+`Trainer.fit` stopped: `max_epochs=1` reached.
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'test_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        test/loss            19.78130340576172
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+(23011,)
+
+<torch.utils.data.dataloader.DataLoader at 0x7f6197c6c7a0>
+
+<torch.utils.data.dataset.Subset at 0x7f59c39ad0d0>
+
+<torch.utils.data.dataset.TensorDataset at 0x7f6197c59b20>
+
+
+(4603,)
+
+
+<torch.utils.data.dataloader.DataLoader at 0x7f6197c6c7a0>
+
+<torch.utils.data.dataset.Subset at 0x7f59c39ad0d0>
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[11], line 1[0m
+[0;32m----> 1[0m [43mtest_loader[49m[38;5;241;43m.[39;49m[43mdataset[49m[38;5;241;43m.[39;49m[43mshape[49m
+
+[0;31mAttributeError[0m: 'Subset' object has no attribute 'shape'
+
+<torch.utils.data.dataloader.DataLoader at 0x7f6197c6c7a0>
+
+tensor([[1.7750]])
+
+
+tensor([[ 1.7750],
+        [ 3.1762],
+        [ 1.8375],
+        ...,
+        [ 0.6954],
+        [20.0781],
+        [16.7039]])
+
+torch.Size([23011, 1])
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[16], line 1[0m
+[0;32m----> 1[0m [43mtrain_loader[49m[38;5;241;43m.[39;49m[43mdataset[49m[38;5;241;43m.[39;49m[43mdataset[49m[38;5;241;43m.[39;49m[43mtensors[49m[[38;5;241m1[39m][38;5;241m.[39mshape
+
+[0;31mAttributeError[0m: 'Subset' object has no attribute 'tensors'
+
+torch.Size([23011, 1])
+
+
+torch.Size([23011, 1])
+
+
+4603
+
+<torch.utils.data.dataloader.DataLoader at 0x7f626bdea630>
+
+torch.Size([23011, 1])
+
+<torch.utils.data.dataloader.DataLoader at 0x7f626bdea630>
+
+36
+
+4603
+
+[23;0t

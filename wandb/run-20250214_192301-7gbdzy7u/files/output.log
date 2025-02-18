@@ -1,0 +1,40 @@
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[2], line 3[0m
+[1;32m      1[0m run [38;5;241m=[39m wandb[38;5;241m.[39minit(project[38;5;241m=[39m[38;5;124m"[39m[38;5;124mPredict-rain-WNorway[39m[38;5;124m"[39m, name[38;5;241m=[39m[38;5;124m"[39m[38;5;124mTruth[39m[38;5;124m"[39m)
+[0;32m----> 3[0m truth [38;5;241m=[39m [43mtrain_loader[49m[38;5;241;43m.[39;49m[43mdataset[49m[38;5;241;43m.[39;49m[43mdataset[49m[38;5;241;43m.[39;49m[43mtensors[49m[[38;5;241m1[39m][38;5;241m.[39mcpu()[38;5;241m.[39mnumpy()[38;5;241m.[39msqueeze()
+[1;32m      4[0m pred [38;5;241m=[39m train_loader[38;5;241m.[39mdataset[38;5;241m.[39mdataset[38;5;241m.[39mtensors[[38;5;241m1[39m][38;5;241m.[39mcpu()[38;5;241m.[39mnumpy()[38;5;241m.[39msqueeze()
+[1;32m      5[0m truth[truth[38;5;241m<[39m[38;5;241m0[39m][38;5;241m=[39m[38;5;241m0[39m
+
+[0;31mAttributeError[0m: 'Subset' object has no attribute 'tensors'
+
+<torch.utils.data.dataset.Subset at 0x7fe44bb25850>
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[4], line 1[0m
+[0;32m----> 1[0m [43mtrain_loader[49m[38;5;241;43m.[39;49m[43mdataset[49m[38;5;241;43m.[39;49m[43mdatasets[49m
+
+[0;31mAttributeError[0m: 'Subset' object has no attribute 'datasets'
+
+<torch.utils.data.dataset.Subset at 0x7fe44bb25850>
+
+
+
+array([ 1.7750455 ,  3.176153  ,  1.8375397 , ...,  0.69538116,
+       20.078098  , 16.703903  ], dtype=float32)
+
+23011
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[9], line 1[0m
+[0;32m----> 1[0m truth [38;5;241m=[39m [43mtest_loader[49m[38;5;241;43m.[39;49m[43mdataset[49m[38;5;241;43m.[39;49m[43mdataset[49m[38;5;241;43m.[39;49m[43mdataset[49m[38;5;241m.[39mtensors[[38;5;241m1[39m][38;5;241m.[39mcpu()[38;5;241m.[39mnumpy()[38;5;241m.[39msqueeze()
+[1;32m      2[0m pred [38;5;241m=[39m test_loader[38;5;241m.[39mdataset[38;5;241m.[39mdataset[38;5;241m.[39mdataset[38;5;241m.[39mtensors[[38;5;241m1[39m][38;5;241m.[39mcpu()[38;5;241m.[39mnumpy()[38;5;241m.[39msqueeze()
+[1;32m      3[0m truth[truth[38;5;241m<[39m[38;5;241m0[39m][38;5;241m=[39m[38;5;241m0[39m
+
+[0;31mAttributeError[0m: 'TensorDataset' object has no attribute 'dataset'
+
+
+
+<function wandb.sdk.wandb_run.finish(exit_code: 'int | None' = None, quiet: 'bool | None' = None) -> 'None'>

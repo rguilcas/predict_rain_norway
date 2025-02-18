@@ -1,0 +1,182 @@
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+
+  | Name    | Type     | Params | Mode
+---------------------------------------------
+0 | model   | Wang2024 | 7.4 M  | train
+1 | loss_fn | MSELoss  | 0      | train
+---------------------------------------------
+7.4 M     Trainable params
+0         Non-trainable params
+7.4 M     Total params
+29.532    Total estimated model params size (MB)
+9         Modules in train mode
+0         Modules in eval mode
+Epoch 9: 100%|█████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:11<00:00,  8.89it/s, v_num=lt0c]
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'val_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'train_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+                                                                                                                                                     
+`Trainer.fit` stopped: `max_epochs=10` reached.
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mRuntimeError[0m                              Traceback (most recent call last)
+Cell [0;32mIn[20], line 1[0m
+[0;32m----> 1[0m truth [38;5;241m=[39m [43mtorch[49m[38;5;241;43m.[39;49m[43mstack[49m[43m([49m[43mmodel[49m[38;5;241;43m.[39;49m[43mtest_step_y[49m[43m)[49m[38;5;241m.[39mcpu()[38;5;241m.[39mnumpy()[38;5;241m.[39msqueeze()
+[1;32m      2[0m pred [38;5;241m=[39m torch[38;5;241m.[39mstack(model[38;5;241m.[39mtest_step_y)[38;5;241m.[39mcpu()[38;5;241m.[39mnumpy()[38;5;241m.[39msqueeze()
+[1;32m      3[0m truth[truth[38;5;241m<[39m[38;5;241m0[39m][38;5;241m=[39m[38;5;241m0[39m
+
+[0;31mRuntimeError[0m: stack expects a non-empty TensorList
+
+[]
+LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0,1]
+/felles_gfi/felles_gfi_users/rogui7909/miniforge3/envs/robin/lib/python3.12/site-packages/lightning/pytorch/trainer/connectors/data_connector.py:425: The 'test_dataloader' does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` to `num_workers=71` in the `DataLoader` to improve performance.
+
+Testing DataLoader 0: 100%|██████████████████████████████████████████████████████████████████████████████████████████| 36/36 [00:04<00:00,  8.69it/s]
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       Test metric             DataLoader 0
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        test/loss            10.83520793914795
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+array([ 0.14858757, 11.055744  ,  1.5513448 , ...,  4.7047796 ,
+        0.61712825,  2.6968777 ], dtype=float32)
+
+
+(4603,)
+
+
+(array([3185,  774,  338,  182,   74,   25,   14,    7,    2,    2]),
+ array([ 0.      ,  6.363556, 12.727112, 19.090668, 25.454224, 31.81778 ,
+        38.181335, 44.54489 , 50.908447, 57.272003, 63.63556 ],
+       dtype=float32))
+
+
+(array([2920,  785,  414,  208,  143,   71,   23,   21,    7,    7,    2,
+           0,    2,    0,    0,    0,    0,    0,    0]),
+ array([ 0,  5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80,
+        85, 90, 95]))
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mValueError[0m                                Traceback (most recent call last)
+Cell [0;32mIn[28], line 2[0m
+[1;32m      1[0m x_hist, y_hist [38;5;241m=[39m np[38;5;241m.[39mhistogram(pred, bins[38;5;241m=[39mnp[38;5;241m.[39marange([38;5;241m0[39m,[38;5;241m100[39m,[38;5;241m5[39m))
+[0;32m----> 2[0m table_hist [38;5;241m=[39m wandb[38;5;241m.[39mTable(data[38;5;241m=[39m[43mnp[49m[38;5;241;43m.[39;49m[43marray[49m[43m([49m[43m[[49m[43mx_hist[49m[43m,[49m[43my_hist[49m[43m][49m[43m)[49m[38;5;241m.[39mT, columns [38;5;241m=[39m [[38;5;124m"[39m[38;5;124mBins[39m[38;5;124m"[39m, [38;5;124m"[39m[38;5;124mCount[39m[38;5;124m"[39m])
+[1;32m      3[0m wandb[38;5;241m.[39mlog({[38;5;124m"[39m[38;5;124mHistogram Table[39m[38;5;124m"[39m: table_hist})
+
+[0;31mValueError[0m: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (2,) + inhomogeneous part.
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mValueError[0m                                Traceback (most recent call last)
+Cell [0;32mIn[29], line 1[0m
+[0;32m----> 1[0m [43mnp[49m[38;5;241;43m.[39;49m[43marray[49m[43m([49m[43m[[49m[43mx_hist[49m[43m,[49m[43my_hist[49m[43m][49m[43m)[49m[38;5;241m.[39mT,
+
+[0;31mValueError[0m: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (2,) + inhomogeneous part.
+
+
+array([2920,  785,  414,  208,  143,   71,   23,   21,    7,    7,    2,
+          0,    2,    0,    0,    0,    0,    0,    0])
+
+(19,)
+
+
+array([ 0,  5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80,
+       85, 90, 95])
+
+(20,)
+
+[0;36m  Cell [0;32mIn[34], line 2[0;36m[0m
+[0;31m    y_hist = y_hist[:-1]+2.5[0m
+[0m    ^[0m
+[0;31mIndentationError[0m[0;31m:[0m unexpected indent
+
+
+
+<wandb.sdk.data_types.table.Table at 0x7fae86b2ecf0>
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mNameError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[37], line 1[0m
+[0;32m----> 1[0m [43mY_hist[49m
+
+[0;31mNameError[0m: name 'Y_hist' is not defined
+
+
+array([ 2.5,  7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5,
+       57.5, 62.5, 67.5, 72.5, 77.5, 82.5, 87.5, 92.5])
+
+
+array([2920,  785,  414,  208,  143,   71,   23,   21,    7,    7,    2,
+          0,    2,    0,    0,    0,    0,    0,    0])
+
+[0;36m  Cell [0;32mIn[40], line 2[0;36m[0m
+[0;31m    y_hist = y_hist[:-1]+2.5[0m
+[0m    ^[0m
+[0;31mIndentationError[0m[0;31m:[0m unexpected indent
+
+
+
+
+
+
+array([2.92e+03, 7.85e+02, 4.14e+02, 2.08e+02, 1.43e+02, 7.10e+01,
+       2.30e+01, 2.10e+01, 7.00e+00, 7.00e+00, 2.00e+00, 0.00e+00,
+       2.00e+00, 0.00e+00, 0.00e+00, 0.00e+00, 0.00e+00, 0.00e+00,
+       0.00e+00])
+
+
+array([ 2.5,  7.5, 12.5, 17.5, 22.5, 27.5, 32.5, 37.5, 42.5, 47.5, 52.5,
+       57.5, 62.5, 67.5, 72.5, 77.5, 82.5, 87.5, 92.5])
+
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[47], line 1[0m
+[0;32m----> 1[0m [43mtable_hist[49m[38;5;241;43m.[39;49m[43mcolums[49m
+
+[0;31mAttributeError[0m: 'Table' object has no attribute 'colums'
+
+['Bins', 'Count']
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mTypeError[0m                                 Traceback (most recent call last)
+Cell [0;32mIn[49], line 1[0m
+[0;32m----> 1[0m [43mtable_hist[49m[43m[[49m[38;5;124;43m'[39;49m[38;5;124;43mBins[39;49m[38;5;124;43m'[39;49m[43m][49m
+
+[0;31mTypeError[0m: 'Table' object is not subscriptable
+
+
+[[np.float64(2.5), np.float64(2920.0)],
+ [np.float64(7.5), np.float64(785.0)],
+ [np.float64(12.5), np.float64(414.0)],
+ [np.float64(17.5), np.float64(208.0)],
+ [np.float64(22.5), np.float64(143.0)],
+ [np.float64(27.5), np.float64(71.0)],
+ [np.float64(32.5), np.float64(23.0)],
+ [np.float64(37.5), np.float64(21.0)],
+ [np.float64(42.5), np.float64(7.0)],
+ [np.float64(47.5), np.float64(7.0)],
+ [np.float64(52.5), np.float64(2.0)],
+ [np.float64(57.5), np.float64(0.0)],
+ [np.float64(62.5), np.float64(2.0)],
+ [np.float64(67.5), np.float64(0.0)],
+ [np.float64(72.5), np.float64(0.0)],
+ [np.float64(77.5), np.float64(0.0)],
+ [np.float64(82.5), np.float64(0.0)],
+ [np.float64(87.5), np.float64(0.0)],
+ [np.float64(92.5), np.float64(0.0)]]
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[51], line 1[0m
+[0;32m----> 1[0m [43mwandb[49m[38;5;241;43m.[39;49m[43mclose[49m()
+
+[0;31mAttributeError[0m: module 'wandb' has no attribute 'close'
+
+[0;31m---------------------------------------------------------------------------[0m
+[0;31mAttributeError[0m                            Traceback (most recent call last)
+Cell [0;32mIn[52], line 1[0m
+[0;32m----> 1[0m [43mwandb[49m[38;5;241;43m.[39;49m[43mend[49m()
+
+[0;31mAttributeError[0m: module 'wandb' has no attribute 'end'
+
+[23;0t
