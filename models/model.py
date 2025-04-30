@@ -67,6 +67,181 @@ class CNN_Model(nn.Module):
         # output = torch.sigmoid(output) 
         return output
 
+
+class ChannelAttention(nn.Module):
+    def __init__(self, in_channels, reduction=16):
+        super(ChannelAttention, self).__init__()
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)  # Global context
+        self.fc = nn.Sequential(
+            nn.Linear(in_channels, in_channels // reduction, bias=False),
+            nn.ReLU(inplace=True),
+            nn.Linear(in_channels // reduction, in_channels, bias=False),
+            # nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        b, c, _, _ = x.size()
+        y = self.avg_pool(x).view(b, c)
+        y = self.fc(y).view(b, c, 1, 1)
+        return x * y.expand_as(x)
+
+
+class CNN_Model_ChannelAttention(nn.Module):
+    def __init__(self, 
+                 input_channels, 
+                 image_size, 
+                 num_classes,
+                 number_conv_layers=3,
+                 size_conv_kernel=3,
+                 out_channels_conv1=12, 
+                 out_channel_factor_increase_per_layer = 2,
+                 ):
+        super(CNN_Model_ChannelAttention, self).__init__()
+        
+        # CNN layers to extract spatial features
+        self.num_classes = num_classes
+        self.conv_layer1 = nn.Sequential(
+                                nn.Conv2d(input_channels, 
+                                          out_channels_conv1, 
+                                          kernel_size=size_conv_kernel, 
+                                          stride=1, padding=(size_conv_kernel-1)//2),
+                                nn.ReLU(),
+                                nn.MaxPool2d(kernel_size=2, stride=2))
+        self.conv_layer2 = nn.Sequential(
+                                nn.Conv2d(out_channels_conv1, 
+                                          out_channels_conv1*out_channel_factor_increase_per_layer, 
+                                          kernel_size=size_conv_kernel, 
+                                          stride=1, padding=(size_conv_kernel-1)//2),
+                                nn.ReLU(),
+                                nn.MaxPool2d(kernel_size=2, stride=2))
+        self.conv_layer3 = nn.Sequential(
+                                nn.Conv2d(out_channels_conv1*out_channel_factor_increase_per_layer, 
+                                          out_channels_conv1*out_channel_factor_increase_per_layer**2, 
+                                          kernel_size=size_conv_kernel, stride=1, padding=(size_conv_kernel-1)//2),
+                                nn.ReLU(),
+                                nn.MaxPool2d(kernel_size=2, stride=2))
+        self.conv_layer4 = nn.Sequential(
+                                nn.Conv2d(out_channels_conv1*out_channel_factor_increase_per_layer**2, 
+                                          out_channels_conv1*out_channel_factor_increase_per_layer**3, 
+                                          kernel_size=size_conv_kernel, stride=1, padding=(size_conv_kernel-1)//2),
+                                nn.ReLU(),
+                                nn.MaxPool2d(kernel_size=2, stride=2))
+        
+        if number_conv_layers == 1:
+            self.cnn = nn.Sequential(self.conv_layer1)
+        elif number_conv_layers == 2:
+            self.cnn = nn.Sequential(self.conv_layer1, self.conv_layer2)
+        elif number_conv_layers == 3:
+            self.cnn = nn.Sequential(self.conv_layer1, self.conv_layer2, self.conv_layer3)
+        elif number_conv_layers == 4:
+            self.cnn = nn.Sequential(self.conv_layer1, self.conv_layer2, self.conv_layer3, self.conv_layer4)
+        
+        max_pools = 4**(number_conv_layers)
+        self.output_cnn_channels  = out_channels_conv1*out_channel_factor_increase_per_layer**(number_conv_layers-1)
+        self.attention = ChannelAttention(self.output_cnn_channels)
+
+        self.linear_size = image_size * self.output_cnn_channels // max_pools 
+        self.fc = nn.Linear(self.linear_size, num_classes)
+    
+    def forward(self, x):
+        # x shape: (batch_size, seq_length, channels, height, width)
+        # Apply CNN to extract spatial features
+        batch_size,  channels, height, width = x.size()
+        cnn_out = self.cnn(x)
+        cnn_out = self.attention(cnn_out)
+        cnn_out = cnn_out.view(batch_size, -1)  # Shape: (batch_size, seq_length, features)
+        output = self.fc(cnn_out)  # Shape: (batch_size, output_size)
+        # output = torch.sigmoid(output) 
+        return output
+
+class SpatialAttention(nn.Module):
+    def __init__(self, kernel_size=7):
+        super(SpatialAttention, self).__init__()
+        padding = kernel_size // 2
+        self.conv = nn.Conv2d(2, 1, kernel_size, padding=padding, bias=False)
+        # self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        # x: (B, C, H, W)
+        avg_out = torch.mean(x, dim=1, keepdim=True)  # (B, 1, H, W)
+        max_out, _ = torch.max(x, dim=1, keepdim=True)  # (B, 1, H, W)
+        x_cat = torch.cat([avg_out, max_out], dim=1)  # (B, 2, H, W)
+        attn_map = self.conv(x_cat)  # (B, 1, H, W)
+        return x * attn_map  # Apply attention map
+
+
+
+class CNN_Model_SpatialAttention(nn.Module):
+    def __init__(self, 
+                 input_channels, 
+                 image_size, 
+                 num_classes,
+                 number_conv_layers=3,
+                 size_conv_kernel=3,
+                 out_channels_conv1=12, 
+                 out_channel_factor_increase_per_layer = 2,
+                 ):
+        super(CNN_Model_SpatialAttention, self).__init__()
+        
+        # CNN layers to extract spatial features
+        self.num_classes = num_classes
+        self.conv_layer1 = nn.Sequential(
+                                nn.Conv2d(input_channels, 
+                                          out_channels_conv1, 
+                                          kernel_size=size_conv_kernel, 
+                                          stride=1, padding=(size_conv_kernel-1)//2),
+                                nn.ReLU(),
+                                nn.MaxPool2d(kernel_size=2, stride=2))
+        self.conv_layer2 = nn.Sequential(
+                                nn.Conv2d(out_channels_conv1, 
+                                          out_channels_conv1*out_channel_factor_increase_per_layer, 
+                                          kernel_size=size_conv_kernel, 
+                                          stride=1, padding=(size_conv_kernel-1)//2),
+                                nn.ReLU(),
+                                nn.MaxPool2d(kernel_size=2, stride=2))
+        self.conv_layer3 = nn.Sequential(
+                                nn.Conv2d(out_channels_conv1*out_channel_factor_increase_per_layer, 
+                                          out_channels_conv1*out_channel_factor_increase_per_layer**2, 
+                                          kernel_size=size_conv_kernel, stride=1, padding=(size_conv_kernel-1)//2),
+                                nn.ReLU(),
+                                nn.MaxPool2d(kernel_size=2, stride=2))
+        self.conv_layer4 = nn.Sequential(
+                                nn.Conv2d(out_channels_conv1*out_channel_factor_increase_per_layer**2, 
+                                          out_channels_conv1*out_channel_factor_increase_per_layer**3, 
+                                          kernel_size=size_conv_kernel, stride=1, padding=(size_conv_kernel-1)//2),
+                                nn.ReLU(),
+                                nn.MaxPool2d(kernel_size=2, stride=2))
+        
+        if number_conv_layers == 1:
+            self.cnn = nn.Sequential(self.conv_layer1)
+        elif number_conv_layers == 2:
+            self.cnn = nn.Sequential(self.conv_layer1, self.conv_layer2)
+        elif number_conv_layers == 3:
+            self.cnn = nn.Sequential(self.conv_layer1, self.conv_layer2, self.conv_layer3)
+        elif number_conv_layers == 4:
+            self.cnn = nn.Sequential(self.conv_layer1, self.conv_layer2, self.conv_layer3, self.conv_layer4)
+        
+        max_pools = 4**(number_conv_layers)
+        self.output_cnn_channels  = out_channels_conv1*out_channel_factor_increase_per_layer**(number_conv_layers-1)
+        self.attention = SpatialAttention()
+
+        self.linear_size = image_size * self.output_cnn_channels // max_pools 
+        self.fc = nn.Linear(self.linear_size, num_classes)
+    
+    def forward(self, x):
+        # x shape: (batch_size, seq_length, channels, height, width)
+        # Apply CNN to extract spatial features
+        batch_size,  channels, height, width = x.size()
+        cnn_out = self.cnn(x)
+        cnn_out = self.attention(cnn_out)
+        cnn_out = cnn_out.view(batch_size, -1)  # Shape: (batch_size, seq_length, features)
+        output = self.fc(cnn_out)  # Shape: (batch_size, output_size)
+        # output = torch.sigmoid(output) 
+        return output
+
+
+
+
 class CNN_3dModel(nn.Module):
     def __init__(self, 
                  input_channels, 

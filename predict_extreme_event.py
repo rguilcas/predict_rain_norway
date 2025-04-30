@@ -97,7 +97,7 @@ def main(args=None):
     start_times = events_predicted - pd.to_timedelta(6*steps-1,'h')
 
     wandb.log({'diagnostics/percent_event_full_detected':(events_predicted.size/df_count.size)*100})
-
+    wandb.finish()
 
 if __name__ == "__main__":
     main()
