@@ -241,6 +241,84 @@ class CNN_Model_SpatialAttention(nn.Module):
 
 
 
+class CBAM(nn.Module):
+    def __init__(self, in_planes, reduction=16, kernel_size=7):
+        super(CBAM, self).__init__()
+        self.channel_attention = ChannelAttention(in_planes, reduction)
+        self.spatial_attention = SpatialAttention(kernel_size)
+
+    def forward(self, x):
+        x = self.channel_attention(x)
+        x = self.spatial_attention(x)
+        return x
+    
+class CNN_Model_CBAM(nn.Module):
+    def __init__(self, 
+                 input_channels, 
+                 image_size, 
+                 num_classes,
+                 number_conv_layers=3,
+                 size_conv_kernel=3,
+                 out_channels_conv1=12, 
+                 out_channel_factor_increase_per_layer = 2,
+                 ):
+        super(CNN_Model_CBAM, self).__init__()
+        
+        # CNN layers to extract spatial features
+        self.num_classes = num_classes
+        self.conv_layer1 = nn.Sequential(
+                                nn.Conv2d(input_channels, 
+                                          out_channels_conv1, 
+                                          kernel_size=size_conv_kernel, 
+                                          stride=1, padding=(size_conv_kernel-1)//2),
+                                nn.ReLU(),
+                                nn.MaxPool2d(kernel_size=2, stride=2))
+        self.conv_layer2 = nn.Sequential(
+                                nn.Conv2d(out_channels_conv1, 
+                                          out_channels_conv1*out_channel_factor_increase_per_layer, 
+                                          kernel_size=size_conv_kernel, 
+                                          stride=1, padding=(size_conv_kernel-1)//2),
+                                nn.ReLU(),
+                                nn.MaxPool2d(kernel_size=2, stride=2))
+        self.conv_layer3 = nn.Sequential(
+                                nn.Conv2d(out_channels_conv1*out_channel_factor_increase_per_layer, 
+                                          out_channels_conv1*out_channel_factor_increase_per_layer**2, 
+                                          kernel_size=size_conv_kernel, stride=1, padding=(size_conv_kernel-1)//2),
+                                nn.ReLU(),
+                                nn.MaxPool2d(kernel_size=2, stride=2))
+        self.conv_layer4 = nn.Sequential(
+                                nn.Conv2d(out_channels_conv1*out_channel_factor_increase_per_layer**2, 
+                                          out_channels_conv1*out_channel_factor_increase_per_layer**3, 
+                                          kernel_size=size_conv_kernel, stride=1, padding=(size_conv_kernel-1)//2),
+                                nn.ReLU(),
+                                nn.MaxPool2d(kernel_size=2, stride=2))
+        
+        if number_conv_layers == 1:
+            self.cnn = nn.Sequential(self.conv_layer1)
+        elif number_conv_layers == 2:
+            self.cnn = nn.Sequential(self.conv_layer1, self.conv_layer2)
+        elif number_conv_layers == 3:
+            self.cnn = nn.Sequential(self.conv_layer1, self.conv_layer2, self.conv_layer3)
+        elif number_conv_layers == 4:
+            self.cnn = nn.Sequential(self.conv_layer1, self.conv_layer2, self.conv_layer3, self.conv_layer4)
+        
+        max_pools = 4**(number_conv_layers)
+        self.output_cnn_channels  = out_channels_conv1*out_channel_factor_increase_per_layer**(number_conv_layers-1)
+        self.attention = CBAM(self.output_cnn_channels)
+
+        self.linear_size = image_size * self.output_cnn_channels // max_pools 
+        self.fc = nn.Linear(self.linear_size, num_classes)
+    
+    def forward(self, x):
+        # x shape: (batch_size, seq_length, channels, height, width)
+        # Apply CNN to extract spatial features
+        batch_size,  channels, height, width = x.size()
+        cnn_out = self.cnn(x)
+        cnn_out = self.attention(cnn_out)
+        cnn_out = cnn_out.view(batch_size, -1)  # Shape: (batch_size, seq_length, features)
+        output = self.fc(cnn_out)  # Shape: (batch_size, output_size)
+        # output = torch.sigmoid(output) 
+        return output
 
 class CNN_3dModel(nn.Module):
     def __init__(self, 

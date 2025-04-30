@@ -1,16 +1,16 @@
 ### Basic hyperparameters
 batch_size:
   desc: Size of each mini-batch
-  value: 512
+  value: 256
 learning_rate:
   desc: Learning rate
-  value: 0.0001
+  value: 0.001
 lr_scheduler:
   desc: Scheduler use for learning rate decay
-  value: 'exponential'
+  value: 'step'
 num_epochs: 
   desc: Number of training epochs
-  value: 100
+  value: 50
 
 
 ### In/Out params
@@ -32,47 +32,45 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dl_inputs_6H_32x128.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "u850 v850 w850"
+  value: "u850 v850 w850 tcwv"
   
 
-# loss_fn: 
-#   desc: Type of loss function
-#   value: 'asymetric_mse'
-# lags_between_predictor_and_predictants: 
-#   desc: Days ahead to predict rainfall
-#   value: 0
+### Network params ViT
+patch_size:
+  desc: Size of patches for embeddings
+  value: 16
+embedding_dimension:
+  desc: Size of embeddig vector
+  value: 512
+depth_transformer:
+  desc: Number of transformer blocks
+  value: 6
+attention_heads:
+  desc: Number of attention heads
+  value: 8
+mlp_dim:
+  desc: feedforward layer size
+  value: 512
+dropout:
+  desc: dropout probability
+  value: 0.1
+emb_dropout:
+  desc: embedding dropout probability
+  value: 0.1
 
-### Network params
-num_conv_layer:
-  desc: Number of convolution layers in the CNN
-  value: 2
-size_conv_kernel:
-  desc: Size of the conv layer kernels
-  value: 9
-conv1_kernel_number:
-  desc: Size of the first conv layer kernels
-  value: 24
-factor_increase_kernels_per_conv_layer:
-  desc: How much to multiply the number of kernel in layer N to get layer N+1
-  value: 2
-spatial_attention:
-  desc: adds spatial attention at the end of the cnn
-  value: True
-
-gradient_clip_val:
-  desc: Clip gradients too high
-  value: 0.71158
-  
-# num_days_predictant:
-#   desc: Days of data to include in the features before the prediction
+### Network params CNM
+# num_conv_layer:
+#   desc: Number of convolution layers in the CNN
 #   value: 1
-
-# model_choice:
-#   desc: Neural network chosen
-#   value: 'CNN_LSTM'
-# LSTM_hidden_size:
-#   desc: hidden size of the LSTM part if it exists
-#   value: 512
-# attribute_test:
-#   desc: Attribute test set or not
-#   value: False
+# size_conv_kernel:
+#   desc: Size of the conv layer kernels
+#   value: 15
+# conv1_kernel_number:
+#   desc: Size of the first conv layer kernels
+#   value: 24
+# factor_increase_kernels_per_conv_layer:
+#   desc: How much to multiply the number of kernel in layer N to get layer N+1
+#   value: 2
+# attention:
+#   desc: adds spatial attention at the end of the cnn
+#   value: 'CBAM'

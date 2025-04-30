@@ -8,6 +8,8 @@ import xarray as xr
 
 
 from models.model import CNN_Model, CNN_Model_SpatialAttention, CNN_Model_CBAM, CNN_Model_ChannelAttention
+from vit_pytorch import ViT
+
 import pandas as pd
 from torch import nn
 from lightning.pytorch import loggers, seed_everything
@@ -40,36 +42,30 @@ def main(args=None):
                                     logger=wandb_logger, 
                                     log_every_n_steps=1, default_root_dir="/Data/gfi/users/rogui7909/lightning_checkpoint/",
                                     callbacks=callbacks, deterministic=True,
-                                    accelerator="gpu", devices=1,
-                                    gradient_clip_val=wandb_logger.experiment.config['gradient_clip_val'])
+                                    accelerator="gpu", devices=1,)
 
     wandb_logger.experiment.config['num_classes'] = wandb_logger.experiment.config['num_timesteps_predicted']
     wandb_logger.experiment.config['num_channels'] = len(wandb_logger.experiment.config['input_variables'])
-
-    match wandb_logger.experiment.config['attention']:
-        case 'spatial':
-            model_used = CNN_Model_SpatialAttention
-        case 'channel':
-            model_used = CNN_Model_ChannelAttention
-        case 'CBAM':
-            model_used = CNN_Model_CBAM
-        case _:
-            model_used = CNN_Model
         
         
-    NN = model_used(input_channels = wandb_logger.experiment.config['num_channels'], 
-                image_size=wandb_logger.experiment.config['image_size'], 
-                num_classes=wandb_logger.experiment.config['num_classes'],
-                number_conv_layers=wandb_logger.experiment.config['num_conv_layer'],
-                size_conv_kernel=wandb_logger.experiment.config['size_conv_kernel'],
-                out_channels_conv1=wandb_logger.experiment.config['conv1_kernel_number'], 
-                out_channel_factor_increase_per_layer = wandb_logger.experiment.config['factor_increase_kernels_per_conv_layer'])
-
+    NN = ViT(
+            image_size=wandb_logger.experiment.config['image_size'],            # your input H=W (e.g., 64×64)
+            patch_size=wandb_logger.experiment.config['patch_size'],            # must divide image_size exactly
+            num_classes= wandb_logger.experiment.config['num_classes'],         # binary classification
+            channels=len(wandb_logger.experiment.config['input_variables']),    # number of input channels
+            dim=wandb_logger.experiment.config['embedding_dimension'],          # embedding dimension
+            depth=wandb_logger.experiment.config['depth_transformer'],          # number of transformer blocks
+            heads=wandb_logger.experiment.config['attention_heads'],            # number of attention heads
+            mlp_dim=wandb_logger.experiment.config['mlp_dim'],                  # feedforward layer size
+            dropout=wandb_logger.experiment.config['dropout'],
+            emb_dropout=wandb_logger.experiment.config['emb_dropout']
+        )
+    
     loss = nn.BCEWithLogitsLoss(pos_weight = torch.tensor(10*wandb_logger.experiment.config['quantile_thresh']))
     model = LitCNN_regression(NN, 
-                          learning_rate=wandb_logger.experiment.config['learning_rate'], 
-                          lr_scheduler =wandb_logger.experiment.config['lr_scheduler'],
-                          loss_fn = loss)
+                              learning_rate=wandb_logger.experiment.config['learning_rate'], 
+                              lr_scheduler = wandb_logger.experiment.config['lr_scheduler'],
+                              loss_fn = loss)
     
     trainer.fit(model, train_loader, val_loader)
 
