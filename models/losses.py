@@ -6,6 +6,41 @@ from torch.nn import functional
 https://github.com/Javicadserres/wind-production-forecast/blob/28310d7dab7b47d7db3d690580505c1a456e471b/src/model/losses.py#L5
 """
 
+def get_loss(loss_key):
+    if loss_key == 'distrib':
+        loss = SortedMSELoss()
+    elif loss_key == 'mse':
+        loss = torch.nn.MSELoss()
+    elif loss_key == 'quantiles90':
+        loss = PinballLoss(0.9)
+    elif loss_key == 'quantiles70':
+        loss = PinballLoss(0.7)
+    elif loss_key == 'quantiles80':
+        loss = PinballLoss(0.8)
+    elif loss_key == 'quantiles75':
+        loss = PinballLoss(0.75)
+    elif loss_key == 'composite_quantiles':
+        loss = CompositeQuantileLoss(quantiles = [0.5,0.75,0.9], lambdas = None)
+    elif loss_key == 'hybrid_mse_quantiles':
+        loss = HybridMSEQuantileLoss()
+    elif loss_key == 'weighted_mse':
+        loss = WeightedMSELoss()
+    elif loss_key == 'weighted_sqrt_mse':
+        loss = WeightedSqrtMSELoss()
+    elif loss_key == 'quantile_extr':
+        loss = CompositeQuantileLoss(quantiles=[0.9,0.95,0.99])
+    elif loss_key == 'log_mse':
+        loss = LogMSE()
+    elif loss_key == 'weighted_log_mse':
+        loss = WeightedLogMSELoss()
+    elif loss_key == 'asymetric_mse':
+        loss = AsymmetricMSELoss(alpha=2)
+    elif loss_key == 'asymetric_mse_thresh':
+        loss = AsymmetricMSEabveThreshLoss(alpha=4, thresh=20)
+    elif loss_key == 'f1_mse':
+        loss = F1MSELoss(threshold_mm=20)
+    return loss
+
 class PinballLoss(nn.Module):
     def __init__(self, quantiles):
         super(PinballLoss, self).__init__()
@@ -55,6 +90,7 @@ class PinballLossSquare(nn.Module):
         losses = torch.max(lower, upper)**2
         loss = torch.mean(torch.sum(losses, dim=1))
         return loss
+
 
 class SmoothPinballLoss(nn.Module):
     """
@@ -156,6 +192,26 @@ class SortedMSELoss(nn.Module):
         sorted_pred, _ = torch.sort(pred, dim=0)
         sorted_target, _ = torch.sort(target, dim=0)
         return (self.mse(sorted_pred, sorted_target) + self.mse(pred, target))/2
+
+class F1MSELoss(nn.Module):
+    def __init__(self, threshold_mm=20):
+        super().__init__()
+        self.mse = nn.MSELoss()
+
+    def forward(self, pred, target):
+        TP = ((target>20)&(pred>20)).sum(axis=0)
+        P_pred = ((pred>20)).sum(axis=0)
+        P_target = ((target>20)).sum(axis=0)
+        recall = (TP/P_target)
+        precision = (TP/P_pred)
+        f1 = 1-recall*precision*2/(precision+recall)
+        f1[(P_pred==0)&(P_target>0)] = 1
+        f1[(P_target==0)&(P_pred>0)] = 1
+        f1[(P_pred==0)&(P_target==0)] = 0
+        f1[(precision==0)&(recall==0)] = 1
+        f1 = torch.mean(f1)*100
+
+        return (f1) + self.mse(pred, target)
 
 
 class LogMSE(nn.Module):
