@@ -1,6 +1,5 @@
 import lightning as L
 from models.losses import DistribLoss
-from models.model import Wang2024
 from torch import optim
 import wandb
 from captum.attr import IntegratedGradients, NoiseTunnel

@@ -1,60 +1,76 @@
+### Basic hyperparameters
 batch_size:
   desc: Size of each mini-batch
   value: 512
 learning_rate:
   desc: Learning rate
-  value: 0.0080843
+  value: 0.0001
 lr_scheduler:
   desc: Scheduler use for learning rate decay
-  value: 'exponenential'
+  value: 'exponential'
 num_epochs: 
   desc: Number of training epochs
   value: 100
-input_variable: 
+
+
+### In/Out params
+file_name_data_out:
+  desc: Path to output data (daily rain data)
+  value: '/Data/gfi/users/rogui7909/data/ERA5/era5_pr_6H_WNorway.nc'
+quantile_thresh:
+  desc: Quantile predicted
+  value: .9
+num_timesteps_predicted:
+  desc: Timesteps predicted for future rain
+  value: 12
+season:
+  desc: Season chosen for the prediction. Can be 'all' or 'DJF' 'MAM' 'JJA' or 'SON'
+  value: 'DJF'
+
+file_name_data_in:
+  desc: Path to input data (atmos variables)
+  value: "/Data/gfi/users/rogui7909/data/ERA5/dl_inputs_6H_32x128.zarr"
+inputs: 
   desc: Input variables chosen 
-  value: ["u850","v850","w850","z500"]
-loss_fn: 
-  desc: Type of loss function
-  value: 'asymetric_mse'
-lags_between_predictor_and_predictants: 
-  desc: Days ahead to predict rainfall
-  value: 0
+  value: "u850 v850 w850"
+  
+
+# loss_fn: 
+#   desc: Type of loss function
+#   value: 'asymetric_mse'
+# lags_between_predictor_and_predictants: 
+#   desc: Days ahead to predict rainfall
+#   value: 0
+
+### Network params
 num_conv_layer:
   desc: Number of convolution layers in the CNN
-  value: 1
+  value: 2
 size_conv_kernel:
   desc: Size of the conv layer kernels
-  value: 3
+  value: 9
 conv1_kernel_number:
   desc: Size of the first conv layer kernels
-  value: 12
+  value: 24
 factor_increase_kernels_per_conv_layer:
   desc: How much to multiply the number of kernel in layer N to get layer N+1
   value: 2
+
+
 gradient_clip_val:
   desc: Clip gradients too high
   value: 0.71158
-dropout_proba:
-  desc: Probability of dropout
-  value: 0
-num_days_predictant:
-  desc: Days of data to include in the features before the prediction
-  value: 1
-num_days_predicted:
-  desc: Days of rain prediction in the future
-  value: 5
-file_name_data_in:
-  desc: Path to input data (atmos variables)
-  value: '/Data/gfi/users/rogui7909/data/ERA5/dl_inputs_NH_32x128.nc'
-file_name_data_out:
-  desc: Path to output data (daily rain data)
-  value: '/Data/gfi/users/rogui7909/era5_rain_norge/ERA5land_daily_TP_indices.nc'
-model_choice:
-  desc: Neural network chosen
-  value: 'CNN_LSTM'
-LSTM_hidden_size:
-  desc: hidden size of the LSTM part if it exists
-  value: 512
-attribute_test:
-  desc: Attribute test set or not
-  value: False
+  
+# num_days_predictant:
+#   desc: Days of data to include in the features before the prediction
+#   value: 1
+
+# model_choice:
+#   desc: Neural network chosen
+#   value: 'CNN_LSTM'
+# LSTM_hidden_size:
+#   desc: hidden size of the LSTM part if it exists
+#   value: 512
+# attribute_test:
+#   desc: Attribute test set or not
+#   value: False
