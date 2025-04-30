@@ -7,7 +7,7 @@ import torch # long
 import xarray as xr
 
 
-from models.model import CNN_Model
+from models.model import CNN_Model, CNN_Model_SpatialAttention
 import pandas as pd
 from torch import nn
 from lightning.pytorch import loggers, seed_everything
@@ -26,7 +26,7 @@ def main(args=None):
     seed_everything(42, workers=True)
     torch.set_float32_matmul_precision('medium')
 
-    wandb_logger = loggers.WandbLogger(project="Predict-rain-WNorway_v4", 
+    wandb_logger = loggers.WandbLogger(project="Predict-rain-WNorway_test", 
                                         save_dir="/Data/gfi/users/rogui7909/wanbd_logs/",
                                         dir="/Data/gfi/users/rogui7909/wanbd_logs/wandb", )
 
@@ -46,7 +46,11 @@ def main(args=None):
     wandb_logger.experiment.config['num_classes'] = wandb_logger.experiment.config['num_timesteps_predicted']
     wandb_logger.experiment.config['num_channels'] = len(wandb_logger.experiment.config['input_variables'])
 
-    NN = CNN_Model(input_channels = wandb_logger.experiment.config['num_channels'], 
+    if wandb_logger.experiment.config['spatial_attention'] is True:
+        model_used = CNN_Model_SpatialAttention
+    else:
+        model_used = CNN_Model
+    NN = model_used(input_channels = wandb_logger.experiment.config['num_channels'], 
                 image_size=wandb_logger.experiment.config['image_size'], 
                 num_classes=wandb_logger.experiment.config['num_classes'],
                 number_conv_layers=wandb_logger.experiment.config['num_conv_layer'],
@@ -67,36 +71,43 @@ def main(args=None):
         trainer.test(model, dataloaders=test_loader)
 
     # Diag
-    targets = xr.DataArray(torch.stack(model.test_true_values).cpu().numpy(), dims=['time','timestep'], coords = ds_test.targets.coords)
-    predictions = xr.DataArray(torch.sigmoid(torch.stack(model.test_pred)).cpu().numpy(), dims=['time','timestep'], coords = ds_test.targets.coords)
-    pred = xr.ones_like(predictions).where(predictions>.7,0)
+    # targets = xr.DataArray(torch.stack(model.test_true_values).cpu().numpy(), dims=['time','timestep'], coords = ds_test.targets.coords)
+    # predictions = xr.DataArray(torch.sigmoid(torch.stack(model.test_pred)).cpu().numpy(), dims=['time','timestep'], coords = ds_test.targets.coords)
+    # pred = xr.ones_like(predictions).where(predictions>.7,0)
 
-    TP = ((pred == targets) & (pred==1)).sum(['time','timestep'])
-    prec = TP/(pred == 1).sum(['time','timestep'])
-    recall = TP/(targets == 1).sum(['time','timestep'])
-    F1 =2*(recall*prec)/(recall+prec)
-    wandb.log({'diagnostics/F1_all':F1.values})
+    y_test = torch.cat(model.test_true_values)#.cpu().numpy()
+    y_scores = torch.sigmoid(torch.cat(model.test_pred))#.cpu().numpy()
+    from torcheval.metrics.functional import binary_auprc
+    wandb.log({"diagnostics/auc_pr": float(binary_auprc(y_scores, y_test).cpu())})
 
-    TP = ((pred == targets) & (pred==1)).sum(['time'])
-    prec = TP/(pred == 1).sum(['time'])
-    recall = TP/(targets == 1).sum(['time'])
-    F1 =2*(recall*prec)/(recall+prec)
-    F1
-    for timestep in F1.timestep.values:
-        wandb.log({f'testF1/F1_+{timestep*6}H':F1.isel(timestep=timestep).values})
 
-    ds_ = xr.Dataset(dict(pred=pred, targets=targets))
-    df_ = ds_.to_dataframe().reset_index()
-    df_ = df_.query("pred==targets & targets==1").reset_index()
-    df_['rain_time'] = df_.time + pd.Series([pd.Timedelta(f'{k*6}h') for k in df_.timestep])
-    df_out = xr.open_dataset(wandb_logger.experiment.config['file_name_data_out']).tp.to_series()
-    steps = wandb_logger.experiment.config['num_timesteps_predicted']
 
-    df_count = df_.groupby(df_.rain_time).time.count()
-    events_predicted = df_count.loc[df_count==steps].index
-    start_times = events_predicted - pd.to_timedelta(6*steps-1,'h')
+    # TP = ((pred == targets) & (pred==1)).sum(['time','timestep'])
+    # prec = TP/(pred == 1).sum(['time','timestep'])
+    # recall = TP/(targets == 1).sum(['time','timestep'])
+    # F1 =2*(recall*prec)/(recall+prec)
+    # wandb.log({'diagnostics/F1_all':F1.values})
 
-    wandb.log({'diagnostics/percent_event_full_detected':(events_predicted.size/df_count.size)*100})
+    # TP = ((pred == targets) & (pred==1)).sum(['time'])
+    # prec = TP/(pred == 1).sum(['time'])
+    # recall = TP/(targets == 1).sum(['time'])
+    # F1 =2*(recall*prec)/(recall+prec)
+    # F1
+    # for timestep in F1.timestep.values:
+    #     wandb.log({f'testF1/F1_+{timestep*6}H':F1.isel(timestep=timestep).values})
+
+    # ds_ = xr.Dataset(dict(pred=pred, targets=targets))
+    # df_ = ds_.to_dataframe().reset_index()
+    # df_ = df_.query("pred==targets & targets==1").reset_index()
+    # df_['rain_time'] = df_.time + pd.Series([pd.Timedelta(f'{k*6}h') for k in df_.timestep])
+    # df_out = xr.open_dataset(wandb_logger.experiment.config['file_name_data_out']).tp.to_series()
+    # steps = wandb_logger.experiment.config['num_timesteps_predicted']
+
+    # df_count = df_.groupby(df_.rain_time).time.count()
+    # events_predicted = df_count.loc[df_count==steps].index
+    # start_times = events_predicted - pd.to_timedelta(6*steps-1,'h')
+
+    # wandb.log({'diagnostics/percent_event_full_detected':(events_predicted.size/df_count.size)*100})
     wandb.finish()
 
 if __name__ == "__main__":

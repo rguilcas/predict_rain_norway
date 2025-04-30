@@ -55,7 +55,9 @@ conv1_kernel_number:
 factor_increase_kernels_per_conv_layer:
   desc: How much to multiply the number of kernel in layer N to get layer N+1
   value: 2
-
+spatial_attention:
+  desc: adds spatial attention at the end of the cnn
+  value: True
 
 gradient_clip_val:
   desc: Clip gradients too high
