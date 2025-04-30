@@ -1,2 +1,4 @@
 wandb/
 *.nc
+old_versions
+.vscode
