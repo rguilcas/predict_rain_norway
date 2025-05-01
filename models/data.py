@@ -18,7 +18,10 @@ def get_input_data_from_wandb_logger(wandb_logger,load=True):
     season = config['season']
 
     ds_out = xr.open_dataset(output_path).tp
-    ds_out = ds_out.rolling(time=num_timesteps_predicted).construct('timestep').shift(time=-num_timesteps_predicted+1)[:-num_timesteps_predicted+1]
+    if num_timesteps_predicted>1:
+        ds_out = ds_out.rolling(time=num_timesteps_predicted).construct('timestep').shift(time=-num_timesteps_predicted+1)[:-num_timesteps_predicted+1]
+    else:
+        ds_out = ds_out.expand_dims('timestep').assign_coords(timestep=[0])
     ds_out = xr.ones_like(ds_out).where(ds_out>ds_out.quantile(quantile_thresh),0).drop_vars(['longitude','latitude'])
     if season =='all':
         pass

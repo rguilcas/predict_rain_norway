@@ -1,7 +1,7 @@
 ### Basic hyperparameters
 batch_size:
   desc: Size of each mini-batch
-  value: 128
+  value: 512
 learning_rate:
   desc: Learning rate
   value: 0.0001
@@ -58,19 +58,19 @@ emb_dropout:
   desc: embedding dropout probability
   value: 0.1
 
-### Network params CNM
-# num_conv_layer:
-#   desc: Number of convolution layers in the CNN
-#   value: 1
-# size_conv_kernel:
-#   desc: Size of the conv layer kernels
-#   value: 15
-# conv1_kernel_number:
-#   desc: Size of the first conv layer kernels
-#   value: 24
-# factor_increase_kernels_per_conv_layer:
-#   desc: How much to multiply the number of kernel in layer N to get layer N+1
-#   value: 2
-# attention:
-#   desc: adds spatial attention at the end of the cnn
-#   value: 'CBAM'
+## Network params CNM
+num_conv_layer:
+  desc: Number of convolution layers in the CNN
+  value: 1
+size_conv_kernel:
+  desc: Size of the conv layer kernels
+  value: 15
+conv1_kernel_number:
+  desc: Size of the first conv layer kernels
+  value: 24
+factor_increase_kernels_per_conv_layer:
+  desc: How much to multiply the number of kernel in layer N to get layer N+1
+  value: 2
+attention:
+  desc: adds spatial attention at the end of the cnn
+  value: 'CBAM'

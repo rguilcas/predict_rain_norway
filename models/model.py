@@ -68,6 +68,82 @@ class CNN_Model(nn.Module):
         return output
 
 
+
+class MultiHeadAttentionViT(nn.Module):
+    def __init__(
+        self,
+        image_size,
+        patch_size,
+        num_classes,
+        channels=3,
+        dim=256,
+        depth=6,
+        heads=8,
+        mlp_dim=1024,
+        dropout=0.1,
+        emb_dropout=0.1, # number of future timesteps
+    ):
+        super().__init__()
+        assert image_size % patch_size == 0, "Image dimensions must be divisible by patch size."
+        num_patches = (image_size // patch_size) ** 2
+        patch_dim = channels * patch_size ** 2
+
+        self.patch_dim = patch_dim
+        self.patch_size = patch_size
+        self.dim = dim
+        self.num_patches = num_patches
+
+        # Patch embedding
+        self.patch_to_embedding = nn.Linear(self.patch_dim, self.dim)
+        self.cls_token = nn.Parameter(torch.randn(1, 1, dim))
+        self.pos_embedding = nn.Parameter(torch.randn(1, num_patches + 1, dim))
+        self.emb_dropout = nn.Dropout(emb_dropout)
+
+        # Each timestep has its own transformer stack and head
+        self.transformer_blocks = nn.ModuleList([
+            nn.TransformerEncoder(
+                nn.TransformerEncoderLayer(d_model=dim, nhead=heads, dim_feedforward=mlp_dim, dropout=dropout, batch_first=True),
+                num_layers=depth
+            )
+            for _ in range(num_classes)
+        ])
+
+        self.heads = nn.ModuleList([
+            nn.Sequential(
+                nn.LayerNorm(dim),
+                nn.Linear(dim, 1)
+            )
+            for _ in range(num_classes)
+        ])
+
+    def forward(self, x):
+        # x: (B, C, H, W)
+        B, C, H, W = x.shape
+        patch_h, patch_w = self.patch_size, self.patch_size
+        num_patches = (H // patch_h) * (W // patch_w)
+
+        # Patch embedding
+        x = x.unfold(2, patch_h, patch_h).unfold(3, patch_w, patch_w)
+        x = x.contiguous().view(B, C, -1, patch_h, patch_w)
+        x = x.permute(0, 2, 1, 3, 4).contiguous().view(B, num_patches, -1)
+        x = self.patch_to_embedding(x)
+        cls_token = self.cls_token.expand(B, -1, -1)
+
+        x = torch.cat((cls_token, x), dim=1)  # (B, num_patches+1, dim)
+        x = x + self.pos_embedding[:, :x.size(1)]
+        x = self.emb_dropout(x)
+        # Each transformer processes the same input independently
+        outputs = []
+        for i in range(self.num_timesteps):
+            xi = self.transformer_blocks[i](x)
+            cls_output = xi[:, 0]
+            outputs.append(self.heads[i](cls_output))
+        outputs = torch.stack(outputs, dim=1) 
+        
+        return outputs.view(B, -1)#torch.stack(outputs, dim=1)  # (B, T, num_classes)
+
+
+
 class ChannelAttention(nn.Module):
     def __init__(self, in_channels, reduction=16):
         super(ChannelAttention, self).__init__()
