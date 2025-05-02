@@ -11,10 +11,14 @@ class CNN_Model(nn.Module):
                  size_conv_kernel=3,
                  out_channels_conv1=12, 
                  out_channel_factor_increase_per_layer = 2,
+                 sigmoid=False,
+                 softmax=False,
                  ):
         super(CNN_Model, self).__init__()
         
         # CNN layers to extract spatial features
+        self.sigmoid = sigmoid
+        self.softmax = softmax
         self.num_classes = num_classes
         self.conv_layer1 = nn.Sequential(
                                 nn.Conv2d(input_channels, 
@@ -64,7 +68,10 @@ class CNN_Model(nn.Module):
         cnn_out = self.cnn(x)
         cnn_out = cnn_out.view(batch_size, -1)  # Shape: (batch_size, seq_length, features)
         output = self.fc(cnn_out)  # Shape: (batch_size, output_size)
-        # output = torch.sigmoid(output) 
+        if self.sigmoid:
+            output = torch.sigmoid(output) 
+        if self.softmax:
+            output = torch.softmax(output, dim=1)
         return output
 
 

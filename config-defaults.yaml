@@ -22,7 +22,7 @@ quantile_thresh:
   value: .9
 num_timesteps_predicted:
   desc: Timesteps predicted for future rain
-  value: 12
+  value: 1
 season:
   desc: Season chosen for the prediction. Can be 'all' or 'DJF' 'MAM' 'JJA' or 'SON'
   value: 'DJF'
@@ -32,31 +32,31 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dl_inputs_6H_32x128.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "u850 v850"
+  value: "u850 v850 w850"
   
 
-### Network params ViT
-patch_size:
-  desc: Size of patches for embeddings
-  value: 8
-embedding_dimension:
-  desc: Size of embeddig vector
-  value: 512
-depth_transformer:
-  desc: Number of transformer blocks
-  value: 6
-attention_heads:
-  desc: Number of attention heads
-  value: 8
-mlp_dim:
-  desc: feedforward layer size
-  value: 512
-dropout:
-  desc: dropout probability
-  value: 0.1
-emb_dropout:
-  desc: embedding dropout probability
-  value: 0.1
+# ### Network params ViT
+# patch_size:
+#   desc: Size of patches for embeddings
+#   value: 8
+# embedding_dimension:
+#   desc: Size of embeddig vector
+#   value: 512
+# depth_transformer:
+#   desc: Number of transformer blocks
+#   value: 6
+# attention_heads:
+#   desc: Number of attention heads
+#   value: 8
+# mlp_dim:
+#   desc: feedforward layer size
+#   value: 512
+# dropout:
+#   desc: dropout probability
+#   value: 0.1
+# emb_dropout:
+#   desc: embedding dropout probability
+#   value: 0.1
 
 ## Network params CNM
 num_conv_layer:
@@ -73,4 +73,4 @@ factor_increase_kernels_per_conv_layer:
   value: 2
 attention:
   desc: adds spatial attention at the end of the cnn
-  value: 'CBAM'
+  value: 'none'
