@@ -11,16 +11,17 @@ def main():
         "method": "bayes",
         "metric": {"goal": "maximize", "name": "diagnostics/f1_90th"},
         "parameters": {
-            "learning_rate": {"max": 1e-2,'min':1e-5, 'distribution':'log_uniform_values'},
+            "learning_rate": {"max": 1e-2,'min':1e-4, 'distribution':'log_uniform_values'},
             "inputs" :{"values":['u850 v850',
                                  'u850 v850 z500',
                                  'u850 v850 w850',
                                  'u850 v850 w850 tcwv',
                                 #  'v850 z500 w850',
                                 ]},
-            "conv1_kernel_number":{"values":[12,24]},
+            # "conv1_kernel_number":{"values":[24]},
             "num_conv_layer":{"values":[2,3,4]},
-            "size_conv_kernel":{"values":[3,5,7,9]},
+            "size_conv_kernel":{"values":[3,5,7,9,13,15]},
+            "lr_scheduler":{"values":['step','exponential']}
         },
     }
 
