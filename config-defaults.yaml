@@ -22,7 +22,7 @@ quantile_thresh:
   value: .9
 num_timesteps_predicted:
   desc: Timesteps predicted for future rain
-  value: 8
+  value: 4
 season:
   desc: Season chosen for the prediction. Can be 'all' or 'DJF' 'MAM' 'JJA' or 'SON'
   value: 'all'
@@ -32,7 +32,7 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dl_inputs_day_32x128.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "u850 v850 w850 tcwv"
+  value: "u850 v850 z500"
   
 
 # ### Network params ViT
