@@ -4,7 +4,7 @@ batch_size:
   value: 512
 learning_rate:
   desc: Learning rate
-  value: 0.0005
+  value: 0.0001
 lr_scheduler:
   desc: Scheduler use for learning rate decay
   value: 'step'
@@ -32,7 +32,7 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dl_inputs_day_32x128.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "u850 v850 w850"
+  value: "u850 v850 z500"
   
 
 # ### Network params ViT
