@@ -5,7 +5,9 @@ import xbatcher as xb
 import xbatcher.loaders.torch
 
 
-def get_input_data_from_wandb_logger(wandb_logger,load=True):
+
+  
+def get_input_data_from_wandb_logger(wandb_logger,load=True, lon_lim = (None,None)):
     config = wandb_logger.experiment.config
     batch_size = config['batch_size']
     num_timesteps_predicted = config['num_timesteps_predicted']
@@ -33,6 +35,8 @@ def get_input_data_from_wandb_logger(wandb_logger,load=True):
     ds_in = xr.open_zarr(input_path).sel(time=ds_out.time).data_normed.sel(var_name = input_variables).sel(time=ds_out.time)
     if load:
         ds_in=ds_in.load()
+    lon_min, lon_max = lon_lim
+    ds_in = ds_in.sel(longitude=slice(lon_min, lon_max))
     X_bgen = xb.BatchGenerator(
         ds_in,
         input_dims={'time': batch_size, 'var_name': len(input_variables), 'latitude': ds_in.latitude.size, 'longitude': ds_in.longitude.size},
@@ -284,8 +288,8 @@ def get_input_data_from_wandb_logger_quantiles(wandb_logger,quantiles = [0,.5,.7
     val_indices = list(range(train_size*batch_size, (train_size + val_size)*batch_size))
     test_indices = list(range((train_size + val_size)*batch_size, total_size*batch_size))
     ds_val = xr.Dataset(dict(inputs=ds_in.isel(time=val_indices), 
-                              targets = ds_out.isel(time=val_indices), 
-                              rain = ds_rain.isel(time=val_indices)))
+                             targets = ds_out.isel(time=val_indices), 
+                             rain = ds_rain.isel(time=val_indices)))
 
     wandb_logger.experiment.config['image_size'] = ds_val.longitude.size * ds_val.latitude.size
 
@@ -300,7 +304,7 @@ def get_input_data_from_wandb_logger_quantiles(wandb_logger,quantiles = [0,.5,.7
     return train_loader, val_loader, test_loader, ds_val
 
 
-def get_input_data_from_wandb_logger_three_types(wandb_logger,quantile = .9,load=True, lon_lim = (None,None)):
+def get_input_data_from_wandb_logger_three_types(wandb_logger, quantile = .9,load=True, lon_lim = (None,None)):
     config = wandb_logger.experiment.config
     batch_size = config['batch_size']
     num_timesteps_predicted = config['num_timesteps_predicted']
