@@ -61,7 +61,7 @@ inputs:
 ## Network params CNM
 num_conv_layer:
   desc: Number of convolution layers in the CNN
-  value: 2
+  value: 3
 size_conv_kernel:
   desc: Size of the conv layer kernels
   value: 3

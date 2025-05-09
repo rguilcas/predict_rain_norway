@@ -35,7 +35,7 @@ def get_input_data_from_wandb_logger(wandb_logger,load=True):
         ds_in=ds_in.load()
     X_bgen = xb.BatchGenerator(
         ds_in,
-        input_dims={'time': batch_size, 'var_name': len(input_variables), 'latitude': 32, 'longitude': 128},
+        input_dims={'time': batch_size, 'var_name': len(input_variables), 'latitude': ds_in.latitude.size, 'longitude': ds_in.longitude.size},
         preload_batch=True,
     )
     y_bgen = xb.BatchGenerator(
@@ -83,21 +83,22 @@ def get_input_data_from_wandb_logger(wandb_logger,load=True):
     )
 
     test_indices = list(range((train_size + val_size)*batch_size, total_size*batch_size))
-    ds_test = xr.Dataset(dict(inputs=ds_in.isel(time=test_indices), 
-                              targets = ds_out.isel(time=test_indices), 
-                              rain = ds_rain.isel(time=test_indices)))
+    val_indices = list(range(train_size*batch_size, (train_size + val_size)*batch_size))
+    ds_val = xr.Dataset(dict(inputs=ds_in.isel(time=val_indices), 
+                              targets = ds_out.isel(time=val_indices), 
+                              rain = ds_rain.isel(time=val_indices)))
 
-    wandb_logger.experiment.config['image_size'] = ds_test.longitude.size * ds_test.latitude.size
+    wandb_logger.experiment.config['image_size'] = ds_val.longitude.size * ds_val.latitude.size
 
     print(f'Data ready:')
-    print(f"    Image size: {wandb_logger.experiment.config['image_size']} ({ds_test.longitude.size}x{ds_test.latitude.size})")
+    print(f"    Image size: {wandb_logger.experiment.config['image_size']} ({ds_val.longitude.size}x{ds_val.latitude.size})")
     print(f"    Input data: " + ', '.join(wandb_logger.experiment.config['input_variables']))
     print(f"    {wandb_logger.experiment.config['num_timesteps_predicted']} Predicted timesteps for future rainfall")
     print(f"    {wandb_logger.experiment.config['quantile_thresh']*100:.0f}th percentile predicted")
     
 
 
-    return train_loader, val_loader, test_loader, ds_test
+    return train_loader, val_loader, test_loader, ds_val
 
 
 
@@ -133,7 +134,7 @@ def get_input_data_from_wandb_logger_deciles(wandb_logger,load=True):
         ds_in=ds_in.load()
     X_bgen = xb.BatchGenerator(
         ds_in,
-        input_dims={'time': batch_size, 'var_name': len(input_variables), 'latitude': 32, 'longitude': 128},
+        input_dims={'time': batch_size, 'var_name': len(input_variables), 'latitude': ds_in.latitude.size, 'longitude': ds_in.longitude.size},
         preload_batch=True,
     )
     y_bgen = xb.BatchGenerator(
@@ -181,21 +182,22 @@ def get_input_data_from_wandb_logger_deciles(wandb_logger,load=True):
     )
 
     test_indices = list(range((train_size + val_size)*batch_size, total_size*batch_size))
-    ds_test = xr.Dataset(dict(inputs=ds_in.isel(time=test_indices), 
-                              targets = ds_out.isel(time=test_indices), 
-                              rain = ds_rain.isel(time=test_indices)))
+    val_indices = list(range(train_size*batch_size, (train_size + val_size)*batch_size))
+    ds_val = xr.Dataset(dict(inputs=ds_in.isel(time=val_indices), 
+                              targets = ds_out.isel(time=val_indices), 
+                              rain = ds_rain.isel(time=val_indices)))
 
-    wandb_logger.experiment.config['image_size'] = ds_test.longitude.size * ds_test.latitude.size
+    wandb_logger.experiment.config['image_size'] = ds_val.longitude.size * ds_val.latitude.size
 
     print(f'Data ready:')
-    print(f"    Image size: {wandb_logger.experiment.config['image_size']} ({ds_test.longitude.size}x{ds_test.latitude.size})")
+    print(f"    Image size: {wandb_logger.experiment.config['image_size']} ({ds_val.longitude.size}x{ds_val.latitude.size})")
     print(f"    Input data: " + ', '.join(wandb_logger.experiment.config['input_variables']))
     print(f"    {wandb_logger.experiment.config['num_timesteps_predicted']} Predicted timesteps for future rainfall")
     print(f"    {wandb_logger.experiment.config['quantile_thresh']*100:.0f}th percentile predicted")
     
 
 
-    return train_loader, val_loader, test_loader, ds_test
+    return train_loader, val_loader, test_loader, ds_val
 
 
 
@@ -233,7 +235,7 @@ def get_input_data_from_wandb_logger_quantiles(wandb_logger,quantiles = [0,.5,.7
         ds_in=ds_in.load()
     X_bgen = xb.BatchGenerator(
         ds_in,
-        input_dims={'time': batch_size, 'var_name': len(input_variables), 'latitude': 32, 'longitude': 128},
+        input_dims={'time': batch_size, 'var_name': len(input_variables), 'latitude': ds_in.longitude.size, 'longitude': ds_in.longitude.size},
         preload_batch=True,
     )
     y_bgen = xb.BatchGenerator(
@@ -279,26 +281,26 @@ def get_input_data_from_wandb_logger_quantiles(wandb_logger,quantiles = [0,.5,.7
         persistent_workers=True,  # Keep workers alive between epochs for faster subsequent epochs
         multiprocessing_context='forkserver',  # Use "forkserver" to spawn subprocesses, ensuring stability in multiprocessing
     )
-
+    val_indices = list(range(train_size*batch_size, (train_size + val_size)*batch_size))
     test_indices = list(range((train_size + val_size)*batch_size, total_size*batch_size))
-    ds_test = xr.Dataset(dict(inputs=ds_in.isel(time=test_indices), 
-                              targets = ds_out.isel(time=test_indices), 
-                              rain = ds_rain.isel(time=test_indices)))
+    ds_val = xr.Dataset(dict(inputs=ds_in.isel(time=val_indices), 
+                              targets = ds_out.isel(time=val_indices), 
+                              rain = ds_rain.isel(time=val_indices)))
 
-    wandb_logger.experiment.config['image_size'] = ds_test.longitude.size * ds_test.latitude.size
+    wandb_logger.experiment.config['image_size'] = ds_val.longitude.size * ds_val.latitude.size
 
     print(f'Data ready:')
-    print(f"    Image size: {wandb_logger.experiment.config['image_size']} ({ds_test.longitude.size}x{ds_test.latitude.size})")
+    print(f"    Image size: {wandb_logger.experiment.config['image_size']} ({ds_val.longitude.size}x{ds_val.latitude.size})")
     print(f"    Input data: " + ', '.join(wandb_logger.experiment.config['input_variables']))
     print(f"    {wandb_logger.experiment.config['num_timesteps_predicted']} Predicted timesteps for future rainfall")
     print(f"    {wandb_logger.experiment.config['quantile_thresh']*100:.0f}th percentile predicted")
     
 
 
-    return train_loader, val_loader, test_loader, ds_test
+    return train_loader, val_loader, test_loader, ds_val
 
 
-def get_input_data_from_wandb_logger_three_types(wandb_logger,quantile = .9,load=True):
+def get_input_data_from_wandb_logger_three_types(wandb_logger,quantile = .9,load=True, lon_lim = (None,None)):
     config = wandb_logger.experiment.config
     batch_size = config['batch_size']
     num_timesteps_predicted = config['num_timesteps_predicted']
@@ -330,9 +332,11 @@ def get_input_data_from_wandb_logger_three_types(wandb_logger,quantile = .9,load
     ds_in = xr.open_zarr(input_path).sel(time=ds_out.time).data_normed.sel(var_name = input_variables).sel(time=ds_out.time)
     if load:
         ds_in=ds_in.load()
+    lon_min, lon_max = lon_lim
+    ds_in = ds_in.sel(longitude=slice(lon_min, lon_max))
     X_bgen = xb.BatchGenerator(
         ds_in,
-        input_dims={'time': batch_size, 'var_name': len(input_variables), 'latitude': 32, 'longitude': 128},
+        input_dims={'time': batch_size, 'var_name': len(input_variables), 'latitude': ds_in.latitude.size, 'longitude': ds_in.longitude.size},
         preload_batch=True,
     )
     y_bgen = xb.BatchGenerator(
@@ -344,8 +348,8 @@ def get_input_data_from_wandb_logger_three_types(wandb_logger,quantile = .9,load
     dataset = xbatcher.loaders.torch.MapDataset(X_bgen, y_bgen)
 
     total_size = len(dataset)
-    train_size = int(0.7 * total_size)
-    val_size = int(0.1 * total_size)
+    train_size = int(0.6 * total_size)
+    val_size = int(0.2 * total_size)
     test_size = total_size - train_size - val_size 
 
     train_set = Subset(dataset, list(range(0, train_size)))
@@ -378,20 +382,20 @@ def get_input_data_from_wandb_logger_three_types(wandb_logger,quantile = .9,load
         persistent_workers=True,  # Keep workers alive between epochs for faster subsequent epochs
         multiprocessing_context='forkserver',  # Use "forkserver" to spawn subprocesses, ensuring stability in multiprocessing
     )
-
+    val_indices = list(range(train_size*batch_size, (train_size + val_size)*batch_size))
     test_indices = list(range((train_size + val_size)*batch_size, total_size*batch_size))
-    ds_test = xr.Dataset(dict(inputs=ds_in.isel(time=test_indices), 
-                              targets = ds_out.isel(time=test_indices), 
-                              rain = ds_rain.isel(time=test_indices)))
+    ds_val = xr.Dataset(dict(inputs=ds_in.isel(time=val_indices), 
+                              targets = ds_out.isel(time=val_indices), 
+                              rain = ds_rain.isel(time=val_indices)))
 
-    wandb_logger.experiment.config['image_size'] = ds_test.longitude.size * ds_test.latitude.size
+    wandb_logger.experiment.config['image_size'] = ds_val.longitude.size * ds_val.latitude.size
 
     print(f'Data ready:')
-    print(f"    Image size: {wandb_logger.experiment.config['image_size']} ({ds_test.longitude.size}x{ds_test.latitude.size})")
+    print(f"    Image size: {wandb_logger.experiment.config['image_size']} ({ds_val.longitude.size}x{ds_val.latitude.size})")
     print(f"    Input data: " + ', '.join(wandb_logger.experiment.config['input_variables']))
     print(f"    {wandb_logger.experiment.config['num_timesteps_predicted']} Predicted timesteps for future rainfall")
     print(f"    {wandb_logger.experiment.config['quantile_thresh']*100:.0f}th percentile predicted")
     
 
 
-    return train_loader, val_loader, test_loader, ds_test
+    return train_loader, val_loader, test_loader, ds_val
