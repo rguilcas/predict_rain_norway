@@ -4,7 +4,7 @@ batch_size:
   value: 512
 learning_rate:
   desc: Learning rate
-  value: 0.0001
+  value: 0.00001
 lr_scheduler:
   desc: Scheduler use for learning rate decay
   value: 'step'
