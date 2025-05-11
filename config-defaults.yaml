@@ -4,13 +4,13 @@ batch_size:
   value: 512
 learning_rate:
   desc: Learning rate
-  value: 0.00001
+  value: 0.0002
 lr_scheduler:
   desc: Scheduler use for learning rate decay
   value: 'step'
 num_epochs: 
   desc: Number of training epochs
-  value: 50
+  value: 100
 
 
 ### In/Out params
@@ -61,7 +61,7 @@ inputs:
 ## Network params CNM
 num_conv_layer:
   desc: Number of convolution layers in the CNN
-  value: 3
+  value: 2
 size_conv_kernel:
   desc: Size of the conv layer kernels
   value: 3
