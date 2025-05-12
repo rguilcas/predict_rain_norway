@@ -28,7 +28,7 @@ class LitCNN_regression(L.LightningModule):
         if lr_scheduler=='exponential':
             lr_scheduler = optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=0.9)
         elif lr_scheduler=='step':
-            lr_scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=30, gamma=0.1)
+            lr_scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=50, gamma=0.1)
         else:
             lr_scheduler = None
         self.scheduler = lr_scheduler

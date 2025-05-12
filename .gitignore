@@ -2,3 +2,4 @@ wandb/
 *.nc
 old_versions
 .vscode
+out_data/
