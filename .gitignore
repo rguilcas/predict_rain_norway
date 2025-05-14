@@ -3,3 +3,4 @@ wandb/
 old_versions
 .vscode
 out_data/
+plots/

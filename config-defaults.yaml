@@ -32,7 +32,7 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dl_inputs_day_32x128.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "u850 v850"
+  value: "u850"
   
 
 # ### Network params ViT
@@ -61,7 +61,7 @@ inputs:
 ## Network params CNM
 num_conv_layer:
   desc: Number of convolution layers in the CNN
-  value: 0
+  value: 3
 size_conv_kernel:
   desc: Size of the conv layer kernels
   value: 3
