@@ -67,7 +67,7 @@ size_conv_kernel:
   value: 3
 conv1_kernel_number:
   desc: Size of the first conv layer kernels
-  value: 4
+  value: 16
 factor_increase_kernels_per_conv_layer:
   desc: How much to multiply the number of kernel in layer N to get layer N+1
   value: 2
