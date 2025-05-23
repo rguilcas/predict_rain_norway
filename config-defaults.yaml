@@ -1,7 +1,7 @@
 ### Basic hyperparameters
 batch_size:
   desc: Size of each mini-batch
-  value: 512
+  value: 256
 learning_rate:
   desc: Learning rate
   value: 0.0001
