@@ -129,8 +129,8 @@ def get_train_val_test_split(ds_rain, ratio=[.6,.2], shuffle=True):
     indices_test = all_indices[int(total_size*(ratio[0]+ratio[1])):] 
     if shuffle:
         np.random.shuffle(indices_train)
-        np.random.shuffle(indices_val)
-        np.random.shuffle(indices_test)
+        # np.random.shuffle(indices_val)
+        # np.random.shuffle(indices_test)
     return indices_train, indices_val, indices_test
 
 def print_info(wandb_logger, ds):
