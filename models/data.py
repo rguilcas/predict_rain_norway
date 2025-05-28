@@ -8,7 +8,7 @@ import numpy as np
 
 
 
-def get_input_data_from_wandb_logger_three_types(wandb_logger, quantile = .9,load=True, lon_lim = (None,None),
+def get_input_data_from_wandb_logger_three_types(wandb_logger, quantile = .9,load=True, lon_lim = (None,None),lat_lim=(90,0),
                                                  add_noise = False, noisy_samples = 10,noise_scale=1,train_val_test_ratio=[.6,.2],
                                                  shuffle_before_xbatcher = True):
     config = wandb_logger.experiment.config
@@ -29,8 +29,18 @@ def get_input_data_from_wandb_logger_three_types(wandb_logger, quantile = .9,loa
     ds_out.attrs['quantile'] = quantile
 
     # ds_out = xr.ones_like(ds_rain).where(ds_rain>ds_rain.quantile(quantile_thresh),0).drop_vars(['longitude','latitude'])
-    lon_min, lon_max = lon_lim
-    ds_in = xr.open_zarr(input_path).sel(time=ds_out.time).data_normed.sel(var_name = input_variables).sel(time=ds_out.time).sel(longitude=slice(lon_min, lon_max))
+    lon_min, lon_max = lon_lim    
+    lat_min, lat_max = lat_lim
+
+    ds_in = xr.open_zarr(input_path).data_normed.sel(var_name = input_variables).sel(longitude=slice(lon_min, lon_max), latitude=slice(lat_min, lat_max)).astype('float32')
+    
+    common_time = [time for time in ds_in.time.values if time in ds_out.time.values]
+    if len(common_time) == 0:
+        raise ValueError('MNo common time between inputs and outputs')
+    ds_in = ds_in.sel(time=common_time)
+    ds_out = ds_out.sel(time=common_time)
+    ds_rain = ds_out.sel(time=common_time)
+    
     if load:
         ds_in=ds_in.load()
 
