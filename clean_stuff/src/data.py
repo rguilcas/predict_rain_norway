@@ -170,7 +170,7 @@ class MyDataLoader:
         print(f"    {self.ds_test.time.size} samples in test")
         print(f"    {self.config['num_timesteps_predicted']} Predicted timesteps for future rainfall")
         print(f"    Prediction type: {self.config['type_prediction']}")
-        print(f"    What quantile is considered extreme: {self.config['quantile_extreme']*100:.0f}th of{'all' if not self.config['quantile_extreme_based_on_rainy_days']  else 'rany'} days")
+        print(f"    What quantile is considered extreme: {self.config['quantile_extreme']*100:.0f}th of {'all' if not self.config['quantile_extreme_based_on_rainy_days']  else 'rainy'} days")
 
 def get_input_data_from_wandb_logger_three_types(wandb_logger, quantile = .9,load=True, lon_lim = (None,None),lat_lim=(90,0),
                                                  add_noise = False, noisy_samples = 10,noise_scale=1,train_val_test_ratio=[.6,.2],
