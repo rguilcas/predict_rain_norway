@@ -160,6 +160,17 @@ class MyDataLoader:
         self.val_loader = get_loader_from_ds(self.ds_val, batch_size=self.config['batch_size'])
         self.test_loader = get_loader_from_ds(self.ds_test, batch_size=self.config['batch_size'])
     
+    
+    def print_infos(self):
+        print(f'Data ready:')
+        print(f"    Image size: {self.feature_image_size} ({self.feature_width}x{self.feature_height})")
+        print(f"    Input variables: " + ', '.join(self.config['input_variables']))
+        print(f"    {self.ds_train.time.size} samples in train")
+        print(f"    {self.ds_val.time.size} samples in validation")
+        print(f"    {self.ds_test.time.size} samples in test")
+        print(f"    {self.config['num_timesteps_predicted']} Predicted timesteps for future rainfall")
+        print(f"    Prediction type: {self.config['type_prediction']}")
+        print(f"    What quantile is considered extreme: {self.config['quantile_extreme']*100:.0f}th of{'all' if not self.config['quantile_extreme_based_on_rainy_days']  else 'rany'} days")
 
 def get_input_data_from_wandb_logger_three_types(wandb_logger, quantile = .9,load=True, lon_lim = (None,None),lat_lim=(90,0),
                                                  add_noise = False, noisy_samples = 10,noise_scale=1,train_val_test_ratio=[.6,.2],
@@ -273,15 +284,6 @@ def get_train_val_test_split(ds_rain, ratio=[.6,.2], shuffle=True):
         # np.random.shuffle(indices_val)
         # np.random.shuffle(indices_test)
     return indices_train, indices_val, indices_test
-
-def print_info(wandb_logger, ds):
-    print(f'Data ready:')
-    print(f"    Image size: {wandb_logger.experiment.config['image_size']} ({ds.longitude.size}x{ds.latitude.size})")
-    print(f"    Input data: " + ', '.join(wandb_logger.experiment.config['input_variables']))
-    print(f"    {wandb_logger.experiment.config['num_timesteps_predicted']} Predicted timesteps for future rainfall")
-    print(f"    {wandb_logger.experiment.config['quantile_thresh']*100:.0f}th percentile predicted")
-
-
 
 
 
