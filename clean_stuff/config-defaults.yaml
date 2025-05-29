@@ -17,9 +17,15 @@ num_epochs:
 file_name_data_out:
   desc: Path to output data (daily rain data)
   value: '/Data/gfi/users/rogui7909/data/ERA5/era5_pr_day_WNorway.nc'
-quantile_thresh:
-  desc: Quantile predicted
+type_prediction:
+  desc: Type of prediction done. Either 'regression', 'quantiles', 'three_classes', 'boolean'
+  value: 'three_classes'
+quantile_extreme:
+  desc: What is defined as extreme in terms of quantiles.
   value: .9
+quantile_extreme_based_on_rainy_days:
+  desc: If the quantile is computed based on rainy days only or on all days.
+  value: True
 num_timesteps_predicted:
   desc: Timesteps predicted for future rain
   value: 4

@@ -6,7 +6,62 @@ import xbatcher.loaders.torch
 import dask
 import numpy as np
 
+def add_timesteps(ds_rain, num_timesteps_predicted):
+    if num_timesteps_predicted>1:
+        ds_rain = ds_rain.rolling(time=num_timesteps_predicted).construct('timestep')
+        ds_rain = ds_rain.shift(time=-num_timesteps_predicted+1)[:-num_timesteps_predicted+1]
+    else:
+        ds_rain = ds_rain.expand_dims('timestep').assign_coords(timestep=[0]).transpose('time','timestep')
+    return ds_rain 
 
+def filter_by_season(ds, season):
+    if season in ['DJF','MAM', 'JJA', 'SON']:
+        ds = ds.where(ds.time.dt.season==season, drop=True)
+        return ds
+    elif season == 'all':
+        return ds
+    else:
+        raise ValueError("Season should be 'all', 'DJF','MAM', 'JJA' or 'SON'.")
+
+def preprocess_rain(ds_rain, type_predictions, quantile_extreme, quantile_extreme_based_on_rainy_days):
+    match type_predictions:
+        case 'regression':
+            return ds_rain
+        case 'quantiles':
+            return (ds_rain.rank('time', pct=True)//.1).astype(int)
+        case 'boolean':
+            if quantile_extreme_based_on_rainy_days:
+                quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time')
+            else:
+                quantile_extreme_rain =  ds_rain.quantile(quantile_extreme, 'time')
+            return ((ds_rain > quantile_extreme_rain)*1).astype(int)
+        case 'three_classes':
+            if quantile_extreme_based_on_rainy_days:
+                quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time')
+            else:
+                quantile_extreme_rain =  ds_rain.quantile(quantile_extreme, 'time')
+            no_rain = xr.ones_like(ds_rain).where(ds_rain>1,0)
+            return no_rain.where(ds_rain<quantile_extreme_rain,2).astype(int)
+        case _:
+            raise ValueError("type_predictions must be 'boolean', 'three_classes', 'quantiles' or 'regression'")
+
+class MyDataLoader:
+    def __init__(self,wandb_logger):
+        self.config = wandb_logger.experiment.config
+        input_variables = self.config['inputs'].split(' ')
+        self.config['input_variables'] = input_variables 
+        self.load_rain_data()
+
+    def load_rain_data(self):
+        ds_rain = xr.open_dataset(self.config['file_name_data_out']).tp
+        ds_rain = add_timesteps(ds_rain, num_timesteps_predicted=self.config['num_timesteps_predicted'])
+        ds_rain = filter_by_season(ds_rain,season=self.config['season'])
+        self.rain = ds_rain
+        self.targets = preprocess_rain(ds_rain, 
+                                  type_predictions=self.config['type_prediction'], 
+                                  quantile_extreme=self.config['quantile_extreme'],
+                                  quantile_extreme_based_on_rainy_days=self.config['quantile_extreme_based_on_rainy_days'])
+        
 
 def get_input_data_from_wandb_logger_three_types(wandb_logger, quantile = .9,load=True, lon_lim = (None,None),lat_lim=(90,0),
                                                  add_noise = False, noisy_samples = 10,noise_scale=1,train_val_test_ratio=[.6,.2],
