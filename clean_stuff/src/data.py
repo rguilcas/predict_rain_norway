@@ -5,6 +5,7 @@ import xbatcher as xb
 import xbatcher.loaders.torch
 import dask
 import numpy as np
+import dask
 
 def add_timesteps(ds_rain, num_timesteps_predicted):
     if num_timesteps_predicted>1:
@@ -45,12 +46,52 @@ def preprocess_rain(ds_rain, type_predictions, quantile_extreme, quantile_extrem
         case _:
             raise ValueError("type_predictions must be 'boolean', 'three_classes', 'quantiles' or 'regression'")
 
+def get_loader_from_ds(ds, batch_size):
+    X_bgen = xb.BatchGenerator(
+        ds.features,
+        input_dims={'time': batch_size, 'var_name': ds.var_name.size, 'latitude': ds.features.latitude.size, 'longitude': ds.features.longitude.size},
+        preload_batch=True,
+    )
+    y_bgen = xb.BatchGenerator(
+        ds.targets,
+        input_dims={'time': batch_size},
+        preload_batch=True,
+    ) 
+    
+    dataset = xbatcher.loaders.torch.MapDataset(X_bgen, y_bgen)
+    
+    return torch.utils.data.DataLoader(
+            dataset,
+            batch_size=None,  # Using batches defined by the dataset itself (via xbatcher)
+            prefetch_factor=3,  # Prefetch up to 3 batches in advance to reduce data loading latency
+            num_workers=1,  # Use 4 parallel worker processes to load data concurrently
+            persistent_workers=True,  # Keep workers alive between epochs for faster subsequent epochs
+            multiprocessing_context='forkserver',  # Use "forkserver" to spawn subprocesses, ensuring stability in multiprocessing
+            )
+
+def get_expanded_ds(ds, noisy_samples=10, noise_scale=.3, shuffle_after_noise=True):
+    ds_noisy = ds.expand_dims(noisy_samples=noisy_samples).rename(time='true_time')
+    ds_noisy = ds_noisy.stack(time=['true_time','noisy_samples'])
+    time = ds_noisy['time'].indexes['true_time'].get_level_values(0).values
+    ds_noisy = ds_noisy.drop_vars(['time', 'true_time', 'noisy_samples']).assign_coords(time = time)
+    noise = xr.DataArray(dask.array.random.normal(size=ds_noisy.features.shape, loc=0, scale=noise_scale), coords=ds_noisy.features.coords, dims=ds_noisy.features.dims)
+    ds_noisy['features'] += noise
+    ds_out = xr.concat([ds,ds_noisy], dim='time')
+    if shuffle_after_noise:
+        shuffled_time = np.arange(ds_out.time.size)
+        np.random.shuffle(shuffled_time)
+        ds_out = ds_out.isel(time=shuffled_time)
+    return ds_out
+
 class MyDataLoader:
     def __init__(self,wandb_logger):
         self.config = wandb_logger.experiment.config
         self.load_rain_data()
         self.load_atmospheric_features()
         self.harmonize_time()
+        self.make_train_val_test_split_datasets()
+        self.make_data_loaders()
+
 
     def load_rain_data(self):
         ds_rain = xr.open_dataset(self.config['file_name_data_out']).tp
@@ -74,7 +115,7 @@ class MyDataLoader:
         self.features = ds_atm.astype('float32')
         self.feature_height = self.features.latitude.size
         self.feature_width = self.features.longitude.size
-        self.feature_image_size = self.height*self.width
+        self.feature_image_size = self.feature_height*self.feature_width
 
     def harmonize_time(self):
         common_time = [time for time in self.features.time.values if time in self.rain.time.values]
@@ -84,6 +125,41 @@ class MyDataLoader:
         self.rain = self.rain.sel(time=common_time)
         self.targets = self.targets.sel(time=common_time)
         self.n_samples = self.targets.time.size
+
+    def make_train_val_test_split_datasets(self, ratio=[.6,.2], shuffle_train=True):
+        all_indices = np.arange(self.rain.time.size)
+        total_size = all_indices.size
+        indices_train = all_indices[:int(total_size*ratio[0])]
+        indices_val = all_indices[int(total_size*ratio[0]):int(total_size*(ratio[0]+ratio[1]))]
+        indices_test = all_indices[int(total_size*(ratio[0]+ratio[1])):] 
+        if shuffle_train:
+            np.random.shuffle(indices_train)
+        self.indices_train = indices_train 
+        self.indices_val = indices_val
+        self.indices_test = indices_test
+        self.ds_train = xr.Dataset(dict(features=self.features.isel(time=self.indices_train),
+                               targets=self.targets.isel(time=self.indices_train),
+                               rain=self.rain.isel(time=self.indices_train),
+                               ))
+        if self.config['augment_training_with_noise']:
+            self.ds_train = get_expanded_ds(self.ds_train, 
+                                            noisy_samples=self.config['num_noisy_samples'], 
+                                            noise_scale=self.config['augment_noise_amplitude'], 
+                                            shuffle_after_noise=shuffle_train)
+        self.ds_val = xr.Dataset(dict(features=self.features.isel(time=self.indices_val),
+                               targets=self.targets.isel(time=self.indices_val),
+                               rain=self.rain.isel(time=self.indices_val),
+                               ))
+        self.ds_test = xr.Dataset(dict(features=self.features.isel(time=self.indices_test),
+                               targets=self.targets.isel(time=self.indices_test),
+                               rain=self.rain.isel(time=self.indices_test),
+                               ))
+            
+    def make_data_loaders(self):
+        self.train_loader = get_loader_from_ds(self.ds_train, batch_size=self.config['batch_size'])
+        self.val_loader = get_loader_from_ds(self.ds_val, batch_size=self.config['batch_size'])
+        self.test_loader = get_loader_from_ds(self.ds_test, batch_size=self.config['batch_size'])
+    
 
 def get_input_data_from_wandb_logger_three_types(wandb_logger, quantile = .9,load=True, lon_lim = (None,None),lat_lim=(90,0),
                                                  add_noise = False, noisy_samples = 10,noise_scale=1,train_val_test_ratio=[.6,.2],
@@ -185,28 +261,6 @@ def add_noise_ds(ds, noisy_samples=10, noise_scale=.3, shuffle_after_noise=True)
         ds = ds.isel(time=indices)
     return ds
 
-def get_loader_from_ds(ds, batch_size):
-    X_bgen = xb.BatchGenerator(
-        ds.inputs,
-        input_dims={'time': batch_size, 'var_name': ds.var_name.size, 'latitude': ds.inputs.latitude.size, 'longitude': ds.inputs.longitude.size},
-        preload_batch=True,
-    )
-    y_bgen = xb.BatchGenerator(
-        ds.targets,
-        input_dims={'time': batch_size},
-        preload_batch=True,
-    ) 
-    
-    dataset = xbatcher.loaders.torch.MapDataset(X_bgen, y_bgen)
-    
-    return torch.utils.data.DataLoader(
-            dataset,
-            batch_size=None,  # Using batches defined by the dataset itself (via xbatcher)
-            prefetch_factor=3,  # Prefetch up to 3 batches in advance to reduce data loading latency
-            num_workers=1,  # Use 4 parallel worker processes to load data concurrently
-            persistent_workers=True,  # Keep workers alive between epochs for faster subsequent epochs
-            multiprocessing_context='forkserver',  # Use "forkserver" to spawn subprocesses, ensuring stability in multiprocessing
-            )
 
 def get_train_val_test_split(ds_rain, ratio=[.6,.2], shuffle=True):
     all_indices = np.arange(ds_rain.time.size)

@@ -32,10 +32,21 @@ num_timesteps_predicted:
 season:
   desc: Season chosen for the prediction. Can be 'all' or 'DJF' 'MAM' 'JJA' or 'SON'
   value: 'all'
+augment_training_with_noise:
+  desc: Whether to augment training set with noise in feautures
+  value: True
+num_noisy_samples:
+  desc: How many copies of the training set to add with noise
+  value: 3
+augment_noise_amplitude:
+  desc: Amplitude of the noise added to the features. The targets are not changed.
+  value: .5
+  
+
 
 file_name_data_in:
   desc: Path to input data (atmos variables)
-  value: "/Data/gfi/users/rogui7909/data/ERA5/dl_inputs_day_361x720.zarr"
+  value: "/Data/gfi/users/rogui7909/data/ERA5/dl_inputs_day_32x128.zarr"
 inputs: 
   desc: Input variables chosen 
   value: "u850 v850"
