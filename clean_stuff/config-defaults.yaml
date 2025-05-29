@@ -39,6 +39,9 @@ file_name_data_in:
 inputs: 
   desc: Input variables chosen 
   value: "u850 v850"
+spatial_extent:
+  desc: List of lon_min, lon_max, lat_min, lat_max
+  value: [-128, 53, 0, 90]
   
 
 # ### Network params ViT

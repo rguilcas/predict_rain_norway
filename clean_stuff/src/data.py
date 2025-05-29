@@ -48,9 +48,9 @@ def preprocess_rain(ds_rain, type_predictions, quantile_extreme, quantile_extrem
 class MyDataLoader:
     def __init__(self,wandb_logger):
         self.config = wandb_logger.experiment.config
-        input_variables = self.config['inputs'].split(' ')
-        self.config['input_variables'] = input_variables 
         self.load_rain_data()
+        self.load_atmospheric_features()
+        self.harmonize_time()
 
     def load_rain_data(self):
         ds_rain = xr.open_dataset(self.config['file_name_data_out']).tp
@@ -61,7 +61,29 @@ class MyDataLoader:
                                   type_predictions=self.config['type_prediction'], 
                                   quantile_extreme=self.config['quantile_extreme'],
                                   quantile_extreme_based_on_rainy_days=self.config['quantile_extreme_based_on_rainy_days'])
-        
+    
+    def load_atmospheric_features(self):
+        input_variables = self.config['inputs'].split(' ')
+        self.config['input_variables'] = input_variables 
+        ds_atm = xr.open_zarr(self.config['file_name_data_in']).data_normed
+        ds_atm = ds_atm.sel(var_name = input_variables)
+        lon_min, lon_max, lat_min, lat_max = self.config['spatial_extent']
+        if ds_atm.latitude.diff('latitude')[0]<0:
+            lat_min, lat_max = lat_max, lat_min
+        ds_atm.sel(longitude=slice(lon_min, lon_max), latitude=slice(lat_min, lat_max))
+        self.features = ds_atm.astype('float32')
+        self.feature_height = self.features.latitude.size
+        self.feature_width = self.features.longitude.size
+        self.feature_image_size = self.height*self.width
+
+    def harmonize_time(self):
+        common_time = [time for time in self.features.time.values if time in self.rain.time.values]
+        if len(common_time) == 0:
+            raise ValueError('No common time between inputs and outputs')
+        self.features = self.features.sel(time=common_time)
+        self.rain = self.rain.sel(time=common_time)
+        self.targets = self.targets.sel(time=common_time)
+        self.n_samples = self.targets.time.size
 
 def get_input_data_from_wandb_logger_three_types(wandb_logger, quantile = .9,load=True, lon_lim = (None,None),lat_lim=(90,0),
                                                  add_noise = False, noisy_samples = 10,noise_scale=1,train_val_test_ratio=[.6,.2],
