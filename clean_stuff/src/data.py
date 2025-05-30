@@ -102,7 +102,19 @@ class MyDataLoader:
                                   type_predictions=self.config['type_prediction'], 
                                   quantile_extreme=self.config['quantile_extreme'],
                                   quantile_extreme_based_on_rainy_days=self.config['quantile_extreme_based_on_rainy_days'])
-    
+        match self.config['type_prediction']:
+            case 'boolean':
+                self.config['prediction_per_timestep'] = 1
+            case 'three_classes':
+                self.config['prediction_per_timestep'] = 3
+            case 'regression':
+                self.config['prediction_per_timestep'] = 1
+            case 'quantiles':
+                self.config['prediction_per_timestep'] = 10
+            case _:
+                raise ValueError("type_predictions must be 'boolean', 'three_classes', 'quantiles' or 'regression'")
+        self.config['num_classes'] = self.config['prediction_per_timestep']*self.config['num_timesteps_predicted']
+
     def load_atmospheric_features(self):
         input_variables = self.config['inputs'].split(' ')
         self.config['input_variables'] = input_variables 
@@ -116,6 +128,7 @@ class MyDataLoader:
         self.feature_height = self.features.latitude.size
         self.feature_width = self.features.longitude.size
         self.feature_image_size = self.feature_height*self.feature_width
+        self.config['num_channels'] = len(self.config['input_variables'])
 
     def harmonize_time(self):
         common_time = [time for time in self.features.time.values if time in self.rain.time.values]

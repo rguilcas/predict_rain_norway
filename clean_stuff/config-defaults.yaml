@@ -34,7 +34,7 @@ season:
   value: 'all'
 augment_training_with_noise:
   desc: Whether to augment training set with noise in feautures
-  value: True
+  value: False
 num_noisy_samples:
   desc: How many copies of the training set to add with noise
   value: 3
