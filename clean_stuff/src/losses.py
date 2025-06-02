@@ -41,6 +41,26 @@ def get_loss(loss_key):
         loss = F1MSELoss(threshold_mm=20)
     return loss
 
+class MultiCrossEntropyLoss(nn.Module):
+    def __init__(self, timesteps):
+        super(MultiCrossEntropyLoss, self).__init__()
+        self.nll = torch.nn.NLLLoss(weight = torch.Tensor([1,1,9]))
+        self.timesteps = timesteps
+        
+    def forward(self, pred, target):
+        """
+        Computes the loss for the given prediction.
+        """
+        loss = []
+        pred = pred.view(-1, self.timesteps, 3)
+        proba = torch.softmax(pred, dim=2)
+        for k,timestep in enumerate(range(self.timesteps)):
+            res = self.nll(torch.log(proba[:,timestep]), target[:,timestep])
+            loss.append(res)#*(k+1)/10)
+        loss = torch.mean(torch.stack(loss))
+        return loss
+    
+
 class PinballLoss(nn.Module):
     def __init__(self, quantiles):
         super(PinballLoss, self).__init__()

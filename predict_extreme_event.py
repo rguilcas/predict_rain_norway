@@ -16,7 +16,6 @@ from models.lightning import LitCNN_regression, AttributableTrainer
 from models.data import get_input_data_from_wandb_logger
 # from models.model import get_model
 
-from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 
 
 

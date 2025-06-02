@@ -4,13 +4,13 @@ batch_size:
   value: 256
 learning_rate:
   desc: Learning rate
-  value: 0.0001
+  value: 0.00001
 lr_scheduler:
   desc: Scheduler use for learning rate decay
   value: 'step'
 num_epochs: 
   desc: Number of training epochs
-  value: 100
+  value: 1
 
 
 ### In/Out params
@@ -37,7 +37,7 @@ augment_training_with_noise:
   value: False
 num_noisy_samples:
   desc: How many copies of the training set to add with noise
-  value: 3
+  value: 0
 augment_noise_amplitude:
   desc: Amplitude of the noise added to the features. The targets are not changed.
   value: .5

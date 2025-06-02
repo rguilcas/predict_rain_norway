@@ -20,10 +20,12 @@ class ExtremeRainPredictor(L.LightningModule):
                  lr_scheduler = 'exponential'):
         super().__init__()
         self.model = model
-        self.test_pred = []
-        self.test_true_values = []
         self.learning_rate = learning_rate
         self.loss_fn = loss_fn
+        self.predictions_validation = []
+        self.targets_validation = []
+        self.predictions_test = []
+        self.targets_test = []
         self.optimizer = optim.Adam(self.parameters(), lr=self.learning_rate, weight_decay=1e-4)
         if lr_scheduler=='exponential':
             lr_scheduler = optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=0.9)
@@ -52,15 +54,22 @@ class ExtremeRainPredictor(L.LightningModule):
         return loss
 
     def test_step(self, batch, batch_idx):
+        loss, predictions = self._shared_forward_step( batch, batch_idx)
         features, true_values = batch
         loss, predictions = self._shared_forward_step( batch, batch_idx)
-        self.test_true_values += true_values
-        self.test_pred += predictions
+        self.targets_test += true_values
+        self.predictions_test += predictions
         self.log("test/loss", loss)
         return loss
-        
+    def on_validation_start(self):
+        self.predictions_validation = []
+        self.targets_validation = []
+
     def validation_step(self, batch, batch_idx):
-        loss, *_ = self._shared_forward_step( batch, batch_idx)
+        features, true_values = batch
+        loss, predictions = self._shared_forward_step( batch, batch_idx)
+        self.targets_validation += true_values
+        self.predictions_validation += predictions
         self.log("val/loss", loss)
     
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
@@ -78,9 +87,13 @@ class ExtremeRainPredictor(L.LightningModule):
         attribution = attribution_method.attribute(features, target=target, baselines=baselines)
         return attribution.detach()
     
-    def on_test_end(self):
-        self.test_true_values = torch.stack(self.test_true_values).cpu().numpy()
-        self.test_pred = torch.stack(self.test_pred).cpu().numpy()
+    def on_test_start(self):
+        self.predictions_test = []
+        self.targets_test = []
+        # self.test_true_values = torch.stack(self.test_true_values).cpu().numpy()
+        # self.test_pred = torch.stack(self.test_pred).cpu().numpy()
+    
+
 
     
 

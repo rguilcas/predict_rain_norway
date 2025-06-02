@@ -1,0 +1,58 @@
+print('Running imports...')
+import os
+import os
+os.environ["MKL_THREADING_LAYER"] = "GNU"
+
+import wandb
+import numpy as np
+import torch # long
+from lightning.pytorch import loggers, seed_everything
+import xarray as xr
+from lightning.pytorch.callbacks.early_stopping import EarlyStopping
+from src.neuralnetworks import ConvLayerStride1_ConvLayerStride2, ConvLayerStride1MaxPool
+from src.data import MyDataLoader
+from src.lightning import ExtremeRainPredictor, AttributableTrainer
+from src.neuralnetworks import CNN_MLP
+from src.losses import MultiCrossEntropyLoss
+from src.callbacks import LogF1Validation
+
+def main(args=None):
+    torch.set_float32_matmul_precision('medium')
+    seed_everything(42, workers=True)
+    wandb_logger = loggers.WandbLogger(project="Predict-rain-WNorway_v5", 
+                                    save_dir="/Data/gfi/users/rogui7909/wanbd_logs/",
+                                    dir="/Data/gfi/users/rogui7909/wanbd_logs/wandb", )
+
+    wandb_logger.experiment # Initialize wandb
+    loader = MyDataLoader(wandb_logger)
+
+    callbacks=[EarlyStopping(monitor="val/loss", mode="min"), LogF1Validation()]
+    trainer = AttributableTrainer(limit_train_batches=100, 
+                                max_epochs=wandb_logger.experiment.config['num_epochs'], 
+                                logger=wandb_logger, 
+                                log_every_n_steps=1, default_root_dir="/Data/gfi/users/rogui7909/lightning_checkpoint/",
+                                callbacks=callbacks, deterministic=True,
+                                accelerator="gpu", devices=1,)
+
+    NN = CNN_MLP(feature_height=loader.feature_height, 
+                feature_width=loader.feature_width,
+                input_channels=loader.config['num_channels'],
+                output_neurons=loader.config['num_classes'],
+                CNN_number_of_layers=loader.config['num_conv_layer'],
+                CNN_base_module = ConvLayerStride1_ConvLayerStride2,
+                )
+    wandb.experiment.config['CNN_layer_modeul'] = 'ConvLayerStride1_ConvLayerStride2'
+    loss = MultiCrossEntropyLoss(timesteps = wandb_logger.experiment.config['num_timesteps_predicted'])
+    model = ExtremeRainPredictor(NN, 
+                            learning_rate=wandb_logger.experiment.config['learning_rate'], 
+                            lr_scheduler =wandb_logger.experiment.config['lr_scheduler'],
+                            loss_fn = loss)
+    trainer.fit(model, loader.train_loader, loader.val_loader)
+    model.eval()
+    with torch.no_grad():
+        trainer.test(model, dataloaders=loader.val_loader)
+    wandb.finish()
+
+
+if __name__ == "__main__":
+    main()
