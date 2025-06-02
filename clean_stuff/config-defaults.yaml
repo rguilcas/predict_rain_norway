@@ -1,16 +1,16 @@
 ### Basic hyperparameters
 batch_size:
   desc: Size of each mini-batch
-  value: 256
+  value: 512
 learning_rate:
   desc: Learning rate
-  value: 0.00001
+  value: 0.0001
 lr_scheduler:
   desc: Scheduler use for learning rate decay
   value: 'step'
 num_epochs: 
   desc: Number of training epochs
-  value: 1
+  value: 100
 
 
 ### In/Out params
@@ -79,6 +79,12 @@ spatial_extent:
 #   value: 0.1
 
 ## Network params CNM
+MLP_hidden_layers_neuron_number:
+  desc: Layers of the MLP after the CNN 
+  value: [512,512,512,512]
+CNN_layer_module:
+  desc: what is the convolutionnal layer used. Can either be 'ConvLayerStride1_ConvLayerStride2', 'ConvLayerStride1MaxPool' or 'ConvLayerStride2NoMaxPool'
+  value: 'ConvLayerStride2NoMaxPool'
 num_conv_layer:
   desc: Number of convolution layers in the CNN
   value: 4

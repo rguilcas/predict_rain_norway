@@ -9,7 +9,7 @@ import torch # long
 from lightning.pytorch import loggers, seed_everything
 import xarray as xr
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
-from src.neuralnetworks import ConvLayerStride1_ConvLayerStride2, ConvLayerStride1MaxPool
+from src.neuralnetworks import ConvLayerStride1_ConvLayerStride2, ConvLayerStride1MaxPool, ConvLayerStride2NoMaxPool
 from src.data import MyDataLoader
 from src.lightning import ExtremeRainPredictor, AttributableTrainer
 from src.neuralnetworks import CNN_MLP
@@ -33,15 +33,22 @@ def main(args=None):
                                 log_every_n_steps=1, default_root_dir="/Data/gfi/users/rogui7909/lightning_checkpoint/",
                                 callbacks=callbacks, deterministic=True,
                                 accelerator="gpu", devices=1,)
-
+    match wandb_logger.experiment.config['CNN_layer_module']:
+        case 'ConvLayerStride1_ConvLayerStride2':
+            CNN_module = ConvLayerStride1_ConvLayerStride2
+        case 'ConvLayerStride1MaxPool':
+            CNN_module = ConvLayerStride1MaxPool
+        case 'ConvLayerStride2NoMaxPool':
+            CNN_module = ConvLayerStride2NoMaxPool
+            
     NN = CNN_MLP(feature_height=loader.feature_height, 
                 feature_width=loader.feature_width,
                 input_channels=loader.config['num_channels'],
                 output_neurons=loader.config['num_classes'],
                 CNN_number_of_layers=loader.config['num_conv_layer'],
-                CNN_base_module = ConvLayerStride1_ConvLayerStride2,
+                CNN_base_module = CNN_module,
+                MLP_hidden_layers_neuron_number = wandb_logger.experiment.config['MLP_hidden_layers_neuron_number'], 
                 )
-    wandb_logger.experiment.config['CNN_layer_modeul'] = 'ConvLayerStride1_ConvLayerStride2'
     loss = MultiCrossEntropyLoss(timesteps = wandb_logger.experiment.config['num_timesteps_predicted'])
     model = ExtremeRainPredictor(NN, 
                             learning_rate=wandb_logger.experiment.config['learning_rate'], 
