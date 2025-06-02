@@ -41,7 +41,7 @@ def main(args=None):
                 CNN_number_of_layers=loader.config['num_conv_layer'],
                 CNN_base_module = ConvLayerStride1_ConvLayerStride2,
                 )
-    wandb.experiment.config['CNN_layer_modeul'] = 'ConvLayerStride1_ConvLayerStride2'
+    wandb_logger.experiment.config['CNN_layer_modeul'] = 'ConvLayerStride1_ConvLayerStride2'
     loss = MultiCrossEntropyLoss(timesteps = wandb_logger.experiment.config['num_timesteps_predicted'])
     model = ExtremeRainPredictor(NN, 
                             learning_rate=wandb_logger.experiment.config['learning_rate'], 
