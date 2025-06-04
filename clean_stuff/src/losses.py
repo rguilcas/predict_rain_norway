@@ -44,7 +44,7 @@ def get_loss(loss_key):
 class MultiCrossEntropyLoss(nn.Module):
     def __init__(self, timesteps):
         super(MultiCrossEntropyLoss, self).__init__()
-        self.nll = torch.nn.NLLLoss(weight = torch.Tensor([1,1,9]))
+        self.nll = torch.nn.NLLLoss(weight = torch.Tensor([1,1,7]))
         self.timesteps = timesteps
         
     def forward(self, pred, target):

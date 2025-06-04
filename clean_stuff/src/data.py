@@ -84,10 +84,10 @@ def get_expanded_ds(ds, noisy_samples=10, noise_scale=.3, shuffle_after_noise=Tr
     return ds_out
 
 class MyDataLoader:
-    def __init__(self,wandb_logger):
+    def __init__(self,wandb_logger, load_atmos=True):
         self.config = wandb_logger.experiment.config
         self.load_rain_data()
-        self.load_atmospheric_features()
+        self.load_atmospheric_features(load=load_atmos)
         self.harmonize_time()
         self.make_train_val_test_split_datasets()
         self.make_data_loaders()
@@ -115,7 +115,7 @@ class MyDataLoader:
                 raise ValueError("type_predictions must be 'boolean', 'three_classes', 'quantiles' or 'regression'")
         self.config['num_classes'] = self.config['prediction_per_timestep']*self.config['num_timesteps_predicted']
 
-    def load_atmospheric_features(self):
+    def load_atmospheric_features(self,load=True):
         input_variables = self.config['inputs'].split(' ')
         self.config['input_variables'] = input_variables 
         ds_atm = xr.open_zarr(self.config['file_name_data_in']).data_normed
@@ -124,7 +124,11 @@ class MyDataLoader:
         if ds_atm.latitude.diff('latitude')[0]<0:
             lat_min, lat_max = lat_max, lat_min
         ds_atm.sel(longitude=slice(lon_min, lon_max), latitude=slice(lat_min, lat_max))
-        self.features = ds_atm.astype('float32')
+        if load:
+            self.features = ds_atm.astype('float32').load()
+        else:
+            self.features = ds_atm.astype('float32')
+        
         self.feature_height = self.features.latitude.size
         self.feature_width = self.features.longitude.size
         self.feature_image_size = self.feature_height*self.feature_width

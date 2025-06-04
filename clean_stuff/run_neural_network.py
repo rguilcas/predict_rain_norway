@@ -25,6 +25,7 @@ def main(args=None):
 
     wandb_logger.experiment # Initialize wandb
     loader = MyDataLoader(wandb_logger)
+    loader.print_infos()
 
     callbacks=[EarlyStopping(monitor="val/loss", mode="min"), LogF1Validation()]
     trainer = AttributableTrainer(limit_train_batches=100, 
