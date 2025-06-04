@@ -6,39 +6,11 @@ from torch.nn import functional
 https://github.com/Javicadserres/wind-production-forecast/blob/28310d7dab7b47d7db3d690580505c1a456e471b/src/model/losses.py#L5
 """
 
-def get_loss(loss_key):
-    if loss_key == 'distrib':
-        loss = SortedMSELoss()
-    elif loss_key == 'mse':
-        loss = torch.nn.MSELoss()
-    elif loss_key == 'quantiles90':
-        loss = PinballLoss(0.9)
-    elif loss_key == 'quantiles70':
-        loss = PinballLoss(0.7)
-    elif loss_key == 'quantiles80':
-        loss = PinballLoss(0.8)
-    elif loss_key == 'quantiles75':
-        loss = PinballLoss(0.75)
-    elif loss_key == 'composite_quantiles':
-        loss = CompositeQuantileLoss(quantiles = [0.5,0.75,0.9], lambdas = None)
-    elif loss_key == 'hybrid_mse_quantiles':
-        loss = HybridMSEQuantileLoss()
-    elif loss_key == 'weighted_mse':
-        loss = WeightedMSELoss()
-    elif loss_key == 'weighted_sqrt_mse':
-        loss = WeightedSqrtMSELoss()
-    elif loss_key == 'quantile_extr':
-        loss = CompositeQuantileLoss(quantiles=[0.9,0.95,0.99])
-    elif loss_key == 'log_mse':
-        loss = LogMSE()
-    elif loss_key == 'weighted_log_mse':
-        loss = WeightedLogMSELoss()
-    elif loss_key == 'asymetric_mse':
-        loss = AsymmetricMSELoss(alpha=2)
-    elif loss_key == 'asymetric_mse_thresh':
-        loss = AsymmetricMSEabveThreshLoss(alpha=4, thresh=20)
-    elif loss_key == 'f1_mse':
-        loss = F1MSELoss(threshold_mm=20)
+def get_loss(loss_key, **kwargs):
+    if loss_key == 'crossentropy':
+        loss = MultiCrossEntropyLoss(**kwargs)
+    elif loss_key == 'focal':
+        loss = MultiFocalLoss(**kwargs)
     return loss
 
 class MultiCrossEntropyLoss(nn.Module):
@@ -61,6 +33,41 @@ class MultiCrossEntropyLoss(nn.Module):
         return loss
     
 
+class MultiFocalLoss(nn.Module):
+    def __init__(self, timesteps, alpha=[1, 1, 9], gamma=2):
+        super(MultiFocalLoss, self).__init__()
+        self.alpha = torch.tensor(alpha)
+        self.gamma = gamma
+        self.timesteps = timesteps
+
+    def forward(self, pred, target):
+        """
+        Computes the focal loss over multiple timesteps.
+        """
+        device = pred.device
+        self.alpha = self.alpha.to(device)
+        pred = pred.view(-1, self.timesteps, 3)
+        proba = torch.softmax(pred, dim=2).clamp(min=1e-8, max=1. - 1e-8)  # prevent log(0)
+
+        loss = []
+        for k, timestep in enumerate(range(self.timesteps)):
+            pt = proba[:, timestep, :]
+            target_t = target[:, timestep]
+            log_pt = torch.log(pt)
+            
+            # Gather the probs for the true classes
+            pt_true = pt.gather(1, target_t.unsqueeze(1)).squeeze(1)
+            log_pt_true = log_pt.gather(1, target_t.unsqueeze(1)).squeeze(1)
+            
+            # Get alpha weighting for each sample
+            alpha_t = self.alpha.gather(0, target_t)
+
+            focal_term = (1 - pt_true) ** self.gamma
+            loss_t = -alpha_t * focal_term * log_pt_true
+            loss.append(loss_t.mean())
+
+        return torch.mean(torch.stack(loss))
+    
 class PinballLoss(nn.Module):
     def __init__(self, quantiles):
         super(PinballLoss, self).__init__()

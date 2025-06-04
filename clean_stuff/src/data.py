@@ -6,6 +6,9 @@ import xbatcher.loaders.torch
 import dask
 import numpy as np
 import dask
+import pandas as pd
+from captum.attr import IntegratedGradients
+from tqdm import tqdm
 
 def add_timesteps(ds_rain, num_timesteps_predicted):
     if num_timesteps_predicted>1:
@@ -188,6 +191,56 @@ class MyDataLoader:
         print(f"    {self.config['num_timesteps_predicted']} Predicted timesteps for future rainfall")
         print(f"    Prediction type: {self.config['type_prediction']}")
         print(f"    What quantile is considered extreme: {self.config['quantile_extreme']*100:.0f}th of {'all' if not self.config['quantile_extreme_based_on_rainy_days']  else 'rainy'} days")
+
+    def attribute_integrated_gradients(self, model, ds_features, predictions, targets):
+        ds_predictions = xr.DataArray(predictions, dims=['time','timestep'], coords = dict(time=ds_features.time[:predictions.shape[0]], timestep=range(1,5)))
+        ds_targets = xr.DataArray(targets, dims=['time','timestep'], coords = dict(time=ds_features.time[:targets.shape[0]], timestep=range(1,5)))
+        ds_results = xr.Dataset(dict(predictions=ds_predictions, targets=ds_targets))                             
+        self.ds_results = ds_results
+
+        series_targets = ds_targets.to_series()
+        series_predictions = ds_predictions.to_series()
+
+        all_preds = ((series_predictions == series_targets)&(series_targets==2)).reset_index()
+        all_preds.columns = ['time_of_prediction','timestep','TP_extreme']
+        all_preds['time_of_event'] = all_preds.time_of_prediction + all_preds.timestep*pd.Timedelta(1,'D')
+        extreme_events_predictions = all_preds.groupby('time_of_event').TP_extreme.sum()
+
+        all_targets = ((series_targets==2)).reset_index()
+        all_targets.columns = ['time_of_prediction','timestep','extreme']
+        all_targets['time_of_event'] = all_targets.time_of_prediction + all_targets.timestep*pd.Timedelta(1,'D')
+        extreme_events = all_targets.groupby('time_of_event').extreme.sum()
+
+        extreme_events_predictions = extreme_events_predictions.loc[extreme_events[extreme_events==4].index]
+        time_TP_extreme = extreme_events_predictions.loc[extreme_events_predictions==4].index
+        self.time_of_TP_extremes = time_TP_extreme
+        steps = 4
+        start_times = time_TP_extreme -  pd.Timedelta(steps-1,'D')
+        self.first_time_prediction_of_TP_extremes = start_times
+
+        method = IntegratedGradients(model.model)
+        all_multi_attrs = []
+        all_multi_sens = []
+
+        for k in tqdm(range(len(time_TP_extreme))):
+            start = start_times[k].strftime("%Y-%m-%d %H:%M:%S")
+            end = time_TP_extreme[k].strftime("%Y-%m-%d %H:%M:%S")
+            # print(start,end)
+            ds_test_extract = ds_features.sel(time=slice(start ,end))
+            tensor_in = torch.Tensor(ds_test_extract.features.values)
+            tensor_out = torch.Tensor(ds_test_extract.targets.values)
+            attrs = method.attribute(tensor_in, baselines=torch.Tensor([0]),target=[3*(steps-k)-1 for k in range(steps)]) 
+            da_attrs = xr.DataArray(attrs, dims = ['timestep','var_name','latitude','longitude'], 
+                                    coords= dict(timestep=np.arange(1,steps+1),var_name=ds_test_extract.var_name, latitude=ds_test_extract.latitude, longitude=ds_test_extract.longitude))
+            all_multi_attrs.append(da_attrs.assign_coords(time=time_TP_extreme[k]))
+            sens = da_attrs/ds_test_extract.features.rename(time='timestep').assign_coords(timestep=da_attrs.timestep)
+            all_multi_sens.append(sens.assign_coords(time=time_TP_extreme[k]))
+        ds_attributions = xr.concat(all_multi_attrs, dim='time')
+        ds_sens = xr.concat(all_multi_sens, dim='time')
+        final_ds = xr.Dataset(dict(attributions = ds_attributions, sensitivity=ds_sens))
+        self.ds_attribution = final_ds
+
+
 
 def get_input_data_from_wandb_logger_three_types(wandb_logger, quantile = .9,load=True, lon_lim = (None,None),lat_lim=(90,0),
                                                  add_noise = False, noisy_samples = 10,noise_scale=1,train_val_test_ratio=[.6,.2],

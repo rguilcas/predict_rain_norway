@@ -4,14 +4,16 @@ batch_size:
   value: 512
 learning_rate:
   desc: Learning rate
-  value: 0.0001
+  value: 0.00001
 lr_scheduler:
   desc: Scheduler use for learning rate decay
   value: 'step'
 num_epochs: 
   desc: Number of training epochs
   value: 100
-
+loss_function:
+  desc: choice of loss function
+  value: 'focal'
 
 ### In/Out params
 file_name_data_out:
@@ -49,39 +51,19 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dl_inputs_day_32x128.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "u850 v850 z500 w850 tcwv"
+  value: "u850"
 spatial_extent:
   desc: List of lon_min, lon_max, lat_min, lat_max
   value: [-128, 53, 0, 90]
   
 
-# ### Network params ViT
-# patch_size:
-#   desc: Size of patches for embeddings
-#   value: 8
-# embedding_dimension:
-#   desc: Size of embeddig vector
-#   value: 512
-# depth_transformer:
-#   desc: Number of transformer blocks
-#   value: 6
-# attention_heads:
-#   desc: Number of attention heads
-#   value: 8
-# mlp_dim:
-#   desc: feedforward layer size
-#   value: 512
-# dropout:
-#   desc: dropout probability
-#   value: 0.1
-# emb_dropout:
-#   desc: embedding dropout probability
-#   value: 0.1
-
 ## Network params CNM
 MLP_hidden_layers_neuron_number:
   desc: Layers of the MLP after the CNN 
   value: [128,128]
+use_skip_connections:
+  desc: uses ResNet style skip connections or not
+  value: True
 CNN_layer_module:
   desc: what is the convolutionnal layer used. Can either be 'ConvLayerStride1_ConvLayerStride2', 'ConvLayerStride1MaxPool' or 'ConvLayerStride2NoMaxPool'
   value: 'ConvLayerStride1_ConvLayerStride2'
@@ -93,7 +75,7 @@ size_conv_kernel:
   value: 3
 conv1_kernel_number:
   desc: Size of the first conv layer kernels
-  value: 16
+  value: 32
 factor_increase_kernels_per_conv_layer:
   desc: How much to multiply the number of kernel in layer N to get layer N+1
   value: 2

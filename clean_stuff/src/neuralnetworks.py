@@ -77,6 +77,27 @@ class ConvLayerStride2NoMaxPool(nn.Module):
         output = self.activation_function(output)
         return output
 
+class ResidualBlock(nn.Module):
+    def __init__(self, base_module, input_channels, output_channels):
+        super(ResidualBlock, self).__init__()
+        self.main = base_module(input_channels, output_channels)
+
+        self.skip_connection = nn.Identity()
+        if input_channels != output_channels:
+            self.skip_connection = nn.Conv2d(input_channels, output_channels, kernel_size=1, stride=1)
+        
+        self.pool_match = False
+        self.pool = nn.AvgPool2d(kernel_size=2, stride=2)
+        self.activation = nn.ReLU()
+
+    def forward(self, x):
+        identity = self.skip_connection(x)
+        identity = self.pool(identity)
+        out = self.main(x)
+        out = self.activation(out + identity)
+        return out
+    
+
 class CNN(nn.Module):
     def __init__(self, 
                  input_channels, 
@@ -86,22 +107,29 @@ class CNN(nn.Module):
                  num_layers=3,
                  activation_function=nn.ReLU(),
                  size_conv_kernel=3,
+                 use_residual=False,
                  ):
         super(CNN, self).__init__()
         self.input_channels = input_channels
         self.num_layers = num_layers
+        self.use_residual = use_residual
         self.output_layers = [output_channels_first_layer*channels_increase_per_layer**layer for layer in range(num_layers)]
         self.convs = nn.ModuleList()
         self.activation_function = activation_function
         self.size_conv_kernel = size_conv_kernel
         for i in range(num_layers):
-            conv = base_module(
-                input_channels if i == 0 else self.output_layers[i-1],
-                self.output_layers[i],
+            in_ch = input_channels if i == 0 else self.output_layers[i - 1]
+            out_ch = self.output_layers[i]
+            module = base_module(
+                in_ch,
+                out_ch,
                 activation_function=self.activation_function,
                 size_conv_kernel=self.size_conv_kernel            
                 )
-            self.convs.append(conv)
+            
+            if self.use_residual:
+                module = ResidualBlock(base_module, in_ch, out_ch)
+            self.convs.append(module)
 
     def forward(self, x):
         for conv in self.convs:
@@ -142,6 +170,7 @@ class CNN_MLP(nn.Module):
                  CNN_activation_function=nn.ReLU(),
                  CNN_size_conv_kernel=3,
                  MLP_hidden_layers_neuron_number = [128,512,512,128],
+                 use_residual=True,
                  ):
         super(CNN_MLP, self).__init__()
         self.feature_height = feature_height
@@ -152,7 +181,8 @@ class CNN_MLP(nn.Module):
                        channels_increase_per_layer=CNN_channels_increase_per_layer,
                        base_module = CNN_base_module,
                        activation_function=CNN_activation_function,
-                       size_conv_kernel=CNN_size_conv_kernel,)
+                       size_conv_kernel=CNN_size_conv_kernel,
+                       use_residual=use_residual)
         reduced_image_size = self.feature_height//(2**self.CNN.num_layers) * self.feature_width//(2**self.CNN.num_layers)
         last_out_layers = self.CNN.output_layers[-1]
         self.linear_size = reduced_image_size*last_out_layers

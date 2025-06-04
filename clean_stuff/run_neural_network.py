@@ -13,7 +13,7 @@ from src.neuralnetworks import ConvLayerStride1_ConvLayerStride2, ConvLayerStrid
 from src.data import MyDataLoader
 from src.lightning import ExtremeRainPredictor, AttributableTrainer
 from src.neuralnetworks import CNN_MLP
-from src.losses import MultiCrossEntropyLoss
+from src.losses import get_loss
 from src.callbacks import LogF1Validation
 
 def main(args=None):
@@ -49,8 +49,10 @@ def main(args=None):
                 CNN_number_of_layers=loader.config['num_conv_layer'],
                 CNN_base_module = CNN_module,
                 MLP_hidden_layers_neuron_number = wandb_logger.experiment.config['MLP_hidden_layers_neuron_number'], 
+                use_residual = wandb_logger.experiment.config['use_skip_connections']
                 )
-    loss = MultiCrossEntropyLoss(timesteps = wandb_logger.experiment.config['num_timesteps_predicted'])
+    loss = get_loss(wandb_logger.experiment.config['loss_function'], timesteps = wandb_logger.experiment.config['num_timesteps_predicted'])
+    # loss = MultiCrossEntropyLoss()
     model = ExtremeRainPredictor(NN, 
                             learning_rate=wandb_logger.experiment.config['learning_rate'], 
                             lr_scheduler =wandb_logger.experiment.config['lr_scheduler'],
