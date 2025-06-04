@@ -126,7 +126,8 @@ class MyDataLoader:
         lon_min, lon_max, lat_min, lat_max = self.config['spatial_extent']
         if ds_atm.latitude.diff('latitude')[0]<0:
             lat_min, lat_max = lat_max, lat_min
-        ds_atm.sel(longitude=slice(lon_min, lon_max), latitude=slice(lat_min, lat_max))
+        ds_atm = ds_atm.sel(longitude=slice(lon_min, lon_max), latitude=slice(lat_min, lat_max))
+        
         if load:
             self.features = ds_atm.astype('float32').load()
         else:
@@ -136,7 +137,10 @@ class MyDataLoader:
         self.feature_width = self.features.longitude.size
         self.feature_image_size = self.feature_height*self.feature_width
         self.config['num_channels'] = len(self.config['input_variables'])
-
+        self.config['feature_height'] = self.feature_height
+        self.config['feature_width'] = self.feature_width
+        self.config['feature_image_size'] = self.feature_image_size
+        
     def harmonize_time(self):
         common_time = [time for time in self.features.time.values if time in self.rain.time.values]
         if len(common_time) == 0:
@@ -221,7 +225,7 @@ class MyDataLoader:
         method = IntegratedGradients(model.model)
         all_multi_attrs = []
         all_multi_sens = []
-
+        print('Attributing true positive extremes ...')
         for k in tqdm(range(len(time_TP_extreme))):
             start = start_times[k].strftime("%Y-%m-%d %H:%M:%S")
             end = time_TP_extreme[k].strftime("%Y-%m-%d %H:%M:%S")

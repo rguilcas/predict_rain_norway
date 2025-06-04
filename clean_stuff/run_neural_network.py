@@ -15,6 +15,7 @@ from src.lightning import ExtremeRainPredictor, AttributableTrainer
 from src.neuralnetworks import CNN_MLP
 from src.losses import get_loss
 from src.callbacks import LogF1Validation
+from src.plotting import plot_mean_attributions,plot_top1pct_pixels
 
 def main(args=None):
     torch.set_float32_matmul_precision('medium')
@@ -61,6 +62,12 @@ def main(args=None):
     model.eval()
     with torch.no_grad():
         trainer.test(model, dataloaders=loader.val_loader)
+    if wandb_logger.experiment.config['attribute_true_positives']:
+        loader.attribute_integrated_gradients(model, loader.ds_val, model.predictions_test, model.targets_test)
+        plot1 = plot_mean_attributions(loader.ds_attribution)
+        wandb.log({"attributions/mean_attribution_plot": wandb.Image(plot1.fig)})
+        plot2 = plot_top1pct_pixels(loader.ds_attribution)
+        wandb.log({"attributions/top1pct_attributions": wandb.Image(plot2.fig)})
     wandb.finish()
 
 
