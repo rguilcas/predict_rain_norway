@@ -42,7 +42,7 @@ def plot_mean_attributions(ds_attributions):
         clean_map_ax(ax)
     return plot
 
-def plot_top1pct_pixels(ds_attributions, top_percent = .01):
+def plot_top1pct_pixels(ds_attributions, top_percent = .001):
     ds_top = (ds_attributions.stack(space=['latitude','longitude','var_name']).rank('space',pct=True)>(1-top_percent)).unstack('space').mean('time')
     plot = ds_top.attributions.where(ds_top.attributions>0).plot(col='timestep',row='var_name', transform=ccrs.PlateCarree(), subplot_kws=dict(projection=ccrs.PlateCarree()), aspect=ds_top.longitude.size/ds_top.latitude.size, size=2, levels=np.arange(0,1.1,.1), cmap='mako_r')
     for ax in plot.axs.flatten():

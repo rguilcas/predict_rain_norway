@@ -51,7 +51,7 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dl_inputs_day_32x128.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "u850 v850 z500"
+  value: "u850"
 spatial_extent:
   desc: List of lon_min, lon_max, lat_min, lat_max
   value: [-128, 53, 0, 90]
@@ -60,13 +60,13 @@ spatial_extent:
 ## Network params CNM
 MLP_hidden_layers_neuron_number:
   desc: Layers of the MLP after the CNN 
-  value: [128,128]
+  value: [512,512]
 use_skip_connections:
   desc: uses ResNet style skip connections or not
-  value: False
+  value: True
 CNN_layer_module:
   desc: what is the convolutionnal layer used. Can either be 'ConvLayerStride1_ConvLayerStride2', 'ConvLayerStride1MaxPool' or 'ConvLayerStride2NoMaxPool'
-  value: 'ConvLayerStride1MaxPool'
+  value: 'ConvLayerStride1_ConvLayerStride2'
 num_conv_layer:
   desc: Number of convolution layers in the CNN
   value: 5
