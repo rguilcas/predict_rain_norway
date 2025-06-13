@@ -1,76 +1,86 @@
 ### Basic hyperparameters
 batch_size:
   desc: Size of each mini-batch
-  value: 256
+  value: 512
 learning_rate:
   desc: Learning rate
-  value: 0.0001
+  value: 0.00001
 lr_scheduler:
   desc: Scheduler use for learning rate decay
   value: 'step'
 num_epochs: 
   desc: Number of training epochs
   value: 100
-
+loss_function:
+  desc: choice of loss function
+  value: 'focal'
 
 ### In/Out params
 file_name_data_out:
   desc: Path to output data (daily rain data)
   value: '/Data/gfi/users/rogui7909/data/ERA5/era5_pr_day_WNorway.nc'
-quantile_thresh:
-  desc: Quantile predicted
+type_prediction:
+  desc: Type of prediction done. Either 'regression', 'quantiles', 'three_classes', 'boolean'
+  value: 'three_classes'
+quantile_extreme:
+  desc: What is defined as extreme in terms of quantiles.
   value: .9
+quantile_extreme_based_on_rainy_days:
+  desc: If the quantile is computed based on rainy days only or on all days.
+  value: True
 num_timesteps_predicted:
   desc: Timesteps predicted for future rain
   value: 4
 season:
   desc: Season chosen for the prediction. Can be 'all' or 'DJF' 'MAM' 'JJA' or 'SON'
   value: 'all'
+augment_training_with_noise:
+  desc: Whether to augment training set with noise in feautures
+  value: False
+num_noisy_samples:
+  desc: How many copies of the training set to add with noise
+  value: 0
+augment_noise_amplitude:
+  desc: Amplitude of the noise added to the features. The targets are not changed.
+  value: .5
+  
+
 
 file_name_data_in:
   desc: Path to input data (atmos variables)
-  value: "/Data/gfi/users/rogui7909/data/ERA5/dl_inputs_day_361x720.zarr"
+  value: "/Data/gfi/users/rogui7909/data/ERA5/dl_inputs_day_181x720.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "u850 v850"
+  value: "u850 v850 z500"
+spatial_extent:
+  desc: List of lon_min, lon_max, lat_min, lat_max
+  value: [-128, 53, 0, 90]
   
 
-# ### Network params ViT
-# patch_size:
-#   desc: Size of patches for embeddings
-#   value: 8
-# embedding_dimension:
-#   desc: Size of embeddig vector
-#   value: 512
-# depth_transformer:
-#   desc: Number of transformer blocks
-#   value: 6
-# attention_heads:
-#   desc: Number of attention heads
-#   value: 8
-# mlp_dim:
-#   desc: feedforward layer size
-#   value: 512
-# dropout:
-#   desc: dropout probability
-#   value: 0.1
-# emb_dropout:
-#   desc: embedding dropout probability
-#   value: 0.1
-
 ## Network params CNM
+MLP_hidden_layers_neuron_number:
+  desc: Layers of the MLP after the CNN 
+  value: [512,512]
+use_skip_connections:
+  desc: uses ResNet style skip connections or not
+  value: True
+CNN_layer_module:
+  desc: what is the convolutionnal layer used. Can either be 'ConvLayerStride1_ConvLayerStride2', 'ConvLayerStride1MaxPool' or 'ConvLayerStride2NoMaxPool'
+  value: 'ConvLayerStride1_ConvLayerStride2'
 num_conv_layer:
   desc: Number of convolution layers in the CNN
-  value: 4
+  value: 7
 size_conv_kernel:
   desc: Size of the conv layer kernels
   value: 3
 conv1_kernel_number:
   desc: Size of the first conv layer kernels
-  value: 16
+  value: 32
 factor_increase_kernels_per_conv_layer:
   desc: How much to multiply the number of kernel in layer N to get layer N+1
   value: 2
-attention:
-  desc: adds spatial attention at the end of the cnn
-  value: 'none'
+
+
+attribute_true_positives:
+  desc: choose whether to compute attributions of true positive extreme events or not.
+  value: False

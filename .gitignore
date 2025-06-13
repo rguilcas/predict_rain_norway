@@ -4,3 +4,5 @@ old_versions
 .vscode
 out_data/
 plots/
+old/
+out_data
