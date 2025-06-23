@@ -51,7 +51,7 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dynamical_variables/dl_inputs_day_32x128_.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "vorticity850"
+  value: "slp t850 z500"
 spatial_extent:
   desc: List of lon_min, lon_max, lat_min, lat_max
   value: [-128, 53, 0, 90]
