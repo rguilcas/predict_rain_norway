@@ -20,7 +20,7 @@ from src.plotting import plot_mean_attributions,plot_top1pct_pixels
 def main(args=None):
     torch.set_float32_matmul_precision('medium')
     seed_everything(42, workers=True)
-    wandb_logger = loggers.WandbLogger(project="Predict-rain-WNorway_v5", 
+    wandb_logger = loggers.WandbLogger(project="Predict-rain-WNorway_v6", 
                                     save_dir="/Data/gfi/users/rogui7909/wanbd_logs/",
                                     dir="/Data/gfi/users/rogui7909/wanbd_logs/wandb", )
 

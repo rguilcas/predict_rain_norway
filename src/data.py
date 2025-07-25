@@ -150,7 +150,7 @@ class MyDataLoader:
         self.targets = self.targets.sel(time=common_time)
         self.n_samples = self.targets.time.size
 
-    def make_train_val_test_split_datasets(self, ratio=[.6,.2], shuffle_train=True):
+    def make_train_val_test_split_datasets(self, ratio=[.7,.15], shuffle_train=True):
         all_indices = np.arange(self.rain.time.size)
         total_size = all_indices.size
         indices_train = all_indices[:int(total_size*ratio[0])]
