@@ -64,10 +64,11 @@ def main(args=None):
         trainer.test(model, dataloaders=loader.val_loader)
     if wandb_logger.experiment.config['attribute_true_positives']:
         loader.attribute_integrated_gradients(model, loader.ds_val, model.predictions_test, model.targets_test)
-        plot1 = plot_mean_attributions(loader.ds_attribution)
-        wandb.log({"attributions/mean_attribution_plot": wandb.Image(plot1.fig)})
-        plot2 = plot_top1pct_pixels(loader.ds_attribution)
-        wandb.log({"attributions/top1pct_attributions": wandb.Image(plot2.fig)})
+        loader.ds_attribution.to_netcdf(f"/Data/gfi/users/rogui7909/data/NN_outputs/attributions/attributions_TP_{wandb.run.id}.nc")
+        # plot1 = plot_mean_attributions(loader.ds_attribution)
+        # wandb.log({"attributions/mean_attribution_plot": wandb.Image(plot1.fig)})
+        # plot2 = plot_top1pct_pixels(loader.ds_attribution)
+        # wandb.log({"attributions/top1pct_attributions": wandb.Image(plot2.fig)})
     wandb.finish()
 
 
