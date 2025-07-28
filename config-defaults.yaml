@@ -69,7 +69,7 @@ CNN_layer_module:
   value: 'ConvLayerStride1MaxPool'
 num_conv_layer:
   desc: Number of convolution layers in the CNN
-  value: 5
+  value: 6
 size_conv_kernel:
   desc: Size of the conv layer kernels
   value: 3

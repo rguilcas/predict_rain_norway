@@ -34,7 +34,7 @@ def main(args=None):
                                 logger=wandb_logger, 
                                 log_every_n_steps=1, default_root_dir="/Data/gfi/users/rogui7909/lightning_checkpoint/",
                                 callbacks=callbacks, deterministic=True,
-                                accelerator="gpu", devices=1,)
+                                accelerator="cpu", devices=1,)
     match wandb_logger.experiment.config['CNN_layer_module']:
         case 'ConvLayerStride1_ConvLayerStride2':
             CNN_module = ConvLayerStride1_ConvLayerStride2
