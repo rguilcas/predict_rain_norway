@@ -47,7 +47,6 @@ def main(config_path=None):
                                 accelerator="cpu", devices=1)
 
     loss = get_loss(config['loss_function'], timesteps = config['num_timesteps_predicted'])
-    # loss = MultiCrossEntropyLoss()
     lightroom_model = ExtremeRainPredictor(NN, 
                             learning_rate=config['learning_rate'], 
                             lr_scheduler =config['lr_scheduler'],
@@ -58,13 +57,7 @@ def main(config_path=None):
     with torch.no_grad():
         trainer.test(lightroom_model, dataloaders=dataloader.val_loader)
 
-    # if config['attribute_true_positives'] in ['TP','all_extr','all']:
-    #     dataloader.attribute_integrated_gradients(lightroom_model, dataloader.ds_val, lightroom_model.predictions_test, lightroom_model.targets_test)
-    #     dataloader.ds_attribution.to_netcdf(f"/Data/gfi/users/rogui7909/data/NN_outputs/attributions/attributions_TP_{wandb.run.id}.nc")
-    #     # plot1 = plot_mean_attributions(loader.ds_attribution)
-    #     # wandb.log({"attributions/mean_attribution_plot": wandb.Image(plot1.fig)})
-    #     # plot2 = plot_top1pct_pixels(loader.ds_attribution)
-    #     # wandb.log({"attributions/top1pct_attributions": wandb.Image(plot2.fig)})
+
     wandb.finish()
 
 

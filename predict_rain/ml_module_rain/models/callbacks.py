@@ -10,12 +10,12 @@ from lightning.pytorch.callbacks import ModelCheckpoint
 def get_checkpoint_callback(wandb_logger):
     run_id = wandb_logger.experiment.id 
     checkpoint_cb = ModelCheckpoint(
-        monitor="val/f1_epoch",         # 🔍 monitor your validation metric
-        mode="max",                 # minimize val_loss
+        monitor="val/loss",         # 🔍 monitor your validation metric
+        mode="min",                 # minimize val_loss
         save_top_k=1,               # only keep the best model
         save_weights_only=True,   # save full model (architecture + weights + config)
         dirpath="/Data/gfi/users/rogui7909/data/NN_outputs/checkpoints/",     # local directory to save
-        filename=f"{run_id}-best-{{epoch:02d}}-{{val/f1_epoch:.2f}}"
+        filename=f"{run_id}-best-{{epoch:02d}}-{{val_loss:.2f}}"
         )
     return checkpoint_cb
 

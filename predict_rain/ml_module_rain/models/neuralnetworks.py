@@ -10,6 +10,10 @@ def get_neural_network(config):
             CNN_module = ConvLayerStride1MaxPool
         case 'ConvLayerStride2NoMaxPool':
             CNN_module = ConvLayerStride2NoMaxPool
+        case 'ConvLayerStride1MaxPool_dropout':
+            CNN_module = ConvLayerStride1MaxPool_dropout
+        case 'ConvLayerStride2NoMaxPool_dropout':
+            CNN_module = ConvLayerStride2NoMaxPool_dropout
         case 'ConvLayerStride1_ConvLayerStride2_dropout':
             CNN_module = ConvLayerStride1_ConvLayerStride2_dropout
     NN = CNN_MLP(feature_height=config['feature_height'], 
@@ -48,6 +52,38 @@ class ConvLayerStride1MaxPool(nn.Module):
         output = self.activation_function(output)
         return output
 
+class ConvLayerStride1MaxPool_dropout(nn.Module):
+    def __init__(self, 
+                 input_channels, 
+                 output_channels,
+                 activation_function=nn.ReLU(),
+                 size_conv_kernel=3,
+                 dropout_p=.3,
+                 dropout_min_channels=128,
+                 ):
+        super(ConvLayerStride1MaxPool, self).__init__()
+        self.input_channels = input_channels
+        self.output_channels = output_channels
+        self.activation_function = activation_function
+        self.dropout_p = dropout_p
+        self.dropout_min_channels=dropout_min_channels
+        self.conv_layer = nn.Conv2d(self.input_channels, 
+                                    self.output_channels, 
+                                    kernel_size=size_conv_kernel, 
+                                    stride=1, padding=(size_conv_kernel-1)//2)
+        self.bn2 = nn.BatchNorm2d(output_channels)
+        self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2,padding=1)
+        self.dropout = nn.Dropout2d(p=self.dropout_p)
+
+    def forward(self, x):
+        output = self.conv_layer(x)
+        output = self.bn2(output)
+        output = self.maxpool(output)
+        output = self.activation_function(output)
+        if self.output_channels>=self.dropout_min_channels:
+            output = self.dropout(output)
+        return output
+
 
 
                  
@@ -61,7 +97,7 @@ class ConvLayerStride1_ConvLayerStride2_dropout(nn.Module):
                  dropout_p=.3,
                  dropout_min_channels=128,
                  ):
-        super(ConvLayerStride1_ConvLayerStride2, self).__init__()
+        super(ConvLayerStride1_ConvLayerStride2_dropout, self).__init__()
         self.input_channels = input_channels
         self.output_channels = output_channels
         self.activation_function = activation_function
@@ -133,13 +169,44 @@ class ConvLayerStride2NoMaxPool(nn.Module):
                                     kernel_size=size_conv_kernel, 
                                     stride=2, padding=(size_conv_kernel-1)//2)
         self.bn2 = nn.BatchNorm2d(output_channels)
-
+        
     def forward(self, x):
         output = self.conv_layer(x)
         output = self.bn2(output)
         output = self.activation_function(output)
         return output
 
+class ConvLayerStride2NoMaxPool_dropout(nn.Module):
+    def __init__(self, 
+                 input_channels, 
+                 output_channels,
+                 activation_function=nn.ReLU(),
+                 size_conv_kernel=3,
+                 dropout_p=.3,
+                 dropout_min_channels=128,
+                 ):
+        super(ConvLayerStride2NoMaxPool_dropout, self).__init__()
+        self.input_channels = input_channels
+        self.output_channels = output_channels
+        self.activation_function = activation_function,
+        self.dropout_p = dropout_p,
+        self.dropout_min_channels=dropout_min_channels,
+        self.conv_layer = nn.Conv2d(self.input_channels, 
+                                    self.output_channels, 
+                                    kernel_size=size_conv_kernel, 
+                                    stride=2, padding=(size_conv_kernel-1)//2)
+        self.bn2 = nn.BatchNorm2d(output_channels)
+        self.dropout = nn.Dropout2d(p=self.dropout_p)
+
+
+    def forward(self, x):
+        output = self.conv_layer(x)
+        output = self.bn2(output)
+        output = self.activation_function(output)
+        if self.output_channels>=self.dropout_min_channels:
+            output = self.dropout(output)
+        return output
+    
 class ResidualBlock(nn.Module):
     def __init__(self, base_module, input_channels, output_channels):
         super(ResidualBlock, self).__init__()

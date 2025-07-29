@@ -12,11 +12,6 @@ import pandas as pd
 import numpy as np
 import argparse
 
-from ml_module_rain.models.neuralnetworks import get_neural_network
-from ml_module_rain.data.datamodule import MyDataLoader
-from ml_module_rain.models.lightning import ExtremeRainPredictor, AttributableTrainer
-from ml_module_rain.models.losses import get_loss
-from ml_module_rain.models.callbacks import LogF1Validation, get_checkpoint_callback
 from ml_module_rain.models.trained_models import load_trained_model
 
 def main(run_id=None, samples_to_attribute='all-extr'):
@@ -52,13 +47,14 @@ def main(run_id=None, samples_to_attribute='all-extr'):
     
     match samples_to_attribute:
         case 'TP':
-            time_of_attributions = all_predictions.query("prediction==target & target==2").groupby('time_of_event').time_of_prediction.count().reset_index().query("time_of_prediction==4").index
+            time_of_attributions = all_predictions.query("(prediction==target) & (target==2)").groupby('time_of_event').time_of_prediction.count().reset_index().query("time_of_prediction==4").time_of_event.values
         case 'all-extr':
             time_of_attributions =all_predictions.query("prediction==2 | target==2").time_of_event.unique()
         case 'all':
             time_of_attributions = all_predictions.time_of_event.unique()
         case _:
             print("Invalid selection of attributions")
+
     predictions_attributions = all_predictions.loc[all_predictions.time_of_event.isin(time_of_attributions)].sort_values(['time_of_event','timestep'], ascending=[True, False])
     start_times = predictions_attributions.query("timestep==3").time_of_prediction.dt.strftime("%Y-%m-%d %H:%M:%S").values
     end_times = predictions_attributions.query("timestep==0").time_of_prediction.dt.strftime("%Y-%m-%d %H:%M:%S").values
@@ -88,22 +84,7 @@ def main(run_id=None, samples_to_attribute='all-extr'):
     ds_predictions_attributions = ds_predictions_attributions.assign_coords(timestep=-ds_predictions_attributions.timestep).sortby('timestep')
     final_ds = xr.merge([xr.Dataset(dict(attributions = ds_attributions, sensitivity=ds_sens)), ds_predictions_attributions])
     final_ds.to_netcdf(f"/Data/gfi/users/rogui7909/data/NN_outputs/attributions/{run_id}_attributions_{samples_to_attribute}.nc")
-    # dataloader.attribute_integrated_gradients(lightroom_model, dataloader.ds_val, lightroom_model.predictions_test, lightroom_model.targets_test)
-    # loss = MultiCrossEntropyLoss()
-
-
     
-    # with torch.no_grad():
-    #     trainer.test(lightroom_model, dataloaders=dataloader.val_loader)
-    # if config['attribute_true_positives'] in ['TP','all-extr','all']:
-    #     dataloader.attribute_integrated_gradients(lightroom_model, dataloader.ds_val, lightroom_model.predictions_test, lightroom_model.targets_test)
-    #     dataloader.ds_attribution.to_netcdf(f"/Data/gfi/users/rogui7909/data/NN_outputs/attributions/attributions_TP_{wandb.run.id}.nc")
-    #     # plot1 = plot_mean_attributions(loader.ds_attribution)
-    #     # wandb.log({"attributions/mean_attribution_plot": wandb.Image(plot1.fig)})
-    #     # plot2 = plot_top1pct_pixels(loader.ds_attribution)
-    #     # wandb.log({"attributions/top1pct_attributions": wandb.Image(plot2.fig)})
-    # wandb.finish()
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run model attribution")
