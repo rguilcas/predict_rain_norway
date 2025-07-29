@@ -61,7 +61,7 @@ class ConvLayerStride1MaxPool_dropout(nn.Module):
                  dropout_p=.3,
                  dropout_min_channels=128,
                  ):
-        super(ConvLayerStride1MaxPool, self).__init__()
+        super(ConvLayerStride1MaxPool_dropout, self).__init__()
         self.input_channels = input_channels
         self.output_channels = output_channels
         self.activation_function = activation_function
@@ -314,7 +314,7 @@ class CNN_MLP(nn.Module):
                        size_conv_kernel=CNN_size_conv_kernel,
                        use_residual=use_residual)
         with torch.no_grad():
-            dummy_input = torch.zeros(1, 1, feature_height, feature_width)
+            dummy_input = torch.zeros(1, input_channels, feature_height, feature_width)
             cnn_output = self.CNN(dummy_input)
             linear_size = cnn_output.view(1, -1).shape[1]
         
