@@ -8,19 +8,20 @@ import torch # long
 from lightning.pytorch import loggers, seed_everything
 import xarray as xr
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
-from models.neuralnetworks import get_neural_network
-from data.datamodule import MyDataLoader
-from models.lightning import ExtremeRainPredictor, AttributableTrainer
-from models.neuralnetworks import CNN_MLP, register_shape_hooks
-from models.losses import get_loss
-from models.callbacks import LogF1Validation, get_checkpoint_callback
-from utils.plotting import plot_mean_attributions, plot_top1pct_pixels
-from utils.config import load_config, save_config
+import argparse
 
-def main(args=None):
+
+from ml_module_rain.models.neuralnetworks import get_neural_network, register_shape_hooks
+from ml_module_rain.data.datamodule import MyDataLoader
+from ml_module_rain.models.lightning import ExtremeRainPredictor, AttributableTrainer
+from ml_module_rain.models.losses import get_loss
+from ml_module_rain.models.callbacks import LogF1Validation, get_checkpoint_callback
+from ml_module_rain.utils.config import load_config
+from pathlib import Path
+
+def main(config_path=None):
     torch.set_float32_matmul_precision('medium')
     seed_everything(42, workers=True)
-    config_path = 'configs/config-defaults.yaml'
     init_config = load_config(config_path)
     wandb_logger = loggers.WandbLogger(project="Predict-rain-WNorway_v6", 
                                     save_dir="/Data/gfi/users/rogui7909/wanbd_logs/",
@@ -51,7 +52,7 @@ def main(args=None):
                             learning_rate=config['learning_rate'], 
                             lr_scheduler =config['lr_scheduler'],
                             loss_fn = loss,
-                            config = config)
+                            init_config=init_config)
     trainer.fit(lightroom_model,dataloader.train_loader, dataloader.val_loader)
     lightroom_model.eval()
     with torch.no_grad():
@@ -68,4 +69,9 @@ def main(args=None):
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Run model attribution")
+    parser.add_argument("--config_path", type=str, default="/home/rogui7909/code/predict_rain_norway/predict_rain/ml_module_rain/configs/config-defaults.yaml", help="path to config file")
+
+    args = parser.parse_args()
+   
+    main(config_path = args.config_path)

@@ -10,6 +10,8 @@ def get_neural_network(config):
             CNN_module = ConvLayerStride1MaxPool
         case 'ConvLayerStride2NoMaxPool':
             CNN_module = ConvLayerStride2NoMaxPool
+        case 'ConvLayerStride1_ConvLayerStride2_dropout':
+            CNN_module = ConvLayerStride1_ConvLayerStride2_dropout
     NN = CNN_MLP(feature_height=config['feature_height'], 
                 feature_width=config['feature_width'],
                 input_channels=config['num_channels'],
@@ -26,7 +28,7 @@ class ConvLayerStride1MaxPool(nn.Module):
                  input_channels, 
                  output_channels,
                  activation_function=nn.ReLU(),
-                 size_conv_kernel=3
+                 size_conv_kernel=3,
                  ):
         super(ConvLayerStride1MaxPool, self).__init__()
         self.input_channels = input_channels
@@ -37,7 +39,7 @@ class ConvLayerStride1MaxPool(nn.Module):
                                     kernel_size=size_conv_kernel, 
                                     stride=1, padding=(size_conv_kernel-1)//2)
         self.bn2 = nn.BatchNorm2d(output_channels)
-        self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.maxpool = nn.MaxPool2d(kernel_size=2, stride=2,padding=1)
 
     def forward(self, x):
         output = self.conv_layer(x)
@@ -46,6 +48,46 @@ class ConvLayerStride1MaxPool(nn.Module):
         output = self.activation_function(output)
         return output
 
+
+
+                 
+                 
+class ConvLayerStride1_ConvLayerStride2_dropout(nn.Module):
+    def __init__(self, 
+                 input_channels, 
+                 output_channels,
+                 activation_function=nn.ReLU(),
+                 size_conv_kernel=3,
+                 dropout_p=.3,
+                 dropout_min_channels=128,
+                 ):
+        super(ConvLayerStride1_ConvLayerStride2, self).__init__()
+        self.input_channels = input_channels
+        self.output_channels = output_channels
+        self.activation_function = activation_function
+        self.dropout_p = dropout_p
+        self.dropout_min_channels=dropout_min_channels
+        self.conv_layer1 = nn.Conv2d(self.input_channels, 
+                                    self.output_channels, 
+                                    kernel_size=size_conv_kernel, 
+                                    stride=1, padding=(size_conv_kernel-1)//2)
+        self.conv_layer2 = nn.Conv2d(self.output_channels, 
+                                    self.output_channels, 
+                                    kernel_size=2, 
+                                    stride=2, padding=0)
+        
+        self.bn2 = nn.BatchNorm2d(output_channels)
+        self.dropout = nn.Dropout2d(p=self.dropout_p)
+
+    def forward(self, x):
+        output = self.conv_layer1(x)
+        output = self.conv_layer2(output)
+        output = self.bn2(output)
+        output = self.activation_function(output)
+        if self.output_channels>=self.dropout_min_channels:
+            output = self.dropout(output)
+        return output
+                 
 class ConvLayerStride1_ConvLayerStride2(nn.Module):
     def __init__(self, 
                  input_channels, 
@@ -204,14 +246,12 @@ class CNN_MLP(nn.Module):
                        activation_function=CNN_activation_function,
                        size_conv_kernel=CNN_size_conv_kernel,
                        use_residual=use_residual)
-        reduced_height = self.feature_height
-        reduced_width = self.feature_width
-        for _ in range(self.CNN.num_layers):
-            reduced_height = math.ceil(reduced_height/2)
-            reduced_width = math.ceil(reduced_width/2)
-        reduced_image_size = reduced_width*reduced_height
-        last_out_layers = self.CNN.output_layers[-1]
-        self.linear_size = reduced_image_size*last_out_layers
+        with torch.no_grad():
+            dummy_input = torch.zeros(1, 1, feature_height, feature_width)
+            cnn_output = self.CNN(dummy_input)
+            linear_size = cnn_output.view(1, -1).shape[1]
+        
+        self.linear_size = linear_size
         self.MLP = MLP(self.linear_size, 
                        output_neurons,
                        hidden_layers_neuron_number = MLP_hidden_layers_neuron_number,

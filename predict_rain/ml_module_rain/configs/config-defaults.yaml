@@ -10,7 +10,7 @@ lr_scheduler:
   value: 'step'
 num_epochs: 
   desc: Number of training epochs
-  value: 20
+  value: 100
 loss_function:
   desc: choice of loss function
   value: 'crossentropy'
@@ -65,11 +65,11 @@ use_skip_connections:
   desc: uses ResNet style skip connections or not
   value: False
 CNN_layer_module:
-  desc: what is the convolutionnal layer used. Can either be 'ConvLayerStride1_ConvLayerStride2', 'ConvLayerStride1MaxPool' or 'ConvLayerStride2NoMaxPool'
-  value: 'ConvLayerStride2NoMaxPool'
+  desc: what is the convolutionnal layer used. Can either be 'ConvLayerStride1_ConvLayerStride2','ConvLayerStride1_ConvLayerStride2_dropout', 'ConvLayerStride1MaxPool' or 'ConvLayerStride2NoMaxPool'
+  value: 'ConvLayerStride1_ConvLayerStride2_dropout'
 num_conv_layer:
   desc: Number of convolution layers in the CNN
-  value: 6
+  value: 7
 size_conv_kernel:
   desc: Size of the conv layer kernels
   value: 3
