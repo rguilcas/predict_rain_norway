@@ -196,7 +196,7 @@ class MyDataLoader:
         print(f"    Prediction type: {self.config['type_prediction']}")
         print(f"    What quantile is considered extreme: {self.config['quantile_extreme']*100:.0f}th of {'all' if not self.config['quantile_extreme_based_on_rainy_days']  else 'rainy'} days")
 
-    def attribute_integrated_gradients(self, model, ds_features, predictions, targets):
+    def attribute_integrated_gradients(self, model, ds_features, predictions, targets, samples_to_attribute='TP'):
         ds_predictions = xr.DataArray(predictions, dims=['time','timestep'], coords = dict(time=ds_features.time[:predictions.shape[0]], timestep=range(1,5)))
         ds_targets = xr.DataArray(targets, dims=['time','timestep'], coords = dict(time=ds_features.time[:targets.shape[0]], timestep=range(1,5)))
         ds_results = xr.Dataset(dict(predictions=ds_predictions, targets=ds_targets))                             
@@ -216,8 +216,18 @@ class MyDataLoader:
         extreme_events = all_targets.groupby('time_of_event').extreme.sum()
 
         extreme_events_predictions = extreme_events_predictions.loc[extreme_events[extreme_events==4].index]
-        time_TP_extreme = extreme_events_predictions.loc[extreme_events_predictions==4].index
-        self.time_of_TP_extremes = time_TP_extreme
+        
+        match samples_to_attribute:
+            case 'TP':
+                time_TP_extreme = extreme_events_predictions.loc[extreme_events_predictions==4].index
+                self.time_of_TP_extremes = time_TP_extreme
+            case 'all_extr':
+                pass 
+            case 'all':
+                time_TP_extreme = extreme_events_predictions.index
+        # else:
+        #     time_TP_extreme = extreme_events_predictions.loc[extreme_events_predictions==4].index
+        #     self.time_of_TP_extremes = time_TP_extreme
         steps = 4
         start_times = time_TP_extreme -  pd.Timedelta(steps-1,'D')
         self.first_time_prediction_of_TP_extremes = start_times
@@ -243,6 +253,7 @@ class MyDataLoader:
         ds_sens = xr.concat(all_multi_sens, dim='time')
         final_ds = xr.Dataset(dict(attributions = ds_attributions, sensitivity=ds_sens))
         self.ds_attribution = final_ds
+
 
 
 

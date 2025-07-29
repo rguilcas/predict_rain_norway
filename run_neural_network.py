@@ -62,7 +62,7 @@ def main(args=None):
     model.eval()
     with torch.no_grad():
         trainer.test(model, dataloaders=loader.val_loader)
-    if wandb_logger.experiment.config['attribute_true_positives']:
+    if wandb_logger.experiment.config['attribute_true_positives'] in ['TP','all_extr','all']:
         loader.attribute_integrated_gradients(model, loader.ds_val, model.predictions_test, model.targets_test)
         loader.ds_attribution.to_netcdf(f"/Data/gfi/users/rogui7909/data/NN_outputs/attributions/attributions_TP_{wandb.run.id}.nc")
         # plot1 = plot_mean_attributions(loader.ds_attribution)

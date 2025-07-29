@@ -1,6 +1,26 @@
 import torch.nn as nn
+import math
 import torch
 
+def get_neural_network(config):
+    match config['CNN_layer_module']:
+        case 'ConvLayerStride1_ConvLayerStride2':
+            CNN_module = ConvLayerStride1_ConvLayerStride2
+        case 'ConvLayerStride1MaxPool':
+            CNN_module = ConvLayerStride1MaxPool
+        case 'ConvLayerStride2NoMaxPool':
+            CNN_module = ConvLayerStride2NoMaxPool
+    NN = CNN_MLP(feature_height=config['feature_height'], 
+                feature_width=config['feature_width'],
+                input_channels=config['num_channels'],
+                output_neurons=config['num_classes'],
+                CNN_number_of_layers=config['num_conv_layer'],
+                CNN_base_module = CNN_module,
+                MLP_hidden_layers_neuron_number = config['MLP_hidden_layers_neuron_number'], 
+                use_residual = config['use_skip_connections']
+                )
+    return NN
+    
 class ConvLayerStride1MaxPool(nn.Module):
     def __init__(self, 
                  input_channels, 
@@ -184,7 +204,12 @@ class CNN_MLP(nn.Module):
                        activation_function=CNN_activation_function,
                        size_conv_kernel=CNN_size_conv_kernel,
                        use_residual=use_residual)
-        reduced_image_size = self.feature_height//(2**self.CNN.num_layers) * self.feature_width//(2**self.CNN.num_layers)
+        reduced_height = self.feature_height
+        reduced_width = self.feature_width
+        for _ in range(self.CNN.num_layers):
+            reduced_height = math.ceil(reduced_height/2)
+            reduced_width = math.ceil(reduced_width/2)
+        reduced_image_size = reduced_width*reduced_height
         last_out_layers = self.CNN.output_layers[-1]
         self.linear_size = reduced_image_size*last_out_layers
         self.MLP = MLP(self.linear_size, 
@@ -196,3 +221,30 @@ class CNN_MLP(nn.Module):
         x = x.view(-1, self.linear_size)
         x = self.MLP(x)
         return x
+
+
+
+
+def register_shape_hooks(model, input_shape):
+    """Register forward hooks on all modules and print output shapes."""
+    hooks = []
+
+    def hook_fn(name):
+        def fn(module, input, output):
+            print(f"{name:<50} | Output shape: {tuple(output.shape)}")
+        return fn
+
+    for name, module in model.named_modules():
+        # Skip the entire model itself
+        if len(list(module.children())) == 0:
+            hooks.append(module.register_forward_hook(hook_fn(name)))
+
+    # Run a dummy input through the model
+    model.eval()
+    with torch.no_grad():
+        dummy_input = torch.randn(*input_shape)
+        model(dummy_input)
+
+    # Remove hooks
+    for h in hooks:
+        h.remove()
