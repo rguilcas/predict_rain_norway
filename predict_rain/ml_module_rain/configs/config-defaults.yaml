@@ -4,7 +4,7 @@ batch_size:
   value: 512
 learning_rate:
   desc: Learning rate
-  value: 0.00001
+  value: 0.0001
 lr_scheduler:
   desc: Scheduler use for learning rate decay
   value: 'step'
@@ -20,8 +20,8 @@ file_name_data_out:
   desc: Path to output data (daily rain data)
   value: '/Data/gfi/users/rogui7909/data/ERA5/precipitation/pr_era5_daily_westnorway_1940-2024.nc'
 type_prediction:
-  desc: Type of prediction done. Either 'regression', 'quantiles', 'three_classes', 'boolean'
-  value: 'three_classes'
+  desc: Type of prediction done. Either 'regression', 'quantiles', 'three_classes', 'boolean', 'boolean_smooth'
+  value: 'three_classes_grey_zone'
 quantile_extreme:
   desc: What is defined as extreme in terms of quantiles.
   value: .9
@@ -51,7 +51,7 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dynamical_variables/dl_inputs_day_1deg_1940-2024.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "slp u850 v850"
+  value: "u850"
 spatial_extent:
   desc: List of lon_min, lon_max, lat_min, lat_max
   value: [-128, 53, 0, 90]
@@ -66,7 +66,7 @@ use_skip_connections:
   value: False
 CNN_layer_module:
   desc: what is the convolutionnal layer used. Can either be 'ConvLayerStride1_ConvLayerStride2' 'ConvLayerStride1MaxPool' or 'ConvLayerStride2NoMaxPool' or with _dropout at the end
-  value: 'ConvLayerStride1_ConvLayerStride2_dropout'
+  value: 'ConvLayerStride1MaxPool_dropout'
 num_conv_layer:
   desc: Number of convolution layers in the CNN
   value: 6

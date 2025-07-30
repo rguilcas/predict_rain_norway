@@ -7,10 +7,14 @@ https://github.com/Javicadserres/wind-production-forecast/blob/28310d7dab7b47d7d
 """
 
 def get_loss(loss_key, **kwargs):
-    if loss_key == 'crossentropy':
-        loss = MultiCrossEntropyLoss(**kwargs)
-    elif loss_key == 'focal':
-        loss = MultiFocalLoss(**kwargs)
+    match loss_key:
+
+        case 'crossentropy':
+            loss = MultiCrossEntropyLoss(**kwargs)
+        case 'focal':
+            loss = MultiFocalLoss(**kwargs)
+        case 'BCEwithlogits':
+            loss = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([10]))
     return loss
 
 class MultiCrossEntropyLoss(nn.Module):

@@ -31,13 +31,15 @@ class ConvLayerStride1MaxPool(nn.Module):
     def __init__(self, 
                  input_channels, 
                  output_channels,
-                 activation_function=nn.ReLU(),
+                 activation_function='ReLU',
                  size_conv_kernel=3,
                  ):
         super(ConvLayerStride1MaxPool, self).__init__()
         self.input_channels = input_channels
         self.output_channels = output_channels
-        self.activation_function = activation_function
+        match activation_function:
+            case 'ReLU':
+                self.activation_function = nn.ReLU()
         self.conv_layer = nn.Conv2d(self.input_channels, 
                                     self.output_channels, 
                                     kernel_size=size_conv_kernel, 
@@ -56,7 +58,7 @@ class ConvLayerStride1MaxPool_dropout(nn.Module):
     def __init__(self, 
                  input_channels, 
                  output_channels,
-                 activation_function=nn.ReLU(),
+                 activation_function='ReLU',
                  size_conv_kernel=3,
                  dropout_p=.3,
                  dropout_min_channels=128,
@@ -64,7 +66,9 @@ class ConvLayerStride1MaxPool_dropout(nn.Module):
         super(ConvLayerStride1MaxPool_dropout, self).__init__()
         self.input_channels = input_channels
         self.output_channels = output_channels
-        self.activation_function = activation_function
+        match activation_function:
+            case 'ReLU':
+                self.activation_function = nn.ReLU()
         self.dropout_p = dropout_p
         self.dropout_min_channels=dropout_min_channels
         self.conv_layer = nn.Conv2d(self.input_channels, 
@@ -92,7 +96,7 @@ class ConvLayerStride1_ConvLayerStride2_dropout(nn.Module):
     def __init__(self, 
                  input_channels, 
                  output_channels,
-                 activation_function=nn.ReLU(),
+                 activation_function='ReLU',
                  size_conv_kernel=3,
                  dropout_p=.3,
                  dropout_min_channels=128,
@@ -100,7 +104,9 @@ class ConvLayerStride1_ConvLayerStride2_dropout(nn.Module):
         super(ConvLayerStride1_ConvLayerStride2_dropout, self).__init__()
         self.input_channels = input_channels
         self.output_channels = output_channels
-        self.activation_function = activation_function
+        match activation_function:
+            case 'ReLU':
+                self.activation_function = nn.ReLU()
         self.dropout_p = dropout_p
         self.dropout_min_channels=dropout_min_channels
         self.conv_layer1 = nn.Conv2d(self.input_channels, 
@@ -128,13 +134,15 @@ class ConvLayerStride1_ConvLayerStride2(nn.Module):
     def __init__(self, 
                  input_channels, 
                  output_channels,
-                 activation_function=nn.ReLU(),
+                 activation_function='ReLU',
                  size_conv_kernel=3
                  ):
         super(ConvLayerStride1_ConvLayerStride2, self).__init__()
         self.input_channels = input_channels
         self.output_channels = output_channels
-        self.activation_function = activation_function
+        match activation_function:
+            case 'ReLU':
+                self.activation_function = nn.ReLU()
         self.conv_layer1 = nn.Conv2d(self.input_channels, 
                                     self.output_channels, 
                                     kernel_size=size_conv_kernel, 
@@ -157,13 +165,15 @@ class ConvLayerStride2NoMaxPool(nn.Module):
     def __init__(self, 
                  input_channels, 
                  output_channels,
-                 activation_function=nn.ReLU(),
+                 activation_function='ReLU',
                  size_conv_kernel=3
                  ):
         super(ConvLayerStride2NoMaxPool, self).__init__()
         self.input_channels = input_channels
         self.output_channels = output_channels
-        self.activation_function = activation_function
+        match activation_function:
+            case 'ReLU':
+                self.activation_function = nn.ReLU()
         self.conv_layer = nn.Conv2d(self.input_channels, 
                                     self.output_channels, 
                                     kernel_size=size_conv_kernel, 
@@ -180,7 +190,7 @@ class ConvLayerStride2NoMaxPool_dropout(nn.Module):
     def __init__(self, 
                  input_channels, 
                  output_channels,
-                 activation_function=nn.ReLU(),
+                 activation_function='ReLU',
                  size_conv_kernel=3,
                  dropout_p=.3,
                  dropout_min_channels=128,
@@ -188,7 +198,9 @@ class ConvLayerStride2NoMaxPool_dropout(nn.Module):
         super(ConvLayerStride2NoMaxPool_dropout, self).__init__()
         self.input_channels = input_channels
         self.output_channels = output_channels
-        self.activation_function = activation_function,
+        match activation_function:
+            case 'ReLU':
+                self.activation_function = nn.ReLU(),
         self.dropout_p = dropout_p,
         self.dropout_min_channels=dropout_min_channels,
         self.conv_layer = nn.Conv2d(self.input_channels, 
@@ -235,7 +247,7 @@ class CNN(nn.Module):
                  channels_increase_per_layer=2,
                  base_module = ConvLayerStride1MaxPool,
                  num_layers=3,
-                 activation_function=nn.ReLU(),
+                 activation_function='ReLU',
                  size_conv_kernel=3,
                  use_residual=False,
                  ):
@@ -297,7 +309,7 @@ class CNN_MLP(nn.Module):
                  CNN_output_channels_first_layer=16,
                  CNN_channels_increase_per_layer=2,
                  CNN_base_module = ConvLayerStride1MaxPool,
-                 CNN_activation_function=nn.ReLU(),
+                 CNN_activation_function='ReLU',
                  CNN_size_conv_kernel=3,
                  MLP_hidden_layers_neuron_number = [128,512,512,128],
                  use_residual=True,

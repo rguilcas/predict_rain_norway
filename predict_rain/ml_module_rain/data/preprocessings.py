@@ -4,7 +4,12 @@ import torch
 import xbatcher.loaders.torch
 import dask 
 import numpy as np
-
+def sigmoid_soft_label(y, threshold, width=10.0):
+    """
+    Sigmoid-based soft label with control over width of transition.
+    Wider = smoother.
+    """
+    return 1 / (1 + np.exp(-(y - threshold) / width))
 
 def add_timesteps(ds_rain, num_timesteps_predicted):
     if num_timesteps_predicted>1:
@@ -35,6 +40,12 @@ def preprocess_rain(ds_rain, type_predictions, quantile_extreme, quantile_extrem
             else:
                 quantile_extreme_rain =  ds_rain.quantile(quantile_extreme, 'time')
             return ((ds_rain > quantile_extreme_rain)*1).astype(int)
+        case 'boolean_smooth':
+            if quantile_extreme_based_on_rainy_days:
+                quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time').values
+            else:
+                quantile_extreme_rain =  ds_rain.quantile(quantile_extreme, 'time').values
+            return sigmoid_soft_label(ds_rain, threshold=quantile_extreme_rain, width=quantile_extreme_rain/10).astype(float)
         case 'three_classes':
             if quantile_extreme_based_on_rainy_days:
                 quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time')
@@ -42,6 +53,13 @@ def preprocess_rain(ds_rain, type_predictions, quantile_extreme, quantile_extrem
                 quantile_extreme_rain =  ds_rain.quantile(quantile_extreme, 'time')
             no_rain = xr.ones_like(ds_rain).where(ds_rain>1,0)
             return no_rain.where(ds_rain<quantile_extreme_rain,2).astype(int)
+        case 'three_classes_grey_zone':
+            if quantile_extreme_based_on_rainy_days:
+                quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time')
+            else:
+                quantile_extreme_rain =  ds_rain.quantile(quantile_extreme, 'time')
+            no_extreme = xr.ones_like(ds_rain).where(ds_rain>quantile_extreme_rain*0.8,0)
+            return no_extreme.where(ds_rain<quantile_extreme_rain*1,2).astype(int)
         case _:
             raise ValueError("type_predictions must be 'boolean', 'three_classes', 'quantiles' or 'regression'")
 

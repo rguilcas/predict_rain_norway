@@ -21,12 +21,14 @@ def get_checkpoint_callback(wandb_logger):
 
 
 class LogF1Validation(Callback):
+    def __init__(self, num_timesteps=4):
+        self.num_timesteps=num_timesteps
     def on_validation_start(self, trainer, model):
         self.predictions_validation = []
         self.targets_validation = []
     def on_validation_end(self, trainer, model):
         y_validation = torch.stack(model.targets_validation)#.cpu().numpy()
-        y_scores = torch.stack(model.predictions_validation).view(-1, 4, 3).cpu()
+        y_scores = torch.stack(model.predictions_validation).view(-1, self.num_timesteps, 3).cpu()
         preds = torch.argmax(y_scores, dim=2) 
         targets = y_validation.cpu().numpy()
         model.predictions_validation = preds 

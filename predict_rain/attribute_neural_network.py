@@ -6,6 +6,8 @@ os.environ["MKL_THREADING_LAYER"] = "GNU"
 
 import torch # long
 from lightning.pytorch import seed_everything
+from torch import nn 
+
 import xarray as xr
 from tqdm import tqdm
 import pandas as pd
@@ -17,14 +19,15 @@ from ml_module_rain.models.trained_models import load_trained_model
 def main(run_id=None, samples_to_attribute='all-extr'):
     torch.set_float32_matmul_precision('medium')
     seed_everything(42, workers=True)
-    dataloader, lightroom_model = load_trained_model(run_id)
+    dataloader, lightning_model = load_trained_model(run_id)
+
     all_targets = []
     all_probas = []
     for batch in tqdm(dataloader.val_loader):
         x, y = batch
-        lightroom_model.eval()
+        lightning_model.eval()
         with torch.no_grad():
-            all_probas.append(lightroom_model(x))
+            all_probas.append(lightning_model(x))
         all_targets.append(y)
     probas = torch.cat(all_probas).view(-1, 4, 3)
     targets = torch.cat(all_targets).cpu().numpy()
@@ -59,7 +62,7 @@ def main(run_id=None, samples_to_attribute='all-extr'):
     start_times = predictions_attributions.query("timestep==3").time_of_prediction.dt.strftime("%Y-%m-%d %H:%M:%S").values
     end_times = predictions_attributions.query("timestep==0").time_of_prediction.dt.strftime("%Y-%m-%d %H:%M:%S").values
 
-    method = IntegratedGradients(lightroom_model.model)
+    method = IntegratedGradients(lightning_model.model)
     all_multi_attrs = []
     all_multi_sens = []
     steps=4

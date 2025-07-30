@@ -94,6 +94,96 @@ class ExtremeRainPredictor(L.LightningModule):
     
 
 
+class ExtremeRainPredictorTest(L.LightningModule):
+    def __init__(self, model=None, 
+                 learning_rate=1e-3,
+                 loss_fn=DistribLoss(), 
+                 lr_scheduler = 'exponential', 
+                 init_config=dict()):
+        super().__init__()
+        self.save_hyperparameters(init_config)
+        self.model = model
+        self.learning_rate = learning_rate
+        self.loss_fn = loss_fn
+        self.predictions_validation = []
+        self.targets_validation = []
+        self.predictions_test = []
+        self.targets_test = []
+        self.optimizer = optim.Adam(self.parameters(), lr=self.learning_rate, weight_decay=1e-4)
+        if lr_scheduler=='exponential':
+            lr_scheduler = optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=0.9)
+        elif lr_scheduler=='step':
+            lr_scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=90, gamma=0.1)
+        else:
+            lr_scheduler = None
+        self.scheduler = lr_scheduler
+
+    
+    def compute_loss(self, predictions, true_values):
+        return self.loss_fn(predictions, true_values)
+        
+    def configure_optimizers(self):
+        return [self.optimizer], [self.scheduler]
+    
+    def _shared_forward_step(self, batch, batch_idx):
+        features, true_values = batch
+        predictions = self.model(features)
+        loss = self.compute_loss(predictions, true_values)
+        return loss, predictions
+
+    def training_step(self, batch, batch_idx):
+        features, true_classes = batch
+        predictions = self.model(features)
+        mask = true_classes != 1
+        if mask.sum() == 0:
+            return torch.tensor(0.0, requires_grad=True)  # skip batch
+        masked_preds = predictions[mask]          # shape: (N_filtered, 3)
+        masked_targets = true_classes[mask]
+        loss = self.compute_loss(masked_targets, masked_preds)
+        self.log("train_loss", loss)
+        return loss
+
+    def test_step(self, batch, batch_idx):
+        features, true_values = batch
+        loss, predictions = self._shared_forward_step( batch, batch_idx)
+        self.targets_test += true_values
+        self.predictions_test += predictions
+        self.log("test/loss", loss)
+        return loss
+    def on_validation_start(self):
+        self.predictions_validation = []
+        self.targets_validation = []
+
+    def validation_step(self, batch, batch_idx):
+        features, true_values = batch
+        loss, predictions = self._shared_forward_step( batch, batch_idx)
+        self.targets_validation += true_values
+        self.predictions_validation += predictions
+        self.log("val/loss", loss)
+    
+    def predict_step(self, batch, batch_idx, dataloader_idx=0):
+        return self(batch)
+    
+    def forward(self, features):
+        predictions = self.model(features)
+        return predictions
+    
+    def attribute_step(self, batch, batch_idx, attribution_method=None, target=9, baselines=0, method_kwargs = dict()):
+        features, true_values = batch
+        features.requires_grad = True
+        if attribution_method is None:
+            attribution_method = IntegratedGradients(self.model, **method_kwargs)
+        attribution = attribution_method.attribute(features, target=target, baselines=baselines)
+        return attribution.detach()
+    
+    def on_test_start(self):
+        self.predictions_test = []
+        self.targets_test = []
+        # self.test_true_values = torch.stack(self.test_true_values).cpu().numpy()
+        # self.test_pred = torch.stack(self.test_pred).cpu().numpy()
+    
+
+
     
 
 class AttributableTrainer(L.Trainer):

@@ -26,14 +26,18 @@ class MyDataLoader:
         match self.config['type_prediction']:
             case 'boolean':
                 self.config['prediction_per_timestep'] = 1
+            case 'boolean_smooth':
+                self.config['prediction_per_timestep'] = 1
             case 'three_classes':
+                self.config['prediction_per_timestep'] = 3
+            case 'three_classes_grey_zone':
                 self.config['prediction_per_timestep'] = 3
             case 'regression':
                 self.config['prediction_per_timestep'] = 1
             case 'quantiles':
                 self.config['prediction_per_timestep'] = 10
             case _:
-                raise ValueError("type_predictions must be 'boolean', 'three_classes', 'quantiles' or 'regression'")
+                raise ValueError("type_predictions must be 'boolean','boolean_smooth', 'three_classes', 'quantiles' or 'regression'")
         self.config['num_classes'] = self.config['prediction_per_timestep']*self.config['num_timesteps_predicted']
 
     def load_atmospheric_features(self,load=True):

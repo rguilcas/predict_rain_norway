@@ -37,7 +37,7 @@ def main(config_path=None):
 
     callbacks=[EarlyStopping(monitor="val/loss", mode="min"), 
                get_checkpoint_callback(wandb_logger),
-               LogF1Validation(),
+               LogF1Validation(num_timesteps=config['num_timesteps_predicted']),
                ]
     trainer = AttributableTrainer(limit_train_batches=100, 
                                 max_epochs=config['num_epochs'], 
@@ -54,6 +54,7 @@ def main(config_path=None):
                             init_config=init_config)
     trainer.fit(lightroom_model,dataloader.train_loader, dataloader.val_loader)
     lightroom_model.eval()
+    lightroom_model.model.eval()
     with torch.no_grad():
         trainer.test(lightroom_model, dataloaders=dataloader.val_loader)
 
