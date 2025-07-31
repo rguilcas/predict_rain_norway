@@ -63,7 +63,7 @@ MLP_hidden_layers_neuron_number:
   value: [512,512]
 use_skip_connections:
   desc: uses ResNet style skip connections or not
-  value: False
+  value: True
 CNN_layer_module:
   desc: what is the convolutionnal layer used. Can either be 'ConvLayerStride1_ConvLayerStride2' 'ConvLayerStride1MaxPool' or 'ConvLayerStride2NoMaxPool' or with _dropout at the end
   value: 'ConvLayerStride1MaxPool_dropout'

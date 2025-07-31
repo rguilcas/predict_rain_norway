@@ -47,16 +47,16 @@ def main(config_path=None):
                                 accelerator="cpu", devices=1)
 
     loss = get_loss(config['loss_function'], timesteps = config['num_timesteps_predicted'])
-    lightroom_model = ExtremeRainPredictor(NN, 
+    lightning_model = ExtremeRainPredictor(NN, 
                             learning_rate=config['learning_rate'], 
                             lr_scheduler =config['lr_scheduler'],
                             loss_fn = loss,
                             init_config=init_config)
-    trainer.fit(lightroom_model,dataloader.train_loader, dataloader.val_loader)
-    lightroom_model.eval()
-    lightroom_model.model.eval()
+    trainer.fit(lightning_model,dataloader.train_loader, dataloader.val_loader)
+    lightning_model.eval()
+    lightning_model.model.eval()
     with torch.no_grad():
-        trainer.test(lightroom_model, dataloaders=dataloader.val_loader)
+        trainer.test(lightning_model, dataloaders=dataloader.val_loader)
 
 
     wandb.finish()
