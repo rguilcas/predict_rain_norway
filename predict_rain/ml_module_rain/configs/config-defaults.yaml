@@ -51,34 +51,46 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dynamical_variables/dl_inputs_day_1deg_1940-2024.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "u850"
+  value: "u850 v850 slp"
 spatial_extent:
   desc: List of lon_min, lon_max, lat_min, lat_max
   value: [-128, 53, 0, 90]
   
 
 ## Network params CNN
-MLP_hidden_layers_neuron_number:
-  desc: Layers of the MLP after the CNN 
-  value: [512,512]
 use_skip_connections:
   desc: uses ResNet style skip connections or not
   value: True
 CNN_layer_module:
-  desc: what is the convolutionnal layer used. Can either be 'ConvLayerStride1_ConvLayerStride2' 'ConvLayerStride1MaxPool' or 'ConvLayerStride2NoMaxPool' or with _dropout at the end
-  value: 'ConvLayerStride1MaxPool_dropout'
+  desc: what is the convolutionnal layer used. Can either be 'doubleconv', 'convstride','conv+pool'
+  value: 'doubleconv'
 num_conv_layer:
   desc: Number of convolution layers in the CNN
-  value: 6
+  value: 7
 size_conv_kernel:
   desc: Size of the conv layer kernels
   value: 3
 conv1_kernel_number:
   desc: Size of the first conv layer kernels
-  value: 32
+  value: 4
 factor_increase_kernels_per_conv_layer:
   desc: How much to multiply the number of kernel in layer N to get layer N+1
   value: 2
+dropout_CNN:
+  desc: Probability of dropout for CNN layers
+  value: 0.4
+batch_norm_CNN:
+  desc: Whether to use batchnorm2d for the CNN layers or not
+  value: True
+
+## Network params MLP
+
+MLP_hidden_layers_neuron_number:
+  desc: Layers of the MLP after the CNN 
+  value: [512]
+dropout_MLP:
+  desc: Probability of dropout between MLP layers
+  value: 0.2
 
 attribute_predictions:
   desc: choose whether to compute attributions or not. Can be 'TP' for true positives, 'all_extr' for all extremes and 'all' for all points. Otherwise 'no'.

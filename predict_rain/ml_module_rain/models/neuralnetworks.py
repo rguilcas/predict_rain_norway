@@ -4,17 +4,22 @@ import torch
 from ml_module_rain.models.individualblocks import ResidualBlock, ConvolutionBlock, MLP
 
 def get_neural_network(config):
-
     NN = CNN_MLP(feature_height=config['feature_height'], 
-                feature_width=config['feature_width'],
-                input_channels=config['num_channels'],
-                output_neurons=config['num_classes'],
-                CNN_number_of_layers=config['num_conv_layer'],
-                CNN_base_module = config['CNN_module'],
-                MLP_hidden_layers_neuron_number = config['MLP_hidden_layers_neuron_number'], 
-                use_residual = config['use_skip_connections'],
-                )
+             feature_width=config['feature_width'],
+             input_channels=config['num_channels'],
+             output_neurons=config['num_classes'],
+             CNN_number_of_layers=config['num_conv_layer'],
+             CNN_output_channels_first_layer=4,
+             CNN_base_module = config['CNN_layer_module'],
+             MLP_hidden_layers_neuron_number =  config['MLP_hidden_layers_neuron_number'], 
+             dropout_MLP =config['dropout_MLP'],
+             use_residuals=config['use_skip_connections'],
+             global_kwargs_encoder=dict(batch_norm= config['batch_norm_CNN'], dropout=config['dropout_CNN']),
+             kwargs_per_layer_encoder = [],)
     return NN
+
+
+
 
 class CNN_MLP(nn.Module):
     def __init__(self, 
