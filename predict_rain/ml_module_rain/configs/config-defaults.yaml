@@ -14,6 +14,9 @@ num_epochs:
 loss_function:
   desc: choice of loss function
   value: 'crossentropy'
+activation_function:
+  desc: activation function for all non linear operators
+  value: 'LeakyReLU'
 
 ### In/Out params
 file_name_data_out:
@@ -51,7 +54,7 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dynamical_variables/dl_inputs_day_1deg_1940-2024.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "u850 v850 slp"
+  value: "t850 z500 v850 u850 msl"
 spatial_extent:
   desc: List of lon_min, lon_max, lat_min, lat_max
   value: [-128, 53, 0, 90]
@@ -63,7 +66,7 @@ use_skip_connections:
   value: True
 CNN_layer_module:
   desc: what is the convolutionnal layer used. Can either be 'doubleconv', 'convstride','conv+pool'
-  value: 'doubleconv'
+  value: 'conv+pool'
 num_conv_layer:
   desc: Number of convolution layers in the CNN
   value: 7
@@ -72,7 +75,7 @@ size_conv_kernel:
   value: 3
 conv1_kernel_number:
   desc: Size of the first conv layer kernels
-  value: 4
+  value: 8
 factor_increase_kernels_per_conv_layer:
   desc: How much to multiply the number of kernel in layer N to get layer N+1
   value: 2
@@ -87,7 +90,7 @@ batch_norm_CNN:
 
 MLP_hidden_layers_neuron_number:
   desc: Layers of the MLP after the CNN 
-  value: [512]
+  value: [512, ]
 dropout_MLP:
   desc: Probability of dropout between MLP layers
   value: 0.2

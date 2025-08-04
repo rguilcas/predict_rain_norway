@@ -13,12 +13,17 @@ class ConvolutionBlock(nn.Module):
     def __init__(self, input_channels, output_channels, 
                  downsample_mode="conv+pool", 
                  batch_norm=False, 
-                 dropout=0):
+                 dropout=0,
+                 activation_function='ReLU'):
         super().__init__()
         self.downsample_block = get_downsample_block(downsample_mode, input_channels, output_channels)
         self.batch_norm_true = batch_norm 
         self.dropout_p = dropout 
-        self.activation_function = nn.ReLU()
+        match activation_function:
+            case 'ReLU':
+                self.activation_function = nn.ReLU()
+            case 'LeakyReLU':
+                self.activation_function = nn.LeakyReLU()
         if self.batch_norm_true : self.batch_norm = nn.BatchNorm2d(output_channels)  
         if self.dropout_p > 0 : self.dropout = nn.Dropout2d(p=self.dropout_p)
 
@@ -81,7 +86,9 @@ class DownsampleDoubleConv(nn.Module):
 ##### Residual block
 
 class ResidualBlock(nn.Module):
-    def __init__(self, base_module, input_channels, output_channels, **base_module_kwargs):
+    def __init__(self, base_module, input_channels, output_channels, 
+                 residual_activation_function = 'ReLU',
+                 **base_module_kwargs):
         super(ResidualBlock, self).__init__()
         self.main = base_module(input_channels, output_channels, **base_module_kwargs)
 
@@ -91,7 +98,11 @@ class ResidualBlock(nn.Module):
         
         self.pool_match = False
         self.pool = nn.AvgPool2d(kernel_size=2, stride=2)
-        self.activation = nn.ReLU()
+        match residual_activation_function:
+            case 'ReLU':
+                self.activation = nn.ReLU()
+            case 'LeakyReLU':
+                self.activation = nn.LeakyReLU()
 
     def forward(self, x):
         identity = self.skip_connection(x)
@@ -110,12 +121,18 @@ class MLP(nn.Module):
                  input_neurons, 
                  output_neurons,
                  hidden_layers_neuron_number = [128,512,512,128],
-                 dropout = 0
+                 dropout = 0,
+                 activation_function='ReLU',
                  ):
         super(MLP, self).__init__()
         self.input_neurons = input_neurons
         self.output_neurons = output_neurons
         self.neurons = [input_neurons] + hidden_layers_neuron_number + [output_neurons]
+        match activation_function:
+            case 'ReLU':
+                self.activation_function = nn.ReLU()
+            case 'LeakyReLU':
+                self.activation_function = nn.LeakyReLU()
         self.layers = nn.ModuleList()
         for i in range(1,len(self.neurons)):
             layer = nn.Linear(self.neurons[i-1], self.neurons[i])
@@ -126,5 +143,6 @@ class MLP(nn.Module):
     def forward(self, x):
         for layer in self.layers:
             x = layer(x)
+            x = self.activation_function(x)
         return x
     
