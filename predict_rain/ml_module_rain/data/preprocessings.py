@@ -39,7 +39,7 @@ def preprocess_rain(ds_rain, type_predictions, quantile_extreme, quantile_extrem
                 quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time')
             else:
                 quantile_extreme_rain =  ds_rain.quantile(quantile_extreme, 'time')
-            return ((ds_rain > quantile_extreme_rain)*1).astype(int)
+            return ((ds_rain > quantile_extreme_rain)*1).astype(float)
         case 'boolean_smooth':
             if quantile_extreme_based_on_rainy_days:
                 quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time').values
@@ -56,9 +56,11 @@ def preprocess_rain(ds_rain, type_predictions, quantile_extreme, quantile_extrem
         case 'three_classes_grey_zone':
             if quantile_extreme_based_on_rainy_days:
                 quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time')
+                quantile_mid_rain = ds_rain.where(ds_rain>1).quantile(0.75, 'time')
             else:
                 quantile_extreme_rain =  ds_rain.quantile(quantile_extreme, 'time')
-            no_extreme = xr.ones_like(ds_rain).where(ds_rain>quantile_extreme_rain*0.8,0)
+                quantile_mid_rain = ds_rain.quantile(0.75, 'time')
+            no_extreme = xr.ones_like(ds_rain).where(ds_rain>quantile_mid_rain,0)
             return no_extreme.where(ds_rain<quantile_extreme_rain*1,2).astype(int)
         case _:
             raise ValueError("type_predictions must be 'boolean', 'three_classes', 'quantiles' or 'regression'")

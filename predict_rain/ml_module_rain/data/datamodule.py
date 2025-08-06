@@ -49,7 +49,7 @@ class MyDataLoader:
         if ds_atm.latitude.diff('latitude')[0]<0:
             lat_min, lat_max = lat_max, lat_min
         ds_atm = ds_atm.sel(longitude=slice(lon_min, lon_max), latitude=slice(lat_min, lat_max))
-        
+        ds_atm = ds_atm-ds_atm.mean(['longitude','latitude'])
         if load:
             self.features = ds_atm.astype('float32').load()
         else:

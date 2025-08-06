@@ -20,15 +20,16 @@ def get_checkpoint_callback(wandb_logger):
     return checkpoint_cb
 
 
-class LogF1Validation(Callback):
-    def __init__(self, num_timesteps=4):
+class LogF1ValidationBoolean(Callback):
+    def __init__(self, num_timesteps=4, target_value=1):
         self.num_timesteps=num_timesteps
+        self.target_value = target_value
     def on_validation_start(self, trainer, model):
         self.predictions_validation = []
         self.targets_validation = []
     def on_validation_end(self, trainer, model):
         y_validation = torch.stack(model.targets_validation)#.cpu().numpy()
-        y_scores = torch.stack(model.predictions_validation).view(-1, self.num_timesteps, 3).cpu()
+        y_scores = torch.stack(model.predictions_validation).view(-1, self.num_timesteps, self.number_of_classes).cpu()
         preds = torch.argmax(y_scores, dim=2) 
         targets = y_validation.cpu().numpy()
         model.predictions_validation = preds 
@@ -58,7 +59,66 @@ class LogF1Validation(Callback):
 
     def on_test_end(self, trainer, model):
         y_test = torch.stack(model.targets_test)#.cpu().numpy()
-        y_scores = torch.stack(model.predictions_test).view(-1, 4, 3).cpu()
+        y_scores = torch.stack(model.predictions_test).view(-1, self.num_timesteps, 3).cpu()
+        preds = torch.argmax(y_scores, dim=2) 
+        targets = y_test.cpu().numpy()
+        model.predictions_test = preds 
+        model.targets_test = targets
+        TP = ((model.predictions_test==model.targets_test) &(model.targets_test==2)).sum(axis=0)
+        recall = TP / (model.targets_test==2).sum(axis=0)
+        precision = TP / (model.predictions_test==2).sum(axis=0)
+        f1 = 2*(precision*recall)/(precision+recall)
+        model.f1_per_day_test = f1
+
+        # xr_targets=xr.DataArray(y_test.cpu().numpy(), dims=['time','timestep'], coords=dict(time=trainer.ds_test.time[:y_test.shape[0]], timestep=np.arange(y_scores.shape[1])))
+        # xr_preds=xr.DataArray(preds.cpu().numpy(), dims=['time','timestep'], coords=dict(time=trainer.ds_test.time[:y_test.shape[0]], timestep=np.arange(y_scores.shape[1])))
+        trainer.targets_test  = targets
+        trainer.predictions_test = preds
+        table_out = wandb.Table(columns=["Day", "F1","Precision","Recall"],
+                            data = np.array([[k for k in range(len(f1))], f1, precision, recall]).T)
+        wandb.log({"test/results_per_day_plot":table_out})
+
+class LogF1Validation(Callback):
+    def __init__(self, num_timesteps=4, target_value=2, number_of_classes=3):
+        self.num_timesteps=num_timesteps
+        self.target_value = target_value
+        self.number_of_classes = number_of_classes
+    def on_validation_start(self, trainer, model):
+        self.predictions_validation = []
+        self.targets_validation = []
+    def on_validation_end(self, trainer, model):
+        y_validation = torch.stack(model.targets_validation)#.cpu().numpy()
+        y_scores = torch.stack(model.predictions_validation).view(-1, self.num_timesteps, self.number_of_classes).cpu()
+        preds = torch.argmax(y_scores, dim=2) 
+        targets = y_validation.cpu().numpy()
+        model.predictions_validation = preds 
+        model.targets_validation = targets
+        TP = ((model.predictions_validation==model.targets_validation) &(model.targets_validation==2)).sum(axis=0)
+        recall = TP / (model.targets_validation==2).sum(axis=0)
+        precision = TP / (model.predictions_validation==2).sum(axis=0)
+        f1 = 2*(precision*recall)/(precision+recall)
+        model.f1_per_day = f1
+
+        TP = ((model.predictions_validation==model.targets_validation) &(model.targets_validation==2)).sum()
+        recall = TP / (model.targets_validation==2).sum()
+        precision = TP / (model.predictions_validation==2).sum()
+        f1 = 2*(precision*recall)/(precision+recall)
+
+        model.precision_validation = precision
+        model.recall_validation = recall
+        model.f1_validation = f1
+        wandb.log({"val/precision_epoch": model.precision_validation,
+                   "val/recall_epoch": model.recall_validation,
+                   "val/f1_epoch": model.f1_validation})
+        
+
+    def on_test_start(self, trainer, model):
+        self.predictions_test = []
+        self.targets_test = []
+
+    def on_test_end(self, trainer, model):
+        y_test = torch.stack(model.targets_test)#.cpu().numpy()
+        y_scores = torch.stack(model.predictions_test).view(-1, self.num_timesteps, 3).cpu()
         preds = torch.argmax(y_scores, dim=2) 
         targets = y_test.cpu().numpy()
         model.predictions_test = preds 

@@ -29,7 +29,7 @@ def main(run_id=None, samples_to_attribute='all-extr'):
         with torch.no_grad():
             all_probas.append(lightning_model(x))
         all_targets.append(y)
-    probas = torch.cat(all_probas).view(-1, 4, 3)
+    probas = torch.cat(all_probas).view(-1, dataloader.config['num_timesteps_predicted'], dataloader.config['prediction_per_timestep'])
     targets = torch.cat(all_targets).cpu().numpy()
     preds = torch.argmax(probas, dim=2).cpu().numpy() 
     probas = probas.cpu().numpy()
@@ -38,35 +38,32 @@ def main(run_id=None, samples_to_attribute='all-extr'):
     preds_da = xr.DataArray(preds, dims=['time','timestep'], coords =ds_aligned.targets.coords)
     ds_aligned ['predictions'] = preds_da
     
-    
     series_targets = ds_aligned.targets.to_series()
     series_predictions = ds_aligned.predictions.to_series()
-    
+
     all_predictions = pd.DataFrame(dict(predictions=series_predictions, targets=series_targets)).reset_index()
     all_predictions.columns = ['time_of_prediction','timestep','prediction','target']
     all_predictions['time_of_event'] = all_predictions.time_of_prediction + all_predictions.timestep*pd.Timedelta(1,'D')
-    valid_times = all_predictions.groupby("time_of_event").target.count().reset_index().query("target==4").time_of_event # Only four predictions
+    valid_times = all_predictions.groupby("time_of_event").target.count().reset_index().query(f"target=={dataloader.config['num_timesteps_predicted']}").time_of_event # Only four predictions
     all_predictions = all_predictions.loc[all_predictions.time_of_event.isin(valid_times)]
-    
+
     match samples_to_attribute:
         case 'TP':
             time_of_attributions = all_predictions.query("(prediction==target) & (target==2)").groupby('time_of_event').time_of_prediction.count().reset_index().query("time_of_prediction==4").time_of_event.values
         case 'all-extr':
-            time_of_attributions =all_predictions.query("prediction==2 | target==2").time_of_event.unique()
+            time_of_attributions = all_predictions.query("prediction==2 | target==2").time_of_event.unique()
         case 'all':
             time_of_attributions = all_predictions.time_of_event.unique()
         case _:
             print("Invalid selection of attributions")
 
+    steps = dataloader.config['num_timesteps_predicted']
     predictions_attributions = all_predictions.loc[all_predictions.time_of_event.isin(time_of_attributions)].sort_values(['time_of_event','timestep'], ascending=[True, False])
-    start_times = predictions_attributions.query("timestep==3").time_of_prediction.dt.strftime("%Y-%m-%d %H:%M:%S").values
+    start_times = predictions_attributions.query(f"timestep=={steps-1}").time_of_prediction.dt.strftime("%Y-%m-%d %H:%M:%S").values
     end_times = predictions_attributions.query("timestep==0").time_of_prediction.dt.strftime("%Y-%m-%d %H:%M:%S").values
-
     method = IntegratedGradients(lightning_model.model)
     all_multi_attrs = []
     all_multi_sens = []
-    steps=4
-
     for k in tqdm(range(len(start_times))):
         start = start_times[k]
         end = end_times[k]
@@ -81,8 +78,12 @@ def main(run_id=None, samples_to_attribute='all-extr'):
         sens = da_attrs/ds_test_extract.features.rename(time='timestep').assign_coords(timestep=da_attrs.timestep)
         all_multi_sens.append(sens.assign_coords(time=time_of_attributions[k]))
         # break
-    ds_attributions = xr.concat(all_multi_attrs, dim='time').assign_coords(timestep=np.arange(-3,1))
-    ds_sens = xr.concat(all_multi_sens, dim='time').assign_coords(timestep=np.arange(-3,1))
+    if steps==1:
+        timesteps = [0]
+    else:
+        timesteps = np.arange(-steps+1,1)
+    ds_attributions = xr.concat(all_multi_attrs, dim='time').assign_coords(timestep=timesteps)
+    ds_sens = xr.concat(all_multi_sens, dim='time').assign_coords(timestep=timesteps)
     ds_predictions_attributions = predictions_attributions.set_index(['time_of_event','timestep'])[['prediction','target']].to_xarray().rename(time_of_event='time')
     ds_predictions_attributions = ds_predictions_attributions.assign_coords(timestep=-ds_predictions_attributions.timestep).sortby('timestep')
     final_ds = xr.merge([xr.Dataset(dict(attributions = ds_attributions, sensitivity=ds_sens)), ds_predictions_attributions])

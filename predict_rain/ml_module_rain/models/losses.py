@@ -8,19 +8,18 @@ https://github.com/Javicadserres/wind-production-forecast/blob/28310d7dab7b47d7d
 
 def get_loss(loss_key, **kwargs):
     match loss_key:
-
         case 'crossentropy':
             loss = MultiCrossEntropyLoss(**kwargs)
         case 'focal':
             loss = MultiFocalLoss(**kwargs)
         case 'BCEwithlogits':
-            loss = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([10]))
+            loss = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([100]))
     return loss
 
 class MultiCrossEntropyLoss(nn.Module):
     def __init__(self, timesteps):
         super(MultiCrossEntropyLoss, self).__init__()
-        self.nll = torch.nn.NLLLoss(weight = torch.Tensor([.5,1,1]))
+        self.nll = torch.nn.NLLLoss(weight = torch.Tensor([0.07584753, 0.4, 0.4]))
         self.timesteps = timesteps
         
     def forward(self, pred, target):
@@ -38,7 +37,7 @@ class MultiCrossEntropyLoss(nn.Module):
     
 
 class MultiFocalLoss(nn.Module):
-    def __init__(self, timesteps, alpha=[1, 1, 9], gamma=2):
+    def __init__(self, timesteps, alpha=[.5,1,1], gamma=2):
         super(MultiFocalLoss, self).__init__()
         self.alpha = torch.tensor(alpha)
         self.gamma = gamma
