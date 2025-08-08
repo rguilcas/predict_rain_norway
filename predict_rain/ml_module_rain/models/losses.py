@@ -13,7 +13,7 @@ def get_loss(loss_key, **kwargs):
         case 'focal':
             loss = MultiFocalLoss(**kwargs)
         case 'BCEwithlogits':
-            pos_weight =  torch.tensor([6., 7., 8., 10.])  # Boost positive class loss
+            pos_weight =  torch.tensor([12., 12., 14., 16.])  # Boost positive class loss
             loss = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     return loss
 

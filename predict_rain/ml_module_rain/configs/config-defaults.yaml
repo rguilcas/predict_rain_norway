@@ -54,7 +54,7 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dynamical_variables/dl_inputs_day_1deg_1940-2024.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "z500 u850 t850 msl v850 pv500 cape"
+  value: "u850 msl z500"
 spatial_extent:
   desc: List of lon_min, lon_max, lat_min, lat_max
   value: [-128, 53, 0, 90]
