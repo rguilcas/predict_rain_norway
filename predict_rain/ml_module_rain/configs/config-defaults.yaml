@@ -13,7 +13,7 @@ num_epochs:
   value: 100
 loss_function:
   desc: choice of loss function
-  value: 'crossentropy'
+  value: 'BCEwithlogits'
 activation_function:
   desc: activation function for all non linear operators
   value: 'ReLU'
@@ -24,7 +24,7 @@ file_name_data_out:
   value: '/Data/gfi/users/rogui7909/data/ERA5/precipitation/pr_era5_daily_westnorway_1940-2024.nc'
 type_prediction:
   desc: Type of prediction done. Either 'regression', 'quantiles', 'three_classes', 'boolean', 'boolean_smooth'
-  value: 'three_classes_grey_zone'
+  value: 'boolean_smooth'
 quantile_extreme:
   desc: What is defined as extreme in terms of quantiles.
   value: .9
@@ -33,7 +33,7 @@ quantile_extreme_based_on_rainy_days:
   value: True
 num_timesteps_predicted:
   desc: Timesteps predicted for future rain
-  value: 1
+  value: 4
 season:
   desc: Season chosen for the prediction. Can be 'all' or 'DJF' 'MAM' 'JJA' or 'SON'
   value: 'all'
@@ -54,7 +54,7 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dynamical_variables/dl_inputs_day_1deg_1940-2024.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "z500 u850 t850 msl v850"
+  value: "z500 u850 t850 msl v850 pv500 cape"
 spatial_extent:
   desc: List of lon_min, lon_max, lat_min, lat_max
   value: [-128, 53, 0, 90]
@@ -75,7 +75,7 @@ size_conv_kernel:
   value: 3
 conv1_kernel_number:
   desc: Size of the first conv layer kernels
-  value: 16
+  value: 32
 factor_increase_kernels_per_conv_layer:
   desc: How much to multiply the number of kernel in layer N to get layer N+1
   value: 2

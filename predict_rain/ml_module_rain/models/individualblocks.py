@@ -141,8 +141,9 @@ class MLP(nn.Module):
                 self.layers.append(nn.Dropout(p=dropout))
 
     def forward(self, x):
-        for layer in self.layers:
+        for layer in self.layers[:-1]:
             x = layer(x)
             x = self.activation_function(x)
+        x = self.layers[-1](x)
         return x
     

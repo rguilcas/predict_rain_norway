@@ -45,7 +45,10 @@ def preprocess_rain(ds_rain, type_predictions, quantile_extreme, quantile_extrem
                 quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time').values
             else:
                 quantile_extreme_rain =  ds_rain.quantile(quantile_extreme, 'time').values
-            return sigmoid_soft_label(ds_rain, threshold=quantile_extreme_rain, width=quantile_extreme_rain/10).astype(float)
+            rain_preproc = sigmoid_soft_label(ds_rain, threshold=quantile_extreme_rain*3/4, width=quantile_extreme_rain/20).astype(float)
+            rain_preproc = rain_preproc.where(ds_rain>quantile_extreme_rain/2,0)
+            rain_preproc = rain_preproc.where(ds_rain<quantile_extreme_rain,1)
+            return rain_preproc
         case 'three_classes':
             if quantile_extreme_based_on_rainy_days:
                 quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time')

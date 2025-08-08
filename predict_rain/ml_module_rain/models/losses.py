@@ -13,7 +13,8 @@ def get_loss(loss_key, **kwargs):
         case 'focal':
             loss = MultiFocalLoss(**kwargs)
         case 'BCEwithlogits':
-            loss = nn.BCEWithLogitsLoss(pos_weight=torch.tensor([100]))
+            pos_weight =  torch.tensor([6., 7., 8., 10.])  # Boost positive class loss
+            loss = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     return loss
 
 class MultiCrossEntropyLoss(nn.Module):

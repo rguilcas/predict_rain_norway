@@ -37,7 +37,7 @@ def main(config_path=None):
 
     callbacks=[EarlyStopping(monitor="val/loss", mode="min"), 
                get_checkpoint_callback(wandb_logger),
-               LogF1Validation(num_timesteps=config['num_timesteps_predicted']),
+            #    LogF1Validation(num_timesteps=config['num_timesteps_predicted']),
                ]
     trainer = AttributableTrainer(limit_train_batches=100, 
                                 max_epochs=config['num_epochs'], 
@@ -57,8 +57,6 @@ def main(config_path=None):
     lightning_model.model.eval()
     with torch.no_grad():
         trainer.test(lightning_model, dataloaders=dataloader.val_loader)
-
-
     wandb.finish()
 
 
