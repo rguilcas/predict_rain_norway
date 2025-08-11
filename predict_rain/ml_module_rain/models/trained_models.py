@@ -17,7 +17,7 @@ def load_trained_model(run_id):
     dataloader = MyDataLoader(config)
     dataloader.print_infos()
     NN = get_neural_network(config)
-    loss = get_loss(config['loss_function'], timesteps = config['num_timesteps_predicted'])
+    loss = get_loss(config)
     lightroom_model = ExtremeRainPredictor(NN, 
                             learning_rate=config['learning_rate'], 
                             lr_scheduler =config['lr_scheduler'],

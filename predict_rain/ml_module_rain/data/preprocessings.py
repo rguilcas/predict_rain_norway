@@ -28,7 +28,48 @@ def filter_by_season(ds, season):
     else:
         raise ValueError("Season should be 'all', 'DJF','MAM', 'JJA' or 'SON'.")
 
-def preprocess_rain(ds_rain, type_predictions, quantile_extreme, quantile_extreme_based_on_rainy_days):
+### sigmoid for grey zone
+def _compute_k(low, high, eps=0.05):
+    if high <= low:
+        raise ValueError("high must be > low")
+    d = (high - low) / 2.0
+    return np.log((1 - eps) / eps) / d
+
+def sigmoid(x):
+    return 1.0 / (1.0 + np.exp(-x))
+
+def smooth_rain_soft(x, low, high, k=None, eps=0.05):
+    """
+    Soft asymptotic sigmoid: values approach 0/1 outside but not exact.
+    x can be scalar or array.
+    """
+    m = 0.5*(low + high)
+    if k is None:
+        k = _compute_k(low, high, eps=eps)
+    return sigmoid(k * (np.asarray(x) - m))
+
+def smooth_rain_rescaled(x, low, high, k=None, eps=0.05):
+    """
+    Rescaled & clipped: exactly 0 at x=low, exactly 1 at x=high,
+    smooth in between, clipped outside [low,high].
+    """
+    x = np.asarray(x)
+    m = 0.5*(low + high)
+    if k is None:
+        k = _compute_k(low, high, eps=eps)
+    raw = sigmoid(k * (x - m))
+    raw_low = sigmoid(-k * (high - low) / 2.0)  # = eps by design
+    raw_high = sigmoid( k * (high - low) / 2.0)  # = 1-eps by design
+    # rescale to [0,1] between low and high, then clip outside:
+    y = (raw - raw_low) / (raw_high - raw_low)
+    return np.clip(y, 0.0, 1.0)
+
+
+# true preprocess
+def preprocess_rain(ds_rain, config):
+    type_predictions = config['type_prediction']
+    quantile_extreme = config['quantile_extreme']
+    quantile_extreme_based_on_rainy_days = config['quantile_extreme_based_on_rainy_days']
     match type_predictions:
         case 'regression':
             return ds_rain
@@ -41,13 +82,18 @@ def preprocess_rain(ds_rain, type_predictions, quantile_extreme, quantile_extrem
                 quantile_extreme_rain =  ds_rain.quantile(quantile_extreme, 'time')
             return ((ds_rain > quantile_extreme_rain)*1).astype(float)
         case 'boolean_smooth':
-            if quantile_extreme_based_on_rainy_days:
-                quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time').values
+            if 'quantile_lower_grey_zone' in config:
+                quantile_lower_grey_zone = config['quantile_lower_grey_zone']
             else:
-                quantile_extreme_rain =  ds_rain.quantile(quantile_extreme, 'time').values
-            rain_preproc = sigmoid_soft_label(ds_rain, threshold=quantile_extreme_rain*3/4, width=quantile_extreme_rain/20).astype(float)
-            rain_preproc = rain_preproc.where(ds_rain>quantile_extreme_rain/2,0)
-            rain_preproc = rain_preproc.where(ds_rain<quantile_extreme_rain,1)
+                quantile_lower_grey_zone = 0.75
+            if quantile_extreme_based_on_rainy_days:
+                quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme,[ 'time', 'timestep']).values
+                quantile_extreme_rain_grey =  ds_rain.where(ds_rain>1).quantile(quantile_lower_grey_zone,[ 'time', 'timestep']).values
+            else:
+                quantile_extreme_rain =  ds_rain.quantile(quantile_extreme,[ 'time', 'timestep']).values
+                quantile_extreme_rain_grey =  ds_rain.quantile(quantile_lower_grey_zone,[ 'time', 'timestep']).values
+            rain_preproc = smooth_rain_rescaled(ds_rain, quantile_extreme_rain_grey, quantile_extreme_rain)
+            rain_preproc = xr.DataArray(rain_preproc, dims=ds_rain.dims, coords=ds_rain.coords)
             return rain_preproc
         case 'three_classes':
             if quantile_extreme_based_on_rainy_days:
@@ -57,12 +103,16 @@ def preprocess_rain(ds_rain, type_predictions, quantile_extreme, quantile_extrem
             no_rain = xr.ones_like(ds_rain).where(ds_rain>1,0)
             return no_rain.where(ds_rain<quantile_extreme_rain,2).astype(int)
         case 'three_classes_grey_zone':
+            if 'quantile_lower_grey_zone' in config:
+                quantile_lower_grey_zone = config['quantile_lower_grey_zone']
+            else:
+                quantile_lower_grey_zone = 0.75
             if quantile_extreme_based_on_rainy_days:
                 quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time')
-                quantile_mid_rain = ds_rain.where(ds_rain>1).quantile(0.75, 'time')
+                quantile_mid_rain = ds_rain.where(ds_rain>1).quantile(quantile_lower_grey_zone, 'time')
             else:
                 quantile_extreme_rain =  ds_rain.quantile(quantile_extreme, 'time')
-                quantile_mid_rain = ds_rain.quantile(0.75, 'time')
+                quantile_mid_rain = ds_rain.quantile(quantile_lower_grey_zone, 'time')
             no_extreme = xr.ones_like(ds_rain).where(ds_rain>quantile_mid_rain,0)
             return no_extreme.where(ds_rain<quantile_extreme_rain*1,2).astype(int)
         case _:

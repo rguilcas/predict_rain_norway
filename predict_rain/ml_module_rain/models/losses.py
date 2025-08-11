@@ -6,14 +6,20 @@ from torch.nn import functional
 https://github.com/Javicadserres/wind-production-forecast/blob/28310d7dab7b47d7db3d690580505c1a456e471b/src/model/losses.py#L5
 """
 
-def get_loss(loss_key, **kwargs):
+def get_loss(config, **kwargs):
+    loss_key = config['loss_function']
     match loss_key:
         case 'crossentropy':
-            loss = MultiCrossEntropyLoss(**kwargs)
+            timesteps = config['num_timesteps_predicted']
+            loss = MultiCrossEntropyLoss(timesteps)
         case 'focal':
-            loss = MultiFocalLoss(**kwargs)
+            timesteps = config['num_timesteps_predicted']
+            loss = MultiFocalLoss(timesteps=timesteps)
         case 'BCEwithlogits':
-            pos_weight =  torch.tensor([12., 12., 14., 16.])  # Boost positive class loss
+            if 'loss_weights' in config.keys():
+                pos_weight =  torch.tensor(config['loss_weights'])  # Boost positive class loss
+            else:
+                pos_weight =  torch.tensor([12., 12., 14., 16.])  # Boost positive class loss
             loss = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
     return loss
 

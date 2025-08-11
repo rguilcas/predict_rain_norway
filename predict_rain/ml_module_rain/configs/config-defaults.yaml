@@ -14,6 +14,9 @@ num_epochs:
 loss_function:
   desc: choice of loss function
   value: 'BCEwithlogits'
+loss_weights:
+  desc: weights for the loss function if BCEwithlogits
+  value: [12., 12., 14., 16.] 
 activation_function:
   desc: activation function for all non linear operators
   value: 'ReLU'
@@ -27,10 +30,13 @@ type_prediction:
   value: 'boolean_smooth'
 quantile_extreme:
   desc: What is defined as extreme in terms of quantiles.
-  value: .9
+  value: .90
 quantile_extreme_based_on_rainy_days:
   desc: If the quantile is computed based on rainy days only or on all days.
   value: True
+quantile_lower_grey_zone:
+  desc: What is the lower limit of the grey zone for boolean grey zone.
+  value: 0.5
 num_timesteps_predicted:
   desc: Timesteps predicted for future rain
   value: 4
@@ -54,7 +60,7 @@ file_name_data_in:
   value: "/Data/gfi/users/rogui7909/data/ERA5/dynamical_variables/dl_inputs_day_1deg_1940-2024.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "u850 msl z500"
+  value: "u850 v850 msl z500"
 spatial_extent:
   desc: List of lon_min, lon_max, lat_min, lat_max
   value: [-128, 53, 0, 90]

@@ -46,7 +46,7 @@ def main(config_path=None):
                                 callbacks=callbacks, deterministic=True,
                                 accelerator="cpu", devices=1)
 
-    loss = get_loss(config['loss_function'], timesteps = config['num_timesteps_predicted'])
+    loss = get_loss(config)
     lightning_model = ExtremeRainPredictor(NN, 
                             learning_rate=config['learning_rate'], 
                             lr_scheduler =config['lr_scheduler'],

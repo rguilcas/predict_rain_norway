@@ -19,10 +19,7 @@ class MyDataLoader:
         ds_rain = add_timesteps(ds_rain, num_timesteps_predicted=self.config['num_timesteps_predicted'])
         ds_rain = filter_by_season(ds_rain,season=self.config['season'])
         self.rain = ds_rain
-        self.targets = preprocess_rain(ds_rain, 
-                                  type_predictions=self.config['type_prediction'], 
-                                  quantile_extreme=self.config['quantile_extreme'],
-                                  quantile_extreme_based_on_rainy_days=self.config['quantile_extreme_based_on_rainy_days'])
+        self.targets = preprocess_rain(ds_rain, self.config)
         match self.config['type_prediction']:
             case 'boolean':
                 self.config['prediction_per_timestep'] = 1
