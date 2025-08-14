@@ -13,6 +13,11 @@ import numpy as np
 import argparse
 from ml_module_rain.models.trained_models import load_trained_model
 
+def change_time_of_prediction_to_time_of_event(ds_in):
+    ds_out = xr.concat([ds_in.isel(timestep_future=k).shift(time_of_prediction=k) for k in range(ds_in.timestep_future.size)], dim='timestep_future')
+    ds_out = ds_out.rename(time_of_prediction='time_of_event', timestep_future='timestep_past')
+    ds_out = ds_out.assign_coords(timestep_past = np.arange(-ds_out.timestep_past.size+1,1))
+    return ds_out
 
 def get_ds_with_predictions(dataloader, lightning_model):
     if torch.cuda.is_available():
@@ -39,67 +44,69 @@ def get_ds_with_predictions(dataloader, lightning_model):
     targets = torch.cat(all_targets).cpu().numpy()
 
     ds_aligned = dataloader.ds_val.isel(time=range(targets.shape[0]))
-    preds_da = xr.DataArray(preds, dims=["time", "timestep"], coords=ds_aligned.targets.coords)
+    ds_aligned = ds_aligned.rename(time='time_of_prediction', timestep ='timestep_future')
+    preds_da = xr.DataArray(preds, dims=["time_of_prediction", "timestep_future"], coords=ds_aligned.targets.coords)
     ds_aligned["predictions"] = preds_da
+    ds_out = change_time_of_prediction_to_time_of_event(ds_aligned)
+    ds_out_valid_times = ds_out.where(ds_out.targets.count('timestep_past') == ds_out.targets.count('timestep_past').max(), drop=True)
+    return ds_out_valid_times.transpose('time_of_event','timestep_past','var_name','latitude','longitude')
 
-    return ds_aligned
-
-def get_ds_with_attributions(dataloader, time_of_attributions, ds_prediction, lightning_model, ds_aligned):
+def get_ds_with_attributions(ds_aligned, lightning_model):
     if torch.cuda.is_available():
         device="cuda"
     else:
         device=='cpu'
-    steps = dataloader.config['num_timesteps_predicted']
-    start_times = (time_of_attributions - pd.Timedelta(ds_prediction.timestep.size - 1, 'D')).dt.strftime("%Y-%m-%d %H:%M:%S").values
-    end_times = time_of_attributions.dt.strftime("%Y-%m-%d %H:%M:%S").values
-
+    steps = ds_aligned.timestep_past.size
+    
     lightning_model.to(device)
     lightning_model.eval()
 
+    features_cpu = torch.tensor(ds_aligned.features.values, dtype=torch.float32, device='cpu')    
+
     method = IntegratedGradients(lightning_model.model)
+    all_attrs = []
 
-    all_multi_attrs = []
-    all_multi_sens = []
+    for idx in tqdm(range(features_cpu.shape[0])):  # iterate over time_of_event
+        x_in = features_cpu[idx].to(device, non_blocking=True).requires_grad_()  # shape: (timestep_past, var_name, lat, lon)
+        baseline = torch.zeros_like(x_in, device=device)
 
-    for k in tqdm(range(len(start_times))):
-        # Select the time slice
-        ds_test_extract = ds_aligned.sel(time=slice(start_times[k], end_times[k]))
-        # Prepare input tensor on GPU
-        tensor_in = torch.tensor(ds_test_extract.features.values, device=device, dtype=torch.float32, requires_grad=True)
-        # Baseline on GPU
-        baseline = torch.zeros_like(tensor_in, device=device)
-        # Compute attributions
         attrs = method.attribute(
-            tensor_in,
+            x_in,  # add batch dim if model expects it
             baselines=baseline,
-            target=[ds_prediction.timestep.size - 1 - t for t in range(ds_prediction.timestep.size)]
+            target=list(range(steps))
         )
 
-        # Move results back to CPU once
-        attrs_cpu = attrs.detach().cpu()
+        attrs_cpu = attrs.detach().cpu()  # remove batch dim
 
+        # Rebuild DataArray
         da_attrs = xr.DataArray(
             attrs_cpu,
-            dims=['timestep', 'var_name', 'latitude', 'longitude'],
+            dims=['timestep_past', 'var_name', 'latitude', 'longitude'],
             coords=dict(
-                timestep=np.arange(1, steps + 1),
-                var_name=ds_test_extract.var_name,
-                latitude=ds_test_extract.latitude,
-                longitude=ds_test_extract.longitude
+                timestep_past=ds_aligned.timestep_past,
+                var_name=ds_aligned.var_name,
+                latitude=ds_aligned.latitude,
+                longitude=ds_aligned.longitude
             )
         )
+        all_attrs.append(da_attrs.assign_coords(time_of_event=ds_aligned.time_of_event[idx]))
 
-        all_multi_attrs.append(da_attrs.assign_coords(time=time_of_attributions[k]))
+        del x_in, attrs, baseline
+        torch.cuda.empty_cache()
 
-        sens = da_attrs / ds_test_extract.features.rename(time='timestep').assign_coords(timestep=da_attrs.timestep)
-        all_multi_sens.append(sens.assign_coords(time=time_of_attributions[k]))
-
-    timesteps = np.arange(-steps + 1, 1)
-    ds_attributions = xr.concat(all_multi_attrs, dim='time_of_event').assign_coords(timestep=timesteps)
-    ds_sens = xr.concat(all_multi_sens, dim='time_of_event').assign_coords(timestep=timesteps)
-
-    final_ds = xr.merge([xr.Dataset(dict(attributions=ds_attributions, sensitivity=ds_sens)), ds_prediction])
-    return final_ds
+    
+    ds_attributions = xr.concat(all_attrs, dim='time_of_event')
+    
+    baseline = torch.zeros_like(features_cpu[idx][:1], device=device)  # shape: (timestep_past, var_name, lat, lon)
+    with torch.no_grad():
+        baseline_prediction = lightning_model.model(baseline)[0]
+    baseline_prediction = baseline_prediction.cpu().numpy()
+    baseline_prediction_da = xr.DataArray(baseline_prediction,
+                                          dims=['timestep_past'], 
+                                          coords = dict(timestep_past=np.arange(0,-baseline_prediction.size,-1))).sortby('timestep_past')
+    ds_aligned['attributions'] = ds_attributions
+    ds_aligned['baseline_attributions'] = baseline_prediction_da
+    return ds_aligned
 
 def haversine_np(lon1, lat1, lon2, lat2, radius=6371):
     # Convert degrees to radians
@@ -115,8 +122,8 @@ def haversine_np(lon1, lat1, lon2, lat2, radius=6371):
     c = 2 * np.arcsin(np.sqrt(a))
     return radius * c
 
-def get_distance_to_cyclone(date, final_ds, df_features, cycs, grid):
-    date_min = (pd.to_datetime(date) - pd.Timedelta(final_ds.timestep.size-1,'D')).strftime("%Y-%m-%d")
+def get_distance_to_cyclone_date(date, final_ds, df_features, cycs, grid):
+    date_min = (pd.to_datetime(date) - pd.Timedelta(final_ds.timestep_past.size-1,'D')).strftime("%Y-%m-%d")
     features_date = df_features.loc[date].dropna().iloc[:-2]
     if features_date.size==0:
         # print("No feature")
@@ -138,56 +145,32 @@ def get_distance_to_cyclone(date, final_ds, df_features, cycs, grid):
     min_distances_to_cyclone = min_distances_to_cyclone.rename(time='timestep').assign_coords(timestep=timesteps)
     return min_distances_to_cyclone
 
-def get_distance_to_cyclones(final_ds):
+def get_distance_to_cyclones(ds_aligned):
     cycs = xr.open_dataset('/Data/gfi/spengler/kko033/cyclone_clustering/data/all_combined_NH_trcks.nc').to_dataframe().set_index('track_id').sort_index()
     df_features = pd.read_csv("/Data/gfi/users/rogui7909/data/attribute_precip_features/western_norway/features_attributed_to_rain_per_day_WN.csv",index_col=0, parse_dates=True)
-    grid = xr.zeros_like(final_ds.attributions.isel(time_of_event=0, var_name=0, timestep=0, drop=True))
+    grid = xr.zeros_like(ds_aligned.attributions.isel(time_of_event=0, var_name=0, timestep_past=0, drop=True))
     all_dist = []
-    days_str = final_ds.time_of_event.dt.strftime('%Y-%m-%d').values
+    days_str = ds_aligned.time_of_event.dt.strftime('%Y-%m-%d').values
 
     for date in tqdm(days_str):
-        dist = get_distance_to_cyclone(date, final_ds, df_features, cycs, grid)
+        dist = get_distance_to_cyclone_date(date, ds_aligned, df_features, cycs, grid)
         if dist is not None:
             all_dist.append(dist)
     dist_to_cyclone = xr.concat(all_dist, dim='time_of_event')
     return dist_to_cyclone
 
 
-def main(run_id=None, samples_to_attribute='extr'):
+def main(run_id=None, samples_to_attribute='all'):
     torch.set_float32_matmul_precision('medium')
     seed_everything(42, workers=True)
     dataloader, lightning_model = load_trained_model(run_id)
-    ds_aligned = get_ds_with_predictions(dataloader, lightning_model)
-
-
-    series_targets = ds_aligned.targets.to_series()
-    series_predictions = ds_aligned.predictions.to_series()
-    all_predictions = pd.DataFrame(dict(predictions=series_predictions, targets=series_targets)).reset_index()
-    all_predictions.columns = ['time_of_prediction','timestep','prediction','target']
-    all_predictions['time_of_event'] = all_predictions.time_of_prediction + all_predictions.timestep*pd.Timedelta(1,'D')
-    valid_times = all_predictions.groupby("time_of_event").target.count().reset_index().query(f"target=={dataloader.config['num_timesteps_predicted']}").time_of_event # Only four predictions
-    all_predictions = all_predictions.loc[all_predictions.time_of_event.isin(valid_times)]
-
-    ds_prediction = all_predictions.pivot(index='time_of_event', values=['target','prediction'], columns='timestep').stack().to_xarray()
-    ds_prediction = ds_prediction.assign_coords(timestep=np.arange(0,-ds_prediction.timestep.size,-1))
-
-    time_of_attributions = ds_prediction.time_of_event
-
-    match samples_to_attribute:
-        case 'extr':
-                time_of_attributions = ds_prediction.time_of_event.where(ds_prediction.isel(timestep=0, drop=True).target == 1, drop=True)
-        case 'all':
-            pass
-        case _:
-            print("Invalid selection of attributions")
+    ds_out = get_ds_with_predictions(dataloader, lightning_model)
+    ds_out = get_ds_with_attributions(ds_out, lightning_model)
+    dist_to_cyclone = get_distance_to_cyclones(ds_out)
+    ds_out['distance_to_cyclone'] = dist_to_cyclone
+    print(f"Saving file in /Data/gfi/users/rogui7909/data/NN_outputs/attributions/{run_id}_attributions_{samples_to_attribute}.nc")
+    ds_out.to_netcdf(f"/Data/gfi/users/rogui7909/data/NN_outputs/attributions/{run_id}_attributions_{samples_to_attribute}.nc")
     
-    time_of_attributions = ds_prediction.time_of_event.where(ds_prediction.isel(timestep=0, drop=True).target == 1, drop=True)
-
-    final_ds = get_ds_with_attributions(dataloader, time_of_attributions, ds_prediction, lightning_model, ds_aligned)
-
-    final_ds['distance_to_cyclone'] = get_distance_to_cyclones(final_ds)
-
-    final_ds.to_netcdf(f"/Data/gfi/users/rogui7909/data/NN_outputs/attributions/{run_id}_attributions_{samples_to_attribute}.nc")
 
 
 if __name__ == "__main__":
