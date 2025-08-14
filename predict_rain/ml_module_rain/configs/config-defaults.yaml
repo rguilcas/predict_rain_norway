@@ -16,7 +16,7 @@ loss_function:
   value: 'BCEwithlogits'
 loss_weights:
   desc: weights for the loss function if BCEwithlogits
-  value: [12., 12., 14., 16.] 
+  value: [12., 12., 14., 20., 20.] 
 activation_function:
   desc: activation function for all non linear operators
   value: 'ReLU'
@@ -36,10 +36,10 @@ quantile_extreme_based_on_rainy_days:
   value: True
 quantile_lower_grey_zone:
   desc: What is the lower limit of the grey zone for boolean grey zone.
-  value: 0.5
+  value: 0.75
 num_timesteps_predicted:
   desc: Timesteps predicted for future rain
-  value: 4
+  value: 5
 season:
   desc: Season chosen for the prediction. Can be 'all' or 'DJF' 'MAM' 'JJA' or 'SON'
   value: 'all'
@@ -63,7 +63,7 @@ inputs:
   value: "u850 v850 msl z500"
 spatial_extent:
   desc: List of lon_min, lon_max, lat_min, lat_max
-  value: [-128, 53, 0, 90]
+  value: [-180, 180, 0, 90]
   
 
 ## Network params CNN

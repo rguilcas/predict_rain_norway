@@ -39,12 +39,13 @@ def main(config_path=None):
                get_checkpoint_callback(wandb_logger),
             #    LogF1Validation(num_timesteps=config['num_timesteps_predicted']),
                ]
+    accelerator = 'gpu' if torch.cuda.is_available() else 'gpu'
     trainer = AttributableTrainer(limit_train_batches=100, 
                                 max_epochs=config['num_epochs'], 
                                 logger=wandb_logger, 
                                 log_every_n_steps=1, default_root_dir="/Data/gfi/users/rogui7909/lightning_checkpoint/",
                                 callbacks=callbacks, deterministic=True,
-                                accelerator="cpu", devices=1)
+                                accelerator=accelerator, devices=1)
 
     loss = get_loss(config)
     lightning_model = ExtremeRainPredictor(NN, 
