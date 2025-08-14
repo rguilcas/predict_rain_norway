@@ -16,7 +16,7 @@ loss_function:
   value: 'BCEwithlogits'
 loss_weights:
   desc: weights for the loss function if BCEwithlogits
-  value: [12., 12., 14., 20., 20.] 
+  value: [12., 12., 14., 20., 20., 20., 20.] 
 activation_function:
   desc: activation function for all non linear operators
   value: 'ReLU'
@@ -39,7 +39,7 @@ quantile_lower_grey_zone:
   value: 0.75
 num_timesteps_predicted:
   desc: Timesteps predicted for future rain
-  value: 5
+  value: 7
 season:
   desc: Season chosen for the prediction. Can be 'all' or 'DJF' 'MAM' 'JJA' or 'SON'
   value: 'all'

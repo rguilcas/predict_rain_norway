@@ -15,10 +15,9 @@ from ml_module_rain.models.trained_models import load_trained_model
 
 def change_time_of_prediction_to_time_of_event(ds_in):
     steps = ds_in.timestep_future.size
-    ds_out = xr.concat([ds_in.isel(timestep_future=k).shift(time_of_prediction=-(steps-k-1)) for k in range(ds_in.timestep_future.size)], dim='timestep_future')
+    ds_out = xr.concat([ds_in.isel(timestep_future=k).shift(time_of_prediction=k) for k in range(ds_in.timestep_future.size)], dim='timestep_future')
     ds_out = ds_out.rename(time_of_prediction='time_of_event', timestep_future='timestep_past')
-    ds_out = ds_out.assign_coords(timestep_past = np.arange(0,-ds_out.timestep_past.size,-1))
-    ds_out = ds_out.sel(timestep_past=np.arange(-ds_out.timestep_past.size+1,1))
+    ds_out = ds_out.assign_coords(timestep_past = np.arange(-ds_out.timestep_past.size+1,1))
     return ds_out
 
 def get_ds_with_predictions(dataloader, lightning_model):
@@ -75,7 +74,7 @@ def get_ds_with_attributions(ds_aligned, lightning_model):
         attrs = method.attribute(
             x_in,  # add batch dim if model expects it
             baselines=baseline,
-            target=[steps - 1 -k for k in range(0,steps)]
+            target=list(range(steps))
         )
 
         attrs_cpu = attrs.detach().cpu()  # remove batch dim
@@ -167,9 +166,9 @@ def main(run_id=None, samples_to_attribute='all'):
     seed_everything(42, workers=True)
     dataloader, lightning_model = load_trained_model(run_id)
     ds_out = get_ds_with_predictions(dataloader, lightning_model)
-    ds_out = get_ds_with_attributions(ds_out, lightning_model)
-    dist_to_cyclone = get_distance_to_cyclones(ds_out)
-    ds_out['distance_to_cyclone'] = dist_to_cyclone
+    # ds_out = get_ds_with_attributions(ds_out, lightning_model)
+    # dist_to_cyclone = get_distance_to_cyclones(ds_out)
+    # ds_out['distance_to_cyclone'] = dist_to_cyclone
     print(f"Saving file in /Data/gfi/users/rogui7909/data/NN_outputs/attributions/{run_id}_attributions_{samples_to_attribute}.nc")
     ds_out.to_netcdf(f"/Data/gfi/users/rogui7909/data/NN_outputs/attributions/{run_id}_attributions_{samples_to_attribute}.nc")
     
