@@ -13,13 +13,17 @@ num_epochs:
   value: 100
 loss_function:
   desc: choice of loss function
-  value: 'BCEwithlogits'
+  value: 'BCEwithlogits_per_horizon'
 loss_weights:
   desc: weights for the loss function if BCEwithlogits
-  value: [12., 12., 14., 20., 20., 20., 20.] 
+  value: [9., 9., 9., 9., 9., 9., 9.] 
+focal_gamma: 
+  desc: Gamma value for focal loss. >1 means more emphasis on uncertain results
+  value: 2.0
 activation_function:
   desc: activation function for all non linear operators
   value: 'ReLU'
+
 
 ### In/Out params
 file_name_data_out:
@@ -71,8 +75,8 @@ use_skip_connections:
   desc: uses ResNet style skip connections or not
   value: True
 CNN_layer_module:
-  desc: what is the convolutionnal layer used. Can either be 'doubleconv', 'convstride','conv+pool'
-  value: 'doubleconv'
+  desc: what is the convolutionnal layer used. Can either be 'doubleconv', 'convstride','conv+pool', 'doubleconv+pool'
+  value: 'doubleconv+pool'
 num_conv_layer:
   desc: Number of convolution layers in the CNN
   value: 7
@@ -94,9 +98,12 @@ batch_norm_CNN:
 
 ## Network params MLP
 
+split_MLP_head_per_horizon:
+  desc: whether to have split heads per horizon 
+  value: True
 MLP_hidden_layers_neuron_number:
   desc: Layers of the MLP after the CNN 
-  value: [128,128]
+  value: [512,128]
 dropout_MLP:
   desc: Probability of dropout between MLP layers
   value: 0.2

@@ -1,6 +1,7 @@
 import torch 
 from torch import nn
-from torch.nn import functional
+from torch.nn import functional 
+import torch.nn.functional as F
 
 """
 https://github.com/Javicadserres/wind-production-forecast/blob/28310d7dab7b47d7db3d690580505c1a456e471b/src/model/losses.py#L5
@@ -15,13 +16,114 @@ def get_loss(config, **kwargs):
         case 'focal':
             timesteps = config['num_timesteps_predicted']
             loss = MultiFocalLoss(timesteps=timesteps)
+        case 'FocalBCE':
+            gamma = config['focal_gamma']
+            if 'loss_weights' in config.keys():
+                pos_weight =  torch.tensor(config['loss_weights'])
+            else:
+                pos_weight =  torch.tensor([12., 12., 14., 16.])
+            loss = BCEFocalLoss(gamma=gamma, pos_weight=pos_weight)
         case 'BCEwithlogits':
             if 'loss_weights' in config.keys():
                 pos_weight =  torch.tensor(config['loss_weights'])  # Boost positive class loss
             else:
                 pos_weight =  torch.tensor([12., 12., 14., 16.])  # Boost positive class loss
             loss = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+        case 'BCEwithlogits_per_horizon':
+            if 'loss_weights' in config.keys():
+                pos_weight =  torch.tensor(config['loss_weights'])  # Boost positive class loss
+            else:
+                pos_weight =  torch.tensor([12., 12., 14., 16.])  # Boost positive class loss
+            # loss = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+            loss = BCEWithLogitsHorizonWeighted(pos_weight=pos_weight, horizon_weight=[1.,1.,1.1,1.1,1.2,1.3,1.4])
     return loss
+
+class BCEWithLogitsHorizonWeighted(nn.Module):
+    def __init__(self, pos_rate=None, pos_weight=None, horizon_weight=None, eps=1e-8):
+        """
+        Args:
+            pos_rate (Tensor or list, optional): [H] base rates per horizon (0-1).
+                                                 Used to compute pos_weight = (1-p)/p.
+            pos_weight (Tensor or list, optional): [H] direct positive-class weights.
+                                                    Ignored if pos_rate is given.
+            horizon_weight (Tensor or list, optional): [H] extra weight per horizon.
+            eps (float): numerical stability constant.
+        """
+        super().__init__()
+        self.eps = eps
+
+        if pos_rate is not None:
+            pos_rate = torch.as_tensor(pos_rate, dtype=torch.float32)
+            pw = (1.0 - pos_rate).clamp(eps, 1.0 - eps) / pos_rate.clamp(eps, 1.0 - eps)
+            self.register_buffer("pos_weight", pw)
+        elif pos_weight is not None:
+            self.register_buffer("pos_weight", torch.as_tensor(pos_weight, dtype=torch.float32))
+        else:
+            self.pos_weight = None
+
+        if horizon_weight is not None:
+            self.register_buffer("horizon_weight", torch.as_tensor(horizon_weight, dtype=torch.float32))
+        else:
+            self.horizon_weight = None
+
+    def forward(self, logits, targets, mask=None):
+        """
+        Args:
+            logits: [B, H] raw logits.
+            targets: [B, H] binary targets (0 or 1).
+            mask: [B, H] binary mask where 1=use, 0=ignore (optional).
+        Returns:
+            Scalar loss.
+        """
+        # BCE per element, no reduction
+        bce = F.binary_cross_entropy_with_logits(
+            logits, targets.float(),
+            reduction='none',
+            pos_weight=self.pos_weight
+        )  # [B, H]
+
+        # Apply horizon weighting
+        if self.horizon_weight is not None:
+            bce = bce * self.horizon_weight  # broadcast over batch dim
+
+        # Masking (optional)
+        if mask is not None:
+            bce = bce * mask
+            denom = mask.sum().clamp_min(1.0)
+        else:
+            denom = torch.tensor(logits.numel(), device=logits.device, dtype=logits.dtype)
+
+        # Mean over valid elements
+        loss = bce.sum() / denom
+        return loss
+    
+class BCEFocalLoss(nn.Module):
+    """
+    Binary focal loss for logits.
+    gamma > 0 focuses on hard examples
+    pos_weight can still be used for class imbalance
+    """
+    def __init__(self, gamma=2.0, pos_weight=None):
+        super().__init__()
+        self.gamma = gamma
+        self.pos_weight = pos_weight
+
+    def forward(self, logits, targets):
+        # targets: same shape as logits, 0/1
+        if self.pos_weight is not None:
+            pos_weight = self.pos_weight.to(logits.device)
+        else:
+            pos_weight = None
+
+        bce_loss = functional.binary_cross_entropy_with_logits(
+            logits, targets, reduction='none', pos_weight=pos_weight
+        )
+        p = torch.sigmoid(logits)
+        pt = targets * p + (1 - targets) * (1 - p)
+        loss = ((1 - pt) ** self.gamma) * bce_loss
+        return loss.mean()
+
+
 
 class MultiCrossEntropyLoss(nn.Module):
     def __init__(self, timesteps):

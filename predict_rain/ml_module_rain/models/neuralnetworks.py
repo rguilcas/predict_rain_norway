@@ -4,7 +4,11 @@ import torch
 from ml_module_rain.models.individualblocks import ResidualBlock, ConvolutionBlock, MLP
 
 def get_neural_network(config):
-    NN = CNN_MLP(feature_height=config['feature_height'], 
+    if config['split_MLP_head_per_horizon']:
+        NN_class = CNN_MLP_multiheads
+    else:
+        NN_class = CNN_MLP
+    NN = NN_class(feature_height=config['feature_height'], 
              feature_width=config['feature_width'],
              input_channels=config['num_channels'],
              output_neurons=config['num_classes'],
@@ -69,6 +73,71 @@ class CNN_MLP(nn.Module):
         x = x.view(-1, self.linear_size)
         x = self.MLP(x)
         return x
+
+class CNN_MLP_multiheads(nn.Module):
+    def __init__(self, 
+                 feature_height, 
+                 feature_width,
+                 input_channels,
+                 output_neurons,  # should now be number of horizons, e.g., 7
+                 CNN_number_of_layers=3,
+                 CNN_output_channels_first_layer=16,
+                 CNN_channels_increase_per_layer=2,
+                 CNN_base_module='doubleconv',
+                 MLP_hidden_layers_neuron_number=[128,512,512,128],
+                 dropout_MLP=0.1,
+                 use_residuals=True,
+                 activation_function='ReLU',
+                 global_kwargs_encoder=dict(),
+                 kwargs_per_layer_encoder=[],
+                 ):
+        super(CNN_MLP_multiheads, self).__init__()
+        self.feature_height = feature_height
+        self.feature_width = feature_width
+        self.activation_function = activation_function
+        self.num_horizons = output_neurons  # <-- treat "classes" as "horizons"
+
+        # Shared CNN backbone
+        self.CNN = Encoder(
+            input_channels=input_channels, 
+            num_layers=CNN_number_of_layers, 
+            output_channels_first_layer=CNN_output_channels_first_layer,
+            channels_increase_per_layer=CNN_channels_increase_per_layer,
+            downsample_mode=CNN_base_module,
+            use_residuals=use_residuals,
+            global_kwargs=global_kwargs_encoder,
+            kwargs_per_layer=kwargs_per_layer_encoder, 
+            activation_function=self.activation_function
+        )
+
+        # Figure out backbone output size
+        with torch.no_grad():
+            dummy_input = torch.zeros(1, input_channels, feature_height, feature_width)
+            cnn_output = self.CNN(dummy_input)
+            linear_size = cnn_output.view(1, -1).shape[1]
+        self.linear_size = linear_size
+
+        # One MLP head per horizon
+        self.heads = nn.ModuleList([
+            MLP(
+                input_neurons=self.linear_size,
+                output_neurons=1,  # 1 logit per horizon
+                hidden_layers_neuron_number=MLP_hidden_layers_neuron_number,
+                dropout=dropout_MLP,
+                activation_function=self.activation_function
+            )
+            for _ in range(self.num_horizons)
+        ])
+
+    def forward(self, x):
+        feats = self.CNN(x)
+        feats = feats.view(-1, self.linear_size)
+
+        # Collect logits from each horizon head
+        logits = [head(feats) for head in self.heads]  # list of (B, 1)
+        logits = torch.cat(logits, dim=1)  # shape: (B, num_horizons)
+
+        return logits
 
 
 

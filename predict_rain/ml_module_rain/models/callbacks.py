@@ -6,6 +6,7 @@ import numpy as np
 from scipy.stats import pearsonr
 import xarray as xr
 from lightning.pytorch.callbacks import ModelCheckpoint
+from sklearn.metrics import precision_recall_curve, average_precision_score
 
 def get_checkpoint_callback(wandb_logger):
     run_id = wandb_logger.experiment.id 
@@ -161,4 +162,60 @@ class LogIndividualScoresThreeClasses(Callback):
                       f"test/rmse_day{k}":rmse[k],
                       f"test/corr_day{k}":corr[k],})
             
+
+class BestF1Callback(Callback):
+    def __init__(self, thresholds=np.arange(0., 1.0001, .01), multi_horizon=False):
+        """
+        thresholds: array of probability thresholds to scan.
+        multi_horizon: if True, assumes preds shape is (N, H) and logs per horizon.
+        """
+        super().__init__()
+        self.thresholds = thresholds
+        self.multi_horizon = multi_horizon
+
+
+    def on_test_epoch_end(self, trainer, pl_module):
+        preds = torch.sigmoid(torch.stack(pl_module.predictions_test)).cpu().numpy()
+        targets = torch.stack(pl_module.targets_test).cpu().numpy()
+        targets[targets<1] = 0
+        
+        
+        if not self.multi_horizon:
+            best_f1, best_thresh = self._compute_best_f1(preds, targets)
+            trainer.logger.log_metrics({"test/best_f1": best_f1, "test/best_threshold": best_thresh})
+        else:
+            H = preds.shape[1]
+            table = wandb.Table(columns=["Horizon", "Best_F1", "Best_Threshold", "PR_AUC"])
+            for h in range(H):
+                best_f1, best_thresh = self._compute_best_f1(preds[:, h], targets[:, h])
+                PR_auc = average_precision_score(targets[:, h],preds[:, h],  pos_label=1)
+                # trainer.logger.log_metrics({f"test/h{h+1}_best_f1": best_f1,
+                #                             f"test/h{h+1}_best_thresh": best_thresh})
+                table.add_data(-h, best_f1, best_thresh, PR_auc)
+            trainer.logger.experiment.log({"test/best_f1_table": table})
+
+        # reset
+        pl_module.predictions_test.clear()
+        pl_module.targets_test.clear()
+
+    def _compute_best_f1(self, preds, targets):
+        preds = xr.DataArray(preds, dims=["time_of_event"])
+        targets = xr.DataArray(targets, dims=["time_of_event"])
+        thresh = xr.DataArray(self.thresholds, dims=['proba_thresh'], coords=dict(proba_thresh=self.thresholds))
+
+        TP = ((preds > thresh) & (targets ==1)).sum(['time_of_event'])
+        precision = TP / ((preds > thresh)).sum(['time_of_event'])
+        recall = TP / ((targets ==1 )).sum(['time_of_event'])
+
+        precision = precision.fillna(0)
+        recall = recall.fillna(0)
+
+        f1 = 2 * recall * precision / (recall + precision)
+        f1 = f1.fillna(0)
+
+        f1_best = f1.max('proba_thresh')
+        best_thresh = f1.proba_thresh[f1.argmax('proba_thresh')]
+
+        return float(f1_best), float(best_thresh)
+
         

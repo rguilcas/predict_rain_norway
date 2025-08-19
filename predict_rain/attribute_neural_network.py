@@ -49,6 +49,11 @@ def get_ds_with_predictions(dataloader, lightning_model):
     ds_aligned = ds_aligned.rename(time='time_of_prediction', timestep ='timestep_future')
     preds_da = xr.DataArray(preds, dims=["time_of_prediction", "timestep_future"], coords=ds_aligned.targets.coords)
     ds_aligned["predictions"] = preds_da
+    
+    # ds_out = change_time_of_prediction_to_time_of_event(ds_aligned[['predictions','targets','rain']])
+    # ds_out_valid_times = ds_out.where(ds_out.targets.count('timestep_past') == ds_out.targets.count('timestep_past').max(), drop=True)
+    # return ds_out_valid_times.transpose('time_of_event','timestep_past')
+    
     ds_out = change_time_of_prediction_to_time_of_event(ds_aligned)
     ds_out_valid_times = ds_out.where(ds_out.targets.count('timestep_past') == ds_out.targets.count('timestep_past').max(), drop=True)
     return ds_out_valid_times.transpose('time_of_event','timestep_past','var_name','latitude','longitude')
@@ -144,7 +149,7 @@ def get_distance_to_cyclone_date(date, final_ds, df_features, cycs, grid):
     min_distances_to_cyclone = distance_to_cyclones.resample(time='D').min()
     min_distances_to_cyclone = min_distances_to_cyclone.assign_coords(time_of_event = pd.to_datetime(date))
     timesteps = (pd.to_datetime(min_distances_to_cyclone.time) - pd.to_datetime(date)).days
-    min_distances_to_cyclone = min_distances_to_cyclone.rename(time='timestep').assign_coords(timestep=timesteps)
+    min_distances_to_cyclone = min_distances_to_cyclone.rename(time='timestep_past').assign_coords(timestep_past=timesteps)
     return min_distances_to_cyclone
 
 def get_distance_to_cyclones(ds_aligned):

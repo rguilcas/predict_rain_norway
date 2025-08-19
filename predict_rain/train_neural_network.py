@@ -15,7 +15,7 @@ from ml_module_rain.models.neuralnetworks import get_neural_network, register_sh
 from ml_module_rain.data.datamodule import MyDataLoader
 from ml_module_rain.models.lightning import ExtremeRainPredictor, AttributableTrainer
 from ml_module_rain.models.losses import get_loss
-from ml_module_rain.models.callbacks import LogF1Validation, get_checkpoint_callback
+from ml_module_rain.models.callbacks import LogF1Validation, get_checkpoint_callback, BestF1Callback
 from ml_module_rain.utils.config import load_config
 from pathlib import Path
 
@@ -34,12 +34,13 @@ def main(config_path=None):
     dataloader.print_infos()
     NN = get_neural_network(config)
 
-    print(dataloader.ds_train)
     callbacks=[EarlyStopping(monitor="val/loss", mode="min"), 
                get_checkpoint_callback(wandb_logger),
+               BestF1Callback(multi_horizon=True)
             #    LogF1Validation(num_timesteps=config['num_timesteps_predicted']),
                ]
-    accelerator = 'gpu' if torch.cuda.is_available() else 'gpu'
+    accelerator = 'gpu' if torch.cuda.is_available() else 'cpu'
+    
     trainer = AttributableTrainer(limit_train_batches=100, 
                                 max_epochs=config['num_epochs'], 
                                 logger=wandb_logger, 

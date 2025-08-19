@@ -42,6 +42,9 @@ def get_downsample_block(mode, input_channels, output_channels, **kwargs):
         return DownsampleStrideConv(input_channels, output_channels, **kwargs)
     elif mode == "doubleconv":
         return DownsampleDoubleConv(input_channels, output_channels, **kwargs)
+    elif mode == "doubleconv+pool":
+        return DownsampleDoubleConvPool(input_channels, output_channels, **kwargs)
+    
     else:
         raise ValueError(f"Unknown mode: {mode}")
     
@@ -51,6 +54,20 @@ class DownsampleConvPool(nn.Module):
         super().__init__()
         self.block = nn.Sequential(
             nn.Conv2d(input_channels, output_channels, kernel_size=3, stride=1, padding=1),
+            nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True)
+        )
+
+    def forward(self, x):
+        return self.block(x)
+    
+class DownsampleDoubleConvPool(nn.Module):
+    """2xConv(stride=1) + MaxPool(2x2, stride=2, ceil_mode=True)"""
+    def __init__(self, input_channels, output_channels):
+        super().__init__()
+        self.block = nn.Sequential(
+            nn.Conv2d(input_channels, output_channels, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(output_channels, output_channels, kernel_size=3, stride=1, padding=1),
             nn.MaxPool2d(kernel_size=2, stride=2, ceil_mode=True)
         )
 
