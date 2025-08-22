@@ -35,9 +35,29 @@ def get_loss(config, **kwargs):
             else:
                 pos_weight =  torch.tensor([12., 12., 14., 16.])  # Boost positive class loss
             # loss = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
-            loss = BCEWithLogitsHorizonWeighted(pos_weight=pos_weight, horizon_weight=[1.,1.,1.1,1.1,1.2,1.3,1.4])
+            loss = BCEWithLogitsHorizonWeighted(pos_weight=pos_weight, horizon_weight=[0.5,0.7,1.,1.3, 1.5, 2., 2.])
     return loss
 
+class FocalBCEWithLogitsLossDynamicHorizonWeights(nn.Module):
+    # Optional: drop-in replacement; set gamma=0 for plain BCE
+    def __init__(self, pos_weight=None, gamma=0.0):
+        super().__init__()
+        self.pos_weight = pos_weight
+        self.gamma = gamma
+
+    def forward(self, logits, targets):
+        # logits, targets: (B,)
+        bce = F.binary_cross_entropy_with_logits(
+            logits, targets, reduction='none', pos_weight=self.pos_weight
+        )
+        if self.gamma == 0:
+            return bce.mean()
+        # p_t = sigmoid(logits) when y=1 else 1-sigmoid(logits)
+        p = torch.sigmoid(logits)
+        p_t = targets * p + (1 - targets) * (1 - p)
+        focal = (1 - p_t).pow(self.gamma) * bce
+        return focal.mean()
+    
 class BCEWithLogitsHorizonWeighted(nn.Module):
     def __init__(self, pos_rate=None, pos_weight=None, horizon_weight=None, eps=1e-8):
         """

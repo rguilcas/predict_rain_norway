@@ -1,7 +1,7 @@
 ### Basic hyperparameters
 batch_size:
   desc: Size of each mini-batch
-  value: 512
+  value: 256
 learning_rate:
   desc: Learning rate
   value: 0.0001
@@ -28,19 +28,26 @@ activation_function:
 ### In/Out params
 file_name_data_out:
   desc: Path to output data (daily rain data)
-  value: '/Data/gfi/users/rogui7909/data/ERA5/precipitation/pr_era5_daily_westnorway_1940-2024.nc'
+  value: '/Data/gfi/users/rogui7909/data/ERA5/precipitation/pr_grid_era5_daily_westnorway_1940-2024.nc'
 type_prediction:
-  desc: Type of prediction done. Either 'regression', 'quantiles', 'three_classes', 'boolean', 'boolean_smooth'
-  value: 'boolean_smooth'
+  desc: Type of prediction done. Either 'regression', 'quantiles', 'three_classes', 'boolean', 'boolean_smooth', 'boolean_smooth_regional'
+  value: 'boolean_smooth_regional'
 quantile_extreme:
   desc: What is defined as extreme in terms of quantiles.
-  value: .90
+  value: .95
 quantile_extreme_based_on_rainy_days:
   desc: If the quantile is computed based on rainy days only or on all days.
-  value: True
+  value: False
 quantile_lower_grey_zone:
   desc: What is the lower limit of the grey zone for boolean grey zone.
   value: 0.75
+fraction_lower_grey_zone_region:
+  desc: Fraction of points above the quantile threshold to be in grey zone
+  value: 0
+fraction_extreme_region:
+  desc: Fraction of points above the quantile threshold to be in extreme zone
+  value: 0.2
+
 num_timesteps_predicted:
   desc: Timesteps predicted for future rain
   value: 7
@@ -48,7 +55,7 @@ season:
   desc: Season chosen for the prediction. Can be 'all' or 'DJF' 'MAM' 'JJA' or 'SON'
   value: 'all'
 augment_training_with_noise:
-  desc: Whether to augment training set with noise in feautures
+  desc: Whether to augment training set with noise in features
   value: False
 num_noisy_samples:
   desc: How many copies of the training set to add with noise
@@ -73,40 +80,49 @@ spatial_extent:
 ## Network params CNN
 use_skip_connections:
   desc: uses ResNet style skip connections or not
-  value: True
-CNN_layer_module:
-  desc: what is the convolutionnal layer used. Can either be 'doubleconv', 'convstride','conv+pool', 'doubleconv+pool'
-  value: 'doubleconv+pool'
+  value: False
+CNN_downsample_mode:
+  desc: can be 'maxpool', 'avgpool', 'strideconv'
+  value: 'strideconv'
+CNN_conv_multiple:
+  desc: doubling all convolution layers to increase receptive field. 'single' or 'double'
+  value: 'single'
+# CNN_layer_module:
+#   desc: what is the convolutionnal layer used. Can either be 'doubleconv', 'convstride','conv+pool', 'doubleconv+pool'
+#   value: 'doubleconv'
 num_conv_layer:
   desc: Number of convolution layers in the CNN
-  value: 7
+  value: 5
 size_conv_kernel:
   desc: Size of the conv layer kernels
   value: 3
 conv1_kernel_number:
   desc: Size of the first conv layer kernels
-  value: 32
+  value: 16
 factor_increase_kernels_per_conv_layer:
   desc: How much to multiply the number of kernel in layer N to get layer N+1
   value: 2
 dropout_CNN:
   desc: Probability of dropout for CNN layers
-  value: 0.4
+  value: 0.
 batch_norm_CNN:
   desc: Whether to use batchnorm2d for the CNN layers or not
-  value: True
+  value: False
 
 ## Network params MLP
 
 split_MLP_head_per_horizon:
   desc: whether to have split heads per horizon 
-  value: True
+  value: False
+MLP_multihead_v2:
+  desc: whether to use the newer version of MLP multihead with GAP and context stuff
+  value: False
 MLP_hidden_layers_neuron_number:
   desc: Layers of the MLP after the CNN 
-  value: [512,128]
+  value: [128]
 dropout_MLP:
   desc: Probability of dropout between MLP layers
-  value: 0.2
+  value: 0.
 
 attribute_predictions:
   desc: choose whether to compute attributions or not. Can be 'TP' for true positives, 'all_extr' for all extremes and 'all' for all points. Otherwise 'no'.

@@ -25,7 +25,7 @@ def get_ds_with_predictions(dataloader, lightning_model):
     if torch.cuda.is_available():
         device="cuda"
     else:
-        device=='cpu'
+        device='cpu'
     lightning_model.to(device)
     lightning_model.eval()
 
@@ -62,7 +62,7 @@ def get_ds_with_attributions(ds_aligned, lightning_model):
     if torch.cuda.is_available():
         device="cuda"
     else:
-        device=='cpu'
+        device='cpu'
     steps = ds_aligned.timestep_past.size
     
     lightning_model.to(device)
@@ -74,6 +74,8 @@ def get_ds_with_attributions(ds_aligned, lightning_model):
     all_attrs = []
 
     for idx in tqdm(range(features_cpu.shape[0])):  # iterate over time_of_event
+        if not (ds_aligned.targets.isel(time_of_event=idx,timestep_past=0)==1):
+            continue
         x_in = features_cpu[idx].to(device, non_blocking=True).requires_grad_()  # shape: (timestep_past, var_name, lat, lon)
         baseline = torch.zeros_like(x_in, device=device)
 

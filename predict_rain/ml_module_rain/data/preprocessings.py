@@ -4,6 +4,7 @@ import torch
 import xbatcher.loaders.torch
 import dask 
 import numpy as np
+
 def sigmoid_soft_label(y, threshold, width=10.0):
     """
     Sigmoid-based soft label with control over width of transition.
@@ -95,6 +96,19 @@ def preprocess_rain(ds_rain, config):
             rain_preproc = smooth_rain_rescaled(ds_rain, quantile_extreme_rain_grey, quantile_extreme_rain)
             rain_preproc = xr.DataArray(rain_preproc, dims=ds_rain.dims, coords=ds_rain.coords)
             return rain_preproc
+        case 'boolean_smooth_regional':
+            fraction_lower_grey_zone_region = config.get('fraction_lower_grey_zone_region', 0.)
+            fraction_extreme_region = config.get('fraction_extreme_region', 0.2)
+            quantile_extreme = config.get('quantile_extreme', 0.95)
+            if quantile_extreme_based_on_rainy_days:
+                quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme,[ 'time', 'timestep']).values
+            else:
+                quantile_extreme_rain =  ds_rain.quantile(quantile_extreme,[ 'time', 'timestep']).values
+            quantile_extreme_rain =  ds_rain.quantile(quantile_extreme,[ 'time']).values
+            pixels_above_quantile = (ds_rain>quantile_extreme_rain).sum(['longitude','latitude'])
+            count_pixels = ds_rain.isel(time=0).count(['longitude','latitude']).values.flatten()[0]
+            rain_preproc = smooth_rain_rescaled(pixels_above_quantile, fraction_lower_grey_zone_region*count_pixels, fraction_extreme_region*count_pixels)
+            return rain_preproc
         case 'three_classes':
             if quantile_extreme_based_on_rainy_days:
                 quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time')
@@ -116,7 +130,7 @@ def preprocess_rain(ds_rain, config):
             no_extreme = xr.ones_like(ds_rain).where(ds_rain>quantile_mid_rain,0)
             return no_extreme.where(ds_rain<quantile_extreme_rain*1,2).astype(int)
         case _:
-            raise ValueError("type_predictions must be 'boolean', 'three_classes', 'quantiles' or 'regression'")
+            raise ValueError(f"type_predictions {type_predictions} must be 'boolean', 'three_classes', 'quantiles', 'boolean_smooth','boolean_smooth_regional' or 'regression'")
 
 def get_loader_from_ds(ds, batch_size):
     X_bgen = xb.BatchGenerator(
