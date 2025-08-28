@@ -4,7 +4,7 @@ batch_size:
   value: 256
 learning_rate:
   desc: Learning rate
-  value: 0.0001
+  value: 0.00001
 lr_scheduler:
   desc: Scheduler use for learning rate decay
   value: 'step'
@@ -80,7 +80,7 @@ spatial_extent:
 ## Network params CNN
 use_skip_connections:
   desc: uses ResNet style skip connections or not
-  value: False
+  value: True
 CNN_downsample_mode:
   desc: can be 'maxpool', 'avgpool', 'strideconv'
   value: 'strideconv'
@@ -92,19 +92,19 @@ CNN_conv_multiple:
 #   value: 'doubleconv'
 num_conv_layer:
   desc: Number of convolution layers in the CNN
-  value: 5
+  value: 6
 size_conv_kernel:
   desc: Size of the conv layer kernels
   value: 3
 conv1_kernel_number:
   desc: Size of the first conv layer kernels
-  value: 16
+  value: 32
 factor_increase_kernels_per_conv_layer:
   desc: How much to multiply the number of kernel in layer N to get layer N+1
   value: 2
 dropout_CNN:
   desc: Probability of dropout for CNN layers
-  value: 0.
+  value: 0.2
 batch_norm_CNN:
   desc: Whether to use batchnorm2d for the CNN layers or not
   value: False
@@ -113,16 +113,16 @@ batch_norm_CNN:
 
 split_MLP_head_per_horizon:
   desc: whether to have split heads per horizon 
-  value: False
+  value: True
 MLP_multihead_v2:
   desc: whether to use the newer version of MLP multihead with GAP and context stuff
   value: False
 MLP_hidden_layers_neuron_number:
   desc: Layers of the MLP after the CNN 
-  value: [128]
+  value: [256,128]
 dropout_MLP:
   desc: Probability of dropout between MLP layers
-  value: 0.
+  value: 0.2
 
 attribute_predictions:
   desc: choose whether to compute attributions or not. Can be 'TP' for true positives, 'all_extr' for all extremes and 'all' for all points. Otherwise 'no'.

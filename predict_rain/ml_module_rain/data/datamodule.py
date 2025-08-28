@@ -1,7 +1,8 @@
 import xarray as xr 
 from captum.attr import IntegratedGradients
 import numpy as np
-
+import torch 
+from tqdm import tqdm
 from ml_module_rain.data.preprocessings import add_timesteps, filter_by_season, preprocess_rain, get_loader_from_ds, get_expanded_ds
 
 class MyDataLoader:
@@ -18,12 +19,18 @@ class MyDataLoader:
         ds_rain = xr.open_dataset(self.config['file_name_data_out']).tp
         ds_rain = add_timesteps(ds_rain, num_timesteps_predicted=self.config['num_timesteps_predicted'])
         ds_rain = filter_by_season(ds_rain,season=self.config['season'])
-        self.rain = ds_rain
-        self.targets = preprocess_rain(ds_rain, self.config)
+        targets = preprocess_rain(ds_rain, self.config)
+        if self.config['type_prediction'] == 'boolean_smooth_regional':
+            self.targets, self.rain = targets
+        else:
+            self.targets = targets
+            self.rain = ds_rain
         match self.config['type_prediction']:
             case 'boolean':
                 self.config['prediction_per_timestep'] = 1
             case 'boolean_smooth':
+                self.config['prediction_per_timestep'] = 1
+            case 'boolean_smooth_regional':
                 self.config['prediction_per_timestep'] = 1
             case 'three_classes':
                 self.config['prediction_per_timestep'] = 3
@@ -34,8 +41,9 @@ class MyDataLoader:
             case 'quantiles':
                 self.config['prediction_per_timestep'] = 10
             case _:
-                raise ValueError("type_predictions must be 'boolean','boolean_smooth', 'three_classes', 'quantiles' or 'regression'")
+                raise ValueError("type_predictions must be 'boolean','boolean_smooth', 'boolean_smooth_regional', 'three_classes', 'quantiles' or 'regression'")
         self.config['num_classes'] = self.config['prediction_per_timestep']*self.config['num_timesteps_predicted']
+        # self.rain = ds_rain
 
     def load_atmospheric_features(self,load=True):
         input_variables = self.config['inputs'].split(' ')

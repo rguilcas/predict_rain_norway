@@ -108,7 +108,8 @@ def preprocess_rain(ds_rain, config):
             pixels_above_quantile = (ds_rain>quantile_extreme_rain).sum(['longitude','latitude'])
             count_pixels = ds_rain.isel(time=0).count(['longitude','latitude']).values.flatten()[0]
             rain_preproc = smooth_rain_rescaled(pixels_above_quantile, fraction_lower_grey_zone_region*count_pixels, fraction_extreme_region*count_pixels)
-            return rain_preproc
+            rain_preproc = xr.DataArray(rain_preproc, dims=pixels_above_quantile.dims, coords=pixels_above_quantile.coords)
+            return rain_preproc, pixels_above_quantile
         case 'three_classes':
             if quantile_extreme_based_on_rainy_days:
                 quantile_extreme_rain =  ds_rain.where(ds_rain>1).quantile(quantile_extreme, 'time')
