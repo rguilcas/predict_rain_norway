@@ -8,9 +8,9 @@ import torch.nn.functional as F
 
 def get_act(name: str):
     return {"ReLU": nn.ReLU(inplace=True),
-            "LeakyReLU": nn.LeakyReLU(inplace=True),
+            "LeakyReLU": nn.LeakyReLU(inplace=False),
             "GELU": nn.GELU(),
-            }.get(name, nn.ReLU(inplace=True))
+            }.get(name, nn.ReLU(inplace=False))
 
 def get_norm(use_bn: bool, C: int):
     return nn.BatchNorm2d(C) if use_bn else nn.Identity()
@@ -271,7 +271,7 @@ class ContextBlock(nn.Module):
         self.bn1 = nn.BatchNorm2d(ch) if use_bn else nn.Identity()
         self.bn2 = nn.BatchNorm2d(ch) if use_bn else nn.Identity()
 
-        self.act = Act(inplace=True) if 'inplace' in Act.__init__.__code__.co_varnames else Act()
+        self.act = Act(inplace=False) if 'inplace' in Act.__init__.__code__.co_varnames else Act()
         self.do = nn.Dropout2d(p_dropout) if p_dropout and p_dropout > 0 else nn.Identity()
 
     def forward(self, x):
@@ -299,11 +299,9 @@ class MLP(nn.Module):
         self.input_neurons = input_neurons
         self.output_neurons = output_neurons
         self.neurons = [input_neurons] + hidden_layers_neuron_number + [output_neurons]
-        match activation_function:
-            case 'ReLU':
-                self.activation_function = nn.ReLU()
-            case 'LeakyReLU':
-                self.activation_function = nn.LeakyReLU()
+        self.activation_function = get_act(activation_function)
+
+
         self.layers = nn.ModuleList()
         for i in range(1,len(self.neurons)):
             layer = nn.Linear(self.neurons[i-1], self.neurons[i])

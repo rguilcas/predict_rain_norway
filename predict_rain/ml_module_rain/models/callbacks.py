@@ -180,19 +180,19 @@ class BestF1Callback(Callback):
         targets[targets<1] = 0
         
         
-        if not self.multi_horizon:
-            best_f1, best_thresh = self._compute_best_f1(preds, targets)
-            trainer.logger.log_metrics({"test/best_f1": best_f1, "test/best_threshold": best_thresh})
-        else:
-            H = preds.shape[1]
-            table = wandb.Table(columns=["Horizon", "Best_F1", "Best_Threshold", "PR_AUC"])
-            for h in range(H):
-                best_f1, best_thresh = self._compute_best_f1(preds[:, h], targets[:, h])
-                PR_auc = average_precision_score(targets[:, h],preds[:, h],  pos_label=1)
-                # trainer.logger.log_metrics({f"test/h{h+1}_best_f1": best_f1,
-                #                             f"test/h{h+1}_best_thresh": best_thresh})
-                table.add_data(-h, best_f1, best_thresh, PR_auc)
-            trainer.logger.experiment.log({"test/best_f1_table": table})
+        # if not self.multi_horizon:
+        best_f1, best_thresh = self._compute_best_f1(preds.flatten(), targets.flatten())
+        trainer.logger.log_metrics({"test/best_f1": best_f1, "test/best_threshold": best_thresh})
+        
+        H = preds.shape[1]
+        table = wandb.Table(columns=["Horizon", "Best_F1", "Best_Threshold", "PR_AUC"])
+        for h in range(H):
+            best_f1, best_thresh = self._compute_best_f1(preds[:, h], targets[:, h])
+            PR_auc = average_precision_score(targets[:, h],preds[:, h],  pos_label=1)
+            # trainer.logger.log_metrics({f"test/h{h+1}_best_f1": best_f1,
+            #                             f"test/h{h+1}_best_thresh": best_thresh})
+            table.add_data(-h, best_f1, best_thresh, PR_auc)
+        trainer.logger.experiment.log({"test/best_f1_table": table})
 
         # reset
         pl_module.predictions_test.clear()

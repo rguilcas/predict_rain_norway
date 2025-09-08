@@ -48,8 +48,12 @@ class MyDataLoader:
     def load_atmospheric_features(self,load=True):
         input_variables = self.config['inputs'].split(' ')
         self.config['input_variables'] = input_variables 
-        ds_atm = xr.open_zarr(self.config['file_name_data_in']).data_normed
-        ds_atm = ds_atm.sel(var_name = input_variables)
+        ds_atm = xr.open_zarr(self.config['file_name_data_in'])
+        ds_mean = ds_atm.mean_fields.sel(var_name = input_variables)
+        ds_std = ds_atm.std_fields.sel(var_name = input_variables)
+        ds_atm = ds_atm[input_variables].to_array('var_name')
+        ds_atm = (ds_atm-ds_mean)/ds_std
+        ds_atm = ds_atm.transpose('time','var_name','latitude','longitude')
         lon_min, lon_max, lat_min, lat_max = self.config['spatial_extent']
         if ds_atm.latitude.diff('latitude')[0]<0:
             lat_min, lat_max = lat_max, lat_min
