@@ -129,6 +129,91 @@ class ResidualDownBlock(nn.Module):
         y = self.down_main(y)
         s = self.skip_down(self.proj(x))
         return self.act(y + s)
+    
+
+class ResidualDownBlockConcat(nn.Module):
+    """Residual ((Single/Double)Conv) + matching downsample on both paths, then concat."""
+    def __init__(self, in_ch, out_ch, conv_multiple="double", down_mode="maxpool",
+                 act="ReLU", use_bn=True, p_drop=0.0, ceil=True, conv_down_kernel=3):
+        super().__init__()
+        assert out_ch >= in_ch, "For concat skip, out_ch must be >= in_ch"
+        add_ch = out_ch - in_ch  # channels added by the main branch
+
+        feat_cls = DoubleConv if conv_multiple == "double" else SingleConv
+        # Main branch creates the *extra* channels
+        self.feat = feat_cls(in_ch, add_ch, act=act, use_bn=use_bn, p_drop=p_drop)
+        self.down_main = Downsample(add_ch, mode=down_mode, conv_kernel=conv_down_kernel,
+                                    ceil=ceil, use_bn=use_bn, act=act)
+
+        # Skip branch keeps in_ch channels but downsamples spatially to match main branch
+        if down_mode == "strideconv":
+            proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, stride=2, bias=use_bn is False)
+            skip = nn.Identity()
+        elif down_mode in ("maxpool", "avgpool"):
+            proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, bias=use_bn is False)
+            skip = Downsample(in_ch, mode=down_mode, ceil=ceil)  # only spatial downsample
+        elif down_mode is None:
+            proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, bias=use_bn is False)
+            skip = nn.Identity()
+        else:
+            raise ValueError(f"Unknown down_mode: {down_mode}")
+
+        self.proj = nn.Sequential(proj, get_norm(use_bn, in_ch))
+        self.skip_down = skip
+        self.act = get_act(act)
+
+        self.out_ch = out_ch  # for reference
+
+    def forward(self, x):
+        y = self.down_main(self.feat(x))        # [N, add_ch, H/2, W/2] (or same H/W if no downsample)
+        s = self.skip_down(self.proj(x))        # [N, in_ch,  H/2, W/2]
+        out = torch.cat([y, s], dim=1)          # concat along channels -> [N, add_ch+in_ch, ...] == out_ch
+        # Optional: sanity checks during development
+        # assert out.shape[1] == self.out_ch
+        return self.act(out)
+
+
+class ResidualDownBlockConcatNoProj(nn.Module):
+    """Residual ((Single/Double)Conv) + matching downsample on both paths, then concat."""
+    def __init__(self, in_ch, out_ch, conv_multiple="double", down_mode="maxpool",
+                 act="ReLU", use_bn=True, p_drop=0.0, ceil=True, conv_down_kernel=3):
+        super().__init__()
+        assert out_ch >= in_ch, "For concat skip, out_ch must be >= in_ch"
+        add_ch = out_ch - in_ch  # channels added by the main branch
+
+        feat_cls = DoubleConv if conv_multiple == "double" else SingleConv
+        # Main branch creates the *extra* channels
+        self.feat = feat_cls(in_ch, add_ch, act=act, use_bn=use_bn, p_drop=p_drop)
+        self.down_main = Downsample(add_ch, mode=down_mode, conv_kernel=conv_down_kernel,
+                                    ceil=ceil, use_bn=use_bn, act=act)
+
+        # Skip branch keeps in_ch channels but downsamples spatially to match main branch
+        if down_mode == "strideconv":
+            proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, stride=2, bias=use_bn is False)
+            skip = nn.Identity()
+        elif down_mode in ("maxpool", "avgpool"):
+            proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, bias=use_bn is False)
+            skip = Downsample(in_ch, mode=down_mode, ceil=ceil)  # only spatial downsample
+        elif down_mode is None:
+            proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, bias=use_bn is False)
+            skip = nn.Identity()
+        else:
+            raise ValueError(f"Unknown down_mode: {down_mode}")
+
+        # self.proj = nn.Sequential(proj, get_norm(use_bn, in_ch))
+        self.skip_down = skip
+        self.act = get_act(act)
+
+        self.out_ch = out_ch  # for reference
+
+    def forward(self, x):
+        y = self.down_main(self.feat(x))        # [N, add_ch, H/2, W/2] (or same H/W if no downsample)
+        s = self.skip_down(x)        # [N, in_ch,  H/2, W/2]
+        out = torch.cat([y, s], dim=1)          # concat along channels -> [N, add_ch+in_ch, ...] == out_ch
+        # Optional: sanity checks during development
+        # assert out.shape[1] == self.out_ch
+        return self.act(out)
+
 
 
 #### CONVOLUTIONNALBLOCKS

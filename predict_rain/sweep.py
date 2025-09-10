@@ -44,7 +44,7 @@ def main_sweep():
     'dropout_CNN': {"min": 0., "max": 0.5},
     'batch_norm_CNN': {"values": [True, False]},
     'dropout_CNN': {"min": 0., "max": 0.5},
-    'MLP_hidden_layers_neuron_number': {"values": [[256], [256,256],[256,256,256]]},
+    'MLP_hidden_layers_neuron_number': {"values": [[128], [128,128]]},
     'dropout_MLP': {"min": 0., "max": 0.5},
     'activation_function':{"values":["ReLU","LeakyReLU","GELU"]}
     },

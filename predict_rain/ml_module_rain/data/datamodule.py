@@ -49,16 +49,17 @@ class MyDataLoader:
         input_variables = self.config['inputs'].split(' ')
         self.config['input_variables'] = input_variables 
         ds_atm = xr.open_zarr(self.config['file_name_data_in'])
-        ds_mean = ds_atm.mean_fields.sel(var_name = input_variables)
-        ds_std = ds_atm.std_fields.sel(var_name = input_variables)
-        ds_atm = ds_atm[input_variables].to_array('var_name')
-        ds_atm = (ds_atm-ds_mean)/ds_std
+        # ds_mean = ds_atm.mean_fields.sel(var_name = input_variables)
+        # ds_std = ds_atm.std_fields.sel(var_name = input_variables)
+        # ds_atm = ds_atm[input_variables].to_array('var_name')
+        # ds_atm = (ds_atm-ds_mean)/ds_std
+        ds_atm = ds_atm.data_normed.sel(var_name =input_variables )
         ds_atm = ds_atm.transpose('time','var_name','latitude','longitude')
         lon_min, lon_max, lat_min, lat_max = self.config['spatial_extent']
         if ds_atm.latitude.diff('latitude')[0]<0:
             lat_min, lat_max = lat_max, lat_min
         ds_atm = ds_atm.sel(longitude=slice(lon_min, lon_max), latitude=slice(lat_min, lat_max))
-        ds_atm = ds_atm-ds_atm.mean(['longitude','latitude'])
+        # ds_atm = ds_atm-ds_atm.mean(['longitude','latitude'])
         if load:
             self.features = ds_atm.astype('float32').load()
         else:
@@ -71,7 +72,6 @@ class MyDataLoader:
         self.config['feature_height'] = self.feature_height
         self.config['feature_width'] = self.feature_width
         self.config['feature_image_size'] = self.feature_image_size
-        
     def harmonize_time(self):
         common_time = [time for time in self.features.time.values if time in self.rain.time.values]
         if len(common_time) == 0:

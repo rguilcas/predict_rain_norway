@@ -1,7 +1,7 @@
 import torch.nn as nn
 import math
 import torch
-from ml_module_rain.models.individualblocks import  MLP, DownBlock, ResidualDownBlock, ContextBlock, GlobalAvgPool
+from ml_module_rain.models.individualblocks import  MLP, DownBlock, ResidualDownBlock, ContextBlock, GlobalAvgPool,ResidualDownBlockConcat
 
 def get_neural_network(config):
     if config['split_MLP_head_per_horizon']:
@@ -16,7 +16,7 @@ def get_neural_network(config):
              input_channels=config['num_channels'],
              output_neurons=config['num_classes'],
              CNN_number_of_layers=config['num_conv_layer'],
-             CNN_output_channels_first_layer=4,
+             CNN_output_channels_first_layer=config['conv1_kernel_number'],
              CNN_downsample_mode = config['CNN_downsample_mode'],
              CNN_conv_multiple = config['CNN_conv_multiple'],
              MLP_hidden_layers_neuron_number =  config['MLP_hidden_layers_neuron_number'], 
@@ -242,6 +242,7 @@ class Encoder(nn.Module):
         self.num_layers = num_layers
         
         for layer in range(num_layers):
+            
             in_ch  = output_channels_first_layer * (channels_increase_per_layer ** (layer-1)) if layer > 0 else input_channels
             out_ch = output_channels_first_layer * (channels_increase_per_layer **  layer)
             # map legacy names to unified modes
