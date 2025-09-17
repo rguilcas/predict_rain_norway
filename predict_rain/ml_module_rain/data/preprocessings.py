@@ -105,8 +105,8 @@ def preprocess_rain(ds_rain, config):
             else:
                 quantile_extreme_rain =  ds_rain.quantile(quantile_extreme,[ 'time', 'timestep']).values
             quantile_extreme_rain =  ds_rain.quantile(quantile_extreme,[ 'time']).values
-            pixels_above_quantile = (ds_rain>quantile_extreme_rain).sum(['longitude','latitude'])
-            count_pixels = ds_rain.isel(time=0).count(['longitude','latitude']).values.flatten()[0]
+            pixels_above_quantile = (ds_rain>quantile_extreme_rain).sum(['x','y'])
+            count_pixels = ds_rain.isel(time=0).count(['x','y']).values.flatten()[0]
             rain_preproc = smooth_rain_rescaled(pixels_above_quantile, fraction_lower_grey_zone_region*count_pixels, fraction_extreme_region*count_pixels)
             rain_preproc = xr.DataArray(rain_preproc, dims=pixels_above_quantile.dims, coords=pixels_above_quantile.coords)
             return rain_preproc, pixels_above_quantile
@@ -136,7 +136,7 @@ def preprocess_rain(ds_rain, config):
 def get_loader_from_ds(ds, batch_size):
     X_bgen = xb.BatchGenerator(
         ds.features,
-        input_dims={'time': batch_size, 'var_name': ds.var_name.size, 'latitude': ds.features.latitude.size, 'longitude': ds.features.longitude.size},
+        input_dims={'time': batch_size, 'var_name': ds.var_name.size, 'y': ds.features.y.size, 'x': ds.features.x.size},
         preload_batch=True,
     )
     y_bgen = xb.BatchGenerator(

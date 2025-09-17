@@ -54,19 +54,19 @@ class MyDataLoader:
         # ds_atm = ds_atm[input_variables].to_array('var_name')
         # ds_atm = (ds_atm-ds_mean)/ds_std
         ds_atm = ds_atm.data_normed.sel(var_name =input_variables )
-        ds_atm = ds_atm.transpose('time','var_name','latitude','longitude')
-        lon_min, lon_max, lat_min, lat_max = self.config['spatial_extent']
-        if ds_atm.latitude.diff('latitude')[0]<0:
-            lat_min, lat_max = lat_max, lat_min
-        ds_atm = ds_atm.sel(longitude=slice(lon_min, lon_max), latitude=slice(lat_min, lat_max))
+        ds_atm = ds_atm.transpose('time','var_name','x','y')
+        # lon_min, lon_max, lat_min, lat_max = self.config['spatial_extent']
+        # if ds_atm.latitude.diff('latitude')[0]<0:
+        #     lat_min, lat_max = lat_max, lat_min
+        # ds_atm = ds_atm.sel(longitude=slice(lon_min, lon_max), latitude=slice(lat_min, lat_max))
         # ds_atm = ds_atm-ds_atm.mean(['longitude','latitude'])
         if load:
             self.features = ds_atm.astype('float32').load()
         else:
             self.features = ds_atm.astype('float32')
         
-        self.feature_height = self.features.latitude.size
-        self.feature_width = self.features.longitude.size
+        self.feature_height = self.features.y.size
+        self.feature_width = self.features.x.size
         self.feature_image_size = self.feature_height*self.feature_width
         self.config['num_channels'] = len(self.config['input_variables'])
         self.config['feature_height'] = self.feature_height
@@ -175,8 +175,8 @@ class MyDataLoader:
             tensor_in = torch.Tensor(ds_test_extract.features.values)
             tensor_out = torch.Tensor(ds_test_extract.targets.values)
             attrs = method.attribute(tensor_in, baselines=torch.Tensor([0]),target=[3*(steps-k)-1 for k in range(steps)]) 
-            da_attrs = xr.DataArray(attrs, dims = ['timestep','var_name','latitude','longitude'], 
-                                    coords= dict(timestep=np.arange(1,steps+1),var_name=ds_test_extract.var_name, latitude=ds_test_extract.latitude, longitude=ds_test_extract.longitude))
+            da_attrs = xr.DataArray(attrs, dims = ['timestep','var_name','x','y'], 
+                                    coords= dict(timestep=np.arange(1,steps+1),var_name=ds_test_extract.var_name, x=ds_test_extract.x, y=ds_test_extract.y))
             all_multi_attrs.append(da_attrs.assign_coords(time=time_TP_extreme[k]))
             sens = da_attrs/ds_test_extract.features.rename(time='timestep').assign_coords(timestep=da_attrs.timestep)
             all_multi_sens.append(sens.assign_coords(time=time_TP_extreme[k]))

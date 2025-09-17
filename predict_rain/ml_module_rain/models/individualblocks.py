@@ -1,13 +1,12 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-
+from collections import OrderedDict
 
 # ---- helpers ---------------------------------------------------------------
 
 def get_act(name: str):
-    return {"ReLU": nn.ReLU(inplace=True),
+    return {"ReLU": nn.ReLU(inplace=False),
             "LeakyReLU": nn.LeakyReLU(inplace=False),
             "GELU": nn.GELU(),
             }.get(name, nn.ReLU(inplace=False))
@@ -26,27 +25,45 @@ def pad_to_even(x):
 class SingleConv(nn.Module):
     def __init__(self, in_ch, out_ch, act="ReLU", use_bn=True, p_drop=0.0):
         super().__init__()
-        self.block = nn.Sequential(
-            nn.Conv2d(in_ch, out_ch, 3, padding=1, bias=use_bn is False),
-            get_norm(use_bn, out_ch),
-            get_act(act),
-            nn.Dropout2d(p_drop) if p_drop > 0 else nn.Identity(),
-        )
-    def forward(self, x): return self.block(x)
+        self.convolution = nn.Conv2d(in_ch, out_ch, 3, padding=1, bias=use_bn is False)
+        self.batchnorm= get_norm(use_bn, out_ch)
+        self.activation= get_act(act)
+        self.dropout= nn.Dropout2d(p_drop) if p_drop > 0 else nn.Identity()
+        
+    def forward(self, x): 
+        out = self.convolution(x)
+        out = self.batchnorm(out)
+        out = self.activation(out)
+        out = self.dropout(out)
+        return out
 
 class DoubleConv(nn.Module):
     def __init__(self, in_ch, out_ch, act="ReLU", use_bn=True, p_drop=0.0):
         super().__init__()
-        self.block = nn.Sequential(
-            nn.Conv2d(in_ch, out_ch, 3, padding=1, bias=use_bn is False),
-            get_norm(use_bn, out_ch),
-            get_act(act),
-            nn.Dropout2d(p_drop) if p_drop > 0 else nn.Identity(),
-            nn.Conv2d(out_ch, out_ch, 3, padding=1, bias=use_bn is False),
-            get_norm(use_bn, out_ch),
-            get_act(act),
-        )
-    def forward(self, x): return self.block(x)
+        self.conv1 = SingleConv(in_ch, out_ch, act=act, use_bn=use_bn, p_drop=p_drop)
+        self.conv2 = SingleConv(out_ch, out_ch, act=act, use_bn=use_bn, p_drop=p_drop)
+    def forward(self, x): 
+        out = self.conv1(x)
+        out = self.conv2(out)
+        return out
+
+
+class ResidualBlock(nn.Module):
+    """(Single/Double)Conv + residual"""
+    def __init__(self, in_ch, out_ch, conv_multiple="double",
+                 act="ReLU", use_bn=True, p_drop=0.0, ceil=True, conv_down_kernel=3):
+        super().__init__()
+        convfeat = DoubleConv if conv_multiple == "double" else SingleConv
+        self.mainconvolution = convfeat(in_ch, out_ch, act=act, use_bn=use_bn, p_drop=p_drop)
+        
+        proj = nn.Conv2d(in_ch, out_ch, 1, bias=use_bn is False)
+        self.projection = nn.Sequential(OrderedDict([('projection_block', proj),('batchnorm',get_norm(use_bn, out_ch))]),)
+        self.activation = get_act(act)
+        
+    def forward(self, x):
+        out1 = self.mainconvolution(x)
+        out2 = self.projection(x)
+        return self.activation(out1+out2)
 
 # ---- downsampling op (pure down, no conv unless asked) ---------------------
 
@@ -62,27 +79,24 @@ class Downsample(nn.Module):
         self.mode = mode
         self.ceil = ceil
         if mode is None:
-            self.op = nn.Identity()
+            self.down = nn.Identity()
         elif mode == "maxpool":
-            self.op = nn.MaxPool2d(kernel_stride, kernel_stride, ceil_mode=ceil)
+            self.down = nn.MaxPool2d(kernel_stride, kernel_stride, ceil_mode=ceil)
         elif mode == "avgpool":
-            self.op = nn.AvgPool2d(kernel_stride, kernel_stride, ceil_mode=ceil)
+            self.down = nn.AvgPool2d(kernel_stride, kernel_stride, ceil_mode=ceil)
         elif mode == "strideconv":
             # stride-2 conv as a downsampler; keep norm+act for stability
-            self.op = nn.Sequential(
-                nn.Conv2d(C, C, conv_kernel, stride=2, padding=conv_kernel//2, bias=use_bn is False),
-                get_norm(use_bn, C),
-                get_act(act),
-            )
+            self.down = nn.Conv2d(C, C, conv_kernel, stride=2, padding=conv_kernel//2, bias=use_bn is False)
         else:
             raise ValueError(f"{mode} should be one of 'strideconv','maxpool' or 'avgpool'")
 
     def forward(self, x):
         if self.mode in ("strideconv", None):
-            return self.op(x)
+            return self.down(x)
         if self.ceil:
             x = pad_to_even(x)
-        return self.op(x)
+        return self.down(x)
+    
 
 # ---- unified blocks --------------------------------------------------------
 
@@ -92,127 +106,112 @@ class DownBlock(nn.Module):
                  act="ReLU", use_bn=True, p_drop=0.0, ceil=True, conv_down_kernel=3):
         super().__init__()
         feat = DoubleConv if conv_multiple == "double" else SingleConv
-        self.feat = feat(in_ch, out_ch, act=act, use_bn=use_bn, p_drop=p_drop)
+        self.convolution = feat(in_ch, out_ch, act=act, use_bn=use_bn, p_drop=p_drop)
         self.down = Downsample(out_ch, mode=down_mode, conv_kernel=conv_down_kernel,
                                ceil=ceil, use_bn=use_bn, act=act)
     def forward(self, x):
-        x = self.feat(x)
+        x = self.convolution(x)
         x = self.down(x)
         return x
 
 class ResidualDownBlock(nn.Module):
-    """Residual( (Single/Double)Conv ) + matching downsample on both paths."""
+    """(Single/Double)Conv → Downsample"""
     def __init__(self, in_ch, out_ch, conv_multiple="double", down_mode="maxpool",
                  act="ReLU", use_bn=True, p_drop=0.0, ceil=True, conv_down_kernel=3):
         super().__init__()
-        feat = DoubleConv if conv_multiple == "double" else SingleConv
-        self.feat = feat(in_ch, out_ch, act=act, use_bn=use_bn, p_drop=p_drop)
-        self.down_main = Downsample(out_ch, mode=down_mode, conv_kernel=conv_down_kernel,
-                                    ceil=ceil, use_bn=use_bn, act=act)
-
-        # projection + skip downsample matches channels & spatial scale
-        if down_mode == "strideconv":
-            proj = nn.Conv2d(in_ch, out_ch, 1, stride=2, bias=use_bn is False)
-            skip = nn.Identity()
-        elif down_mode in ("maxpool", "avgpool"):
-            proj = nn.Conv2d(in_ch, out_ch, 1, bias=use_bn is False)
-            skip = Downsample(out_ch, mode=down_mode, ceil=ceil)
-        elif down_mode is None:
-            proj = nn.Conv2d(in_ch, out_ch, 1, bias=use_bn is False)
-            skip = nn.Identity()
-        self.proj = nn.Sequential(proj, get_norm(use_bn, out_ch))
-        self.skip_down = skip
-        self.act = get_act(act)
-
+        self.residual_convolution = ResidualBlock(in_ch, out_ch, conv_multiple=conv_multiple,
+                 act=act, use_bn=use_bn, p_drop=p_drop, ceil=ceil, conv_down_kernel=conv_down_kernel)
+        self.down = Downsample(out_ch, mode=down_mode, conv_kernel=conv_down_kernel,
+                               ceil=ceil, use_bn=use_bn, act=act)
     def forward(self, x):
-        y = self.feat(x)
-        y = self.down_main(y)
-        s = self.skip_down(self.proj(x))
-        return self.act(y + s)
+        out = self.residual_convolution(x)
+        out = self.down(out)
+        return out
+    
     
 
-class ResidualDownBlockConcat(nn.Module):
-    """Residual ((Single/Double)Conv) + matching downsample on both paths, then concat."""
-    def __init__(self, in_ch, out_ch, conv_multiple="double", down_mode="maxpool",
-                 act="ReLU", use_bn=True, p_drop=0.0, ceil=True, conv_down_kernel=3):
-        super().__init__()
-        assert out_ch >= in_ch, "For concat skip, out_ch must be >= in_ch"
-        add_ch = out_ch - in_ch  # channels added by the main branch
+# class ResidualDownBlockConcat(nn.Module):
+#     """Residual ((Single/Double)Conv) + matching downsample on both paths, then concat."""
+#     def __init__(self, in_ch, out_ch, conv_multiple="double", down_mode="maxpool",
+#                  act="ReLU", use_bn=True, p_drop=0.0, ceil=True, conv_down_kernel=3):
+#         super().__init__()
+#         assert out_ch >= in_ch, "For concat skip, out_ch must be >= in_ch"
+#         add_ch = out_ch - in_ch  # channels added by the main branch
 
-        feat_cls = DoubleConv if conv_multiple == "double" else SingleConv
-        # Main branch creates the *extra* channels
-        self.feat = feat_cls(in_ch, add_ch, act=act, use_bn=use_bn, p_drop=p_drop)
-        self.down_main = Downsample(add_ch, mode=down_mode, conv_kernel=conv_down_kernel,
-                                    ceil=ceil, use_bn=use_bn, act=act)
+#         feat_cls = DoubleConv if conv_multiple == "double" else SingleConv
+#         # Main branch creates the *extra* channels
+#         self.feat = feat_cls(in_ch, add_ch, act=act, use_bn=use_bn, p_drop=p_drop)
+#         self.down_main = Downsample(add_ch, mode=down_mode, conv_kernel=conv_down_kernel,
+#                                     ceil=ceil, use_bn=use_bn, act=act)
 
-        # Skip branch keeps in_ch channels but downsamples spatially to match main branch
-        if down_mode == "strideconv":
-            proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, stride=2, bias=use_bn is False)
-            skip = nn.Identity()
-        elif down_mode in ("maxpool", "avgpool"):
-            proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, bias=use_bn is False)
-            skip = Downsample(in_ch, mode=down_mode, ceil=ceil)  # only spatial downsample
-        elif down_mode is None:
-            proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, bias=use_bn is False)
-            skip = nn.Identity()
-        else:
-            raise ValueError(f"Unknown down_mode: {down_mode}")
+#         # Skip branch keeps in_ch channels but downsamples spatially to match main branch
+#         if down_mode == "strideconv":
+#             proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, stride=2, bias=use_bn is False)
+#             skip = nn.Identity()
+#         elif down_mode in ("maxpool", "avgpool"):
+#             proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, bias=use_bn is False)
+#             skip = Downsample(in_ch, mode=down_mode, ceil=ceil)  # only spatial downsample
+#         elif down_mode is None:
+#             proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, bias=use_bn is False)
+#             skip = nn.Identity()
+#         else:
+#             raise ValueError(f"Unknown down_mode: {down_mode}")
 
-        self.proj = nn.Sequential(proj, get_norm(use_bn, in_ch))
-        self.skip_down = skip
-        self.act = get_act(act)
+#         self.proj = nn.Sequential(proj, get_norm(use_bn, in_ch))
+#         self.skip_down = skip
+#         self.act = get_act(act)
 
-        self.out_ch = out_ch  # for reference
+#         self.out_ch = out_ch  # for reference
 
-    def forward(self, x):
-        y = self.down_main(self.feat(x))        # [N, add_ch, H/2, W/2] (or same H/W if no downsample)
-        s = self.skip_down(self.proj(x))        # [N, in_ch,  H/2, W/2]
-        out = torch.cat([y, s], dim=1)          # concat along channels -> [N, add_ch+in_ch, ...] == out_ch
-        # Optional: sanity checks during development
-        # assert out.shape[1] == self.out_ch
-        return self.act(out)
+#     def forward(self, x):
+#         y = self.down_main(self.feat(x))        # [N, add_ch, H/2, W/2] (or same H/W if no downsample)
+#         s = self.skip_down(self.proj(x))        # [N, in_ch,  H/2, W/2]
+#         out = torch.cat([y, s], dim=1)          # concat along channels -> [N, add_ch+in_ch, ...] == out_ch
+#         # Optional: sanity checks during development
+#         # assert out.shape[1] == self.out_ch
+#         return self.act(out)
 
 
-class ResidualDownBlockConcatNoProj(nn.Module):
-    """Residual ((Single/Double)Conv) + matching downsample on both paths, then concat."""
-    def __init__(self, in_ch, out_ch, conv_multiple="double", down_mode="maxpool",
-                 act="ReLU", use_bn=True, p_drop=0.0, ceil=True, conv_down_kernel=3):
-        super().__init__()
-        assert out_ch >= in_ch, "For concat skip, out_ch must be >= in_ch"
-        add_ch = out_ch - in_ch  # channels added by the main branch
+# class ResidualDownBlockConcatNoProj(nn.Module):
+#     """Residual ((Single/Double)Conv) + matching downsample on both paths, then concat."""
+#     def __init__(self, in_ch, out_ch, conv_multiple="double", down_mode="maxpool",
+#                  act="ReLU", use_bn=True, p_drop=0.0, ceil=True, conv_down_kernel=3):
+#         super().__init__()
+#         assert out_ch >= in_ch, "For concat skip, out_ch must be >= in_ch"
+#         add_ch = out_ch - in_ch  # channels added by the main branch
 
-        feat_cls = DoubleConv if conv_multiple == "double" else SingleConv
-        # Main branch creates the *extra* channels
-        self.feat = feat_cls(in_ch, add_ch, act=act, use_bn=use_bn, p_drop=p_drop)
-        self.down_main = Downsample(add_ch, mode=down_mode, conv_kernel=conv_down_kernel,
-                                    ceil=ceil, use_bn=use_bn, act=act)
+#         feat_cls = DoubleConv if conv_multiple == "double" else SingleConv
+#         # Main branch creates the *extra* channels
+#         self.feat = feat_cls(in_ch, add_ch, act=act, use_bn=use_bn, p_drop=p_drop)
+#         self.down_main = Downsample(add_ch, mode=down_mode, conv_kernel=conv_down_kernel,
+#                                     ceil=ceil, use_bn=use_bn, act=act)
 
-        # Skip branch keeps in_ch channels but downsamples spatially to match main branch
-        if down_mode == "strideconv":
-            proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, stride=2, bias=use_bn is False)
-            skip = nn.Identity()
-        elif down_mode in ("maxpool", "avgpool"):
-            proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, bias=use_bn is False)
-            skip = Downsample(in_ch, mode=down_mode, ceil=ceil)  # only spatial downsample
-        elif down_mode is None:
-            proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, bias=use_bn is False)
-            skip = nn.Identity()
-        else:
-            raise ValueError(f"Unknown down_mode: {down_mode}")
+#         # Skip branch keeps in_ch channels but downsamples spatially to match main branch
+#         if down_mode == "strideconv":
+#             proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, stride=2, bias=use_bn is False)
+#             skip = nn.Identity()
+#         elif down_mode in ("maxpool", "avgpool"):
+#             proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, bias=use_bn is False)
+#             skip = Downsample(in_ch, mode=down_mode, ceil=ceil)  # only spatial downsample
+#         elif down_mode is None:
+#             proj = nn.Conv2d(in_ch, in_ch, kernel_size=1, bias=use_bn is False)
+#             skip = nn.Identity()
+#         else:
+#             raise ValueError(f"Unknown down_mode: {down_mode}")
 
-        # self.proj = nn.Sequential(proj, get_norm(use_bn, in_ch))
-        self.skip_down = skip
-        self.act = get_act(act)
+#         self.proj = nn.Sequential(proj, get_norm(use_bn, in_ch))
+#         self.skip_down = skip
+#         self.act = get_act(act)
 
-        self.out_ch = out_ch  # for reference
+#         self.out_ch = out_ch  # for reference
 
-    def forward(self, x):
-        y = self.down_main(self.feat(x))        # [N, add_ch, H/2, W/2] (or same H/W if no downsample)
-        s = self.skip_down(x)        # [N, in_ch,  H/2, W/2]
-        out = torch.cat([y, s], dim=1)          # concat along channels -> [N, add_ch+in_ch, ...] == out_ch
-        # Optional: sanity checks during development
-        # assert out.shape[1] == self.out_ch
-        return self.act(out)
+#     def forward(self, x):
+#         y = self.down_main(self.feat(x))        # [N, add_ch, H/2, W/2] (or same H/W if no downsample)
+#         s = self.skip_down(x)        # [N, in_ch,  H/2, W/2]
+#         out = torch.cat([y, s], dim=1)          # concat along channels -> [N, add_ch+in_ch, ...] == out_ch
+#         # Optional: sanity checks during development
+#         # assert out.shape[1] == self.out_ch
+#         return self.act(out)
 
 
 
@@ -228,7 +227,7 @@ class ResidualDownBlockConcatNoProj(nn.Module):
 #                  dropout=0,
 #                  activation_function='ReLU'):
 #         super().__init__()
-#         self.downsample_block = get_downsample_block(downsample_mode, input_channels, output_channels)
+#         self.down_block = get_downsample_block(downsample_mode, input_channels, output_channels)
 #         self.batch_norm_true = batch_norm 
 #         self.dropout_p = dropout 
 #         match activation_function:
@@ -381,23 +380,21 @@ class MLP(nn.Module):
                  activation_function='ReLU',
                  ):
         super(MLP, self).__init__()
+        self.number_layers = len(hidden_layers_neuron_number) + 1
         self.input_neurons = input_neurons
         self.output_neurons = output_neurons
         self.neurons = [input_neurons] + hidden_layers_neuron_number + [output_neurons]
-        self.activation_function = get_act(activation_function)
-
-
-        self.layers = nn.ModuleList()
+        
         for i in range(1,len(self.neurons)):
-            layer = nn.Linear(self.neurons[i-1], self.neurons[i])
-            self.layers.append(layer)
-            if i < len(self.neurons)-1 and dropout>0:
-                self.layers.append(nn.Dropout(p=dropout))
+            list_modules = [("linearlayer",nn.Linear(self.neurons[i-1], self.neurons[i]))]
+            if i < self.number_layers:
+                list_modules += [("activation",get_act(activation_function)),
+                                 ("dropout", nn.Dropout(p=dropout))]
+            layer = nn.Sequential(OrderedDict(list_modules))
+            setattr(self, f"fc{i}", layer )
 
     def forward(self, x):
-        for layer in self.layers[:-1]:
-            x = layer(x)
-            x = self.activation_function(x)
-        x = self.layers[-1](x)
+        for i in range(1, self.number_layers+1):
+            x = getattr(self, f"fc{i}" )(x)
+        
         return x
-    

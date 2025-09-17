@@ -1,7 +1,7 @@
 import torch.nn as nn
 import math
 import torch
-from ml_module_rain.models.individualblocks import  MLP, DownBlock, ResidualDownBlock, ContextBlock, GlobalAvgPool,ResidualDownBlockConcat
+from ml_module_rain.models.individualblocks import  MLP, DownBlock, ResidualDownBlock, ContextBlock, GlobalAvgPool
 
 def get_neural_network(config):
     if config['split_MLP_head_per_horizon']:

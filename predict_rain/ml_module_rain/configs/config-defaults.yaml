@@ -1,7 +1,7 @@
 ### Basic hyperparameters
 batch_size:
   desc: Size of each mini-batch
-  value: 256
+  value: 128
 learning_rate:
   desc: Learning rate
   value: 0.0001
@@ -69,10 +69,10 @@ augment_noise_amplitude:
 file_name_data_in:
   desc: Path to input data (atmos variables)
   # value: "/Data/gfi/scratch/rogui7909/dl_inputs_day_1deg_1940-2024.zarr"
-  value: "/Data/gfi/users/rogui7909/data/ERA5/dynamical_variables/dl_inputs_day_1deg_1940-2024.zarr"
+  value: "/Data/gfi/users/rogui7909/data/ERA5/dynamical_variables/dl_inputs_day_1deg_1940-2024_equalarea.zarr"
 inputs: 
   desc: Input variables chosen 
-  value: "u850 v850 msl z500"
+  value: "u850 v850 msl z500 tcwv"
 spatial_extent:
   desc: List of lon_min, lon_max, lat_min, lat_max
   value: [-128, 53, 0, 88]
@@ -105,7 +105,7 @@ factor_increase_kernels_per_conv_layer:
   value: 2
 dropout_CNN:
   desc: Probability of dropout for CNN layers
-  value: 0.3
+  value: 0.4
 batch_norm_CNN:
   desc: Whether to use batchnorm2d for the CNN layers or not
   value: True
@@ -120,10 +120,10 @@ MLP_multihead_v2:
   value: False
 MLP_hidden_layers_neuron_number:
   desc: Layers of the MLP after the CNN 
-  value: [32,32]
+  value: [128]
 dropout_MLP:
   desc: Probability of dropout between MLP layers
-  value: 0.4
+  value: 0.1
 
 attribute_predictions:
   desc: choose whether to compute attributions or not. Can be 'TP' for true positives, 'all_extr' for all extremes and 'all' for all points. Otherwise 'no'.
