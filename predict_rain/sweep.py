@@ -50,7 +50,7 @@ def main_sweep():
     }
 
     sweep_id = wandb.sweep(sweep=sweep_configuration, project="Predict-rain-WNorway_v7")
-    wandb.agent(sweep_id, function=main_config, count=200)
+    wandb.agent(sweep_id, function=main_config, count=400)
 
 if __name__=='__main__':
     main_sweep()

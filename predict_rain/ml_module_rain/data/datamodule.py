@@ -54,7 +54,7 @@ class MyDataLoader:
         # ds_atm = ds_atm[input_variables].to_array('var_name')
         # ds_atm = (ds_atm-ds_mean)/ds_std
         ds_atm = ds_atm.data_normed.sel(var_name =input_variables )
-        ds_atm = ds_atm.transpose('time','var_name','x','y')
+        ds_atm = ds_atm.transpose('time','var_name','x','y').isel(x=slice(0,100), y=slice(0,100))
         # lon_min, lon_max, lat_min, lat_max = self.config['spatial_extent']
         # if ds_atm.latitude.diff('latitude')[0]<0:
         #     lat_min, lat_max = lat_max, lat_min
