@@ -86,7 +86,7 @@ class Downsample(nn.Module):
             self.down = nn.AvgPool2d(kernel_stride, kernel_stride, ceil_mode=ceil)
         elif mode == "strideconv":
             # stride-2 conv as a downsampler; keep norm+act for stability
-            self.down = nn.Conv2d(C, C, conv_kernel, stride=2, padding=conv_kernel//2, bias=use_bn is False)
+            self.down = nn.Conv2d(C, C, conv_kernel, channels=C, stride=2, padding=conv_kernel//2, bias=use_bn is False)
         else:
             raise ValueError(f"{mode} should be one of 'strideconv','maxpool' or 'avgpool'")
 

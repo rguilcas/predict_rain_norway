@@ -49,12 +49,12 @@ class MyDataLoader:
         input_variables = self.config['inputs'].split(' ')
         self.config['input_variables'] = input_variables 
         ds_atm = xr.open_zarr(self.config['file_name_data_in'])
-        # ds_mean = ds_atm.mean_fields.sel(var_name = input_variables)
-        # ds_std = ds_atm.std_fields.sel(var_name = input_variables)
-        # ds_atm = ds_atm[input_variables].to_array('var_name')
-        # ds_atm = (ds_atm-ds_mean)/ds_std
-        ds_atm = ds_atm.data_normed.sel(var_name =input_variables )
-        ds_atm = ds_atm.transpose('time','var_name','x','y').isel(x=slice(0,100), y=slice(0,100))
+        ds_mean = ds_atm.data_mean.sel(var_name = input_variables)
+        ds_std = ds_atm.data_std.sel(var_name = input_variables)
+        ds_atm = ds_atm[input_variables].to_array('var_name')
+        ds_atm = (ds_atm-ds_mean)/ds_std
+        # ds_atm = ds_atm.data_normed.sel(var_name =input_variables )
+        ds_atm = ds_atm.transpose('time','var_name','x','y')#.isel(x=slice(0,100), y=slice(0,100))
         # lon_min, lon_max, lat_min, lat_max = self.config['spatial_extent']
         # if ds_atm.latitude.diff('latitude')[0]<0:
         #     lat_min, lat_max = lat_max, lat_min

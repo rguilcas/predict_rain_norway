@@ -23,7 +23,7 @@ def main(config_path=None):
     torch.set_float32_matmul_precision('medium')
     seed_everything(42, workers=True)
     init_config = load_config(config_path)
-    wandb_logger = loggers.WandbLogger(project="Predict-rain-WNorway_v6", 
+    wandb_logger = loggers.WandbLogger(project="Predict-rain-WNorway_v8", 
                                     save_dir="/Data/gfi/users/rogui7909/wanbd_logs/",
                                     dir="/Data/gfi/users/rogui7909/wanbd_logs/wandb",
                                     config=init_config )

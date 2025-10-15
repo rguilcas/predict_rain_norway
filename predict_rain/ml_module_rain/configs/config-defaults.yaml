@@ -70,7 +70,7 @@ augment_noise_amplitude:
 file_name_data_in:
   desc: Path to input data (atmos variables)
   # value: "/Data/gfi/scratch/rogui7909/dl_inputs_day_1deg_1940-2024.zarr"
-  value: "/Data/gfi/users/rogui7909/data/ERA5/dynamical_variables/dl_inputs_day_1deg_1940-2024_equalarea.zarr"
+  value: "/Data/gfi/users/rogui7909/data/ERA5/dynamical_variables/dl_inputs_day_100km_1940-2024_NPS.zarr"
 inputs: 
   desc: Input variables chosen 
   value: "u850 v850 msl z500"
@@ -82,10 +82,10 @@ spatial_extent:
 ## Network params CNN
 use_skip_connections:
   desc: uses ResNet style skip connections or not
-  value: True
+  value: False
 CNN_downsample_mode:
   desc: can be 'maxpool', 'avgpool', 'strideconv'
-  value: 'maxpool'
+  value: 'strideconv'
 CNN_conv_multiple:
   desc: doubling all convolution layers to increase receptive field. 'single' or 'double'
   value: 'single'
