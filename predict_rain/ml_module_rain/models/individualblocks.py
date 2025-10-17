@@ -109,9 +109,13 @@ class DownBlock(nn.Module):
         self.convolution = feat(in_ch, out_ch, act=act, use_bn=use_bn, p_drop=p_drop)
         self.down = Downsample(out_ch, mode=down_mode, conv_kernel=conv_down_kernel,
                                ceil=ceil, use_bn=use_bn, act=act)
+        self.activation = get_act(act)
+        self.batchnorm= get_norm(use_bn, out_ch)
     def forward(self, x):
         x = self.convolution(x)
         x = self.down(x)
+        x = self.batchnorm(x)
+        x = self.activation(x)
         return x
 
 class ResidualDownBlock(nn.Module):
@@ -123,9 +127,15 @@ class ResidualDownBlock(nn.Module):
                  act=act, use_bn=use_bn, p_drop=p_drop, ceil=ceil, conv_down_kernel=conv_down_kernel)
         self.down = Downsample(out_ch, mode=down_mode, conv_kernel=conv_down_kernel,
                                ceil=ceil, use_bn=use_bn, act=act)
+        
+        self.activation = get_act(act)
+        self.batchnorm= get_norm(use_bn, out_ch)
+        
     def forward(self, x):
         out = self.residual_convolution(x)
         out = self.down(out)
+        out = self.batchnorm(out)
+        out = self.activation(out)
         return out
     
     

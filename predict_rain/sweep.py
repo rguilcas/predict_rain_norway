@@ -31,11 +31,11 @@ def main_sweep():
     from train_neural_network import main
 
     sweep_configuration = {
-    "name": "September 17th 2025 sweep with new projection",
+    "name": "October 15th 2025 sweep with new projection",
     "method": "bayes",
     "metric": {"goal": "maximize", "name": "test/best_f1"}, 
     "parameters": {
-    "learning_rate": {"max": 1e-3,'min':1e-5, 'distribution':'log_uniform_values'},
+    "learning_rate": {"max": 1e-3,'min':1e-6, 'distribution':'log_uniform_values'},
     'use_skip_connections':{"values":[True, False]}, 
     'CNN_downsample_mode':{"values":['maxpool','avgpool','strideconv']}, 
     'CNN_conv_multiple':{"values":['single', 'double']},
@@ -43,14 +43,14 @@ def main_sweep():
     'conv1_kernel_number':{"values":[8,16,32,48,64]},
     'batch_norm_CNN': {"values": [True, False]},
     'dropout_CNN': {"min": 0., "max": 0.6},
-    'MLP_hidden_layers_neuron_number': {"values": [[128], [128,128]]},
+    'MLP_hidden_layers_neuron_number': {"values": [[256], [256,256], [256,256,256]]},
     'dropout_MLP': {"min": 0., "max": 0.6},
     'activation_function':{"values":["ReLU","LeakyReLU","GELU"]}
     },
     }
 
-    sweep_id = wandb.sweep(sweep=sweep_configuration, project="Predict-rain-WNorway_v7")
-    wandb.agent(sweep_id, function=main_config, count=400)
+    sweep_id = wandb.sweep(sweep=sweep_configuration, project="Predict-rain-WNorway_v8")
+    wandb.agent(sweep_id, function=main_config, count=100)
 
 if __name__=='__main__':
     main_sweep()
