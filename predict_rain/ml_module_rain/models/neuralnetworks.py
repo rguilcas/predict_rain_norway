@@ -75,9 +75,10 @@ class CNN_MLP(nn.Module):
                        dropout = dropout_MLP,
                        activation_function=self.activation_function
                       )
+        self.flatten = nn.Flatten()
     def forward(self, x):
         x = self.CNN(x)
-        x = x.view(-1, self.linear_size)
+        x = self.flatten(x)#.view(-1, self.linear_size)
         x = self.MLP(x)
         return x
 

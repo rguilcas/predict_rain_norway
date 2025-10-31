@@ -35,17 +35,17 @@ def main_sweep():
     "method": "bayes",
     "metric": {"goal": "maximize", "name": "test/best_f1"}, 
     "parameters": {
-    "learning_rate": {"max": 1e-3,'min':1e-6, 'distribution':'log_uniform_values'},
-    'use_skip_connections':{"values":[True, False]}, 
-    'CNN_downsample_mode':{"values":['maxpool','avgpool','strideconv']}, 
+    "learning_rate": {"max": 0.01,'min':0.00001, 'distribution':'log_uniform_values'},
+    # 'use_skip_connections':{"values":[True, False]}, 
+    # 'CNN_downsample_mode':{"values":['maxpool','avgpool','strideconv']}, 
     'CNN_conv_multiple':{"values":['single', 'double']},
-    'num_conv_layer':{"values":[4,5,6]},
+    'num_conv_layer':{"values":[3,4,5,6]},
     'conv1_kernel_number':{"values":[8,16,32,48,64]},
-    'batch_norm_CNN': {"values": [True, False]},
-    'dropout_CNN': {"min": 0., "max": 0.6},
-    'MLP_hidden_layers_neuron_number': {"values": [[256], [256,256], [256,256,256]]},
-    'dropout_MLP': {"min": 0., "max": 0.6},
-    'activation_function':{"values":["ReLU","LeakyReLU","GELU"]}
+    # 'batch_norm_CNN': {"values": [True, False]},
+    'dropout_CNN': {"min": 0., "max": 0.5},
+    # 'MLP_hidden_layers_neuron_number': {"values": [[256], [256,256], [256,256,256]]},
+    'dropout_MLP': {"min": 0., "max": 0.5},
+    # 'activation_function':{"values":["ReLU","LeakyReLU","GELU"]}
     },
     }
 
