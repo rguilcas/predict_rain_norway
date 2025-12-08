@@ -1,6 +1,7 @@
 import xarray as xr 
 from captum.attr import IntegratedGradients
 import numpy as np
+import pandas as pd
 import torch 
 from tqdm import tqdm
 from ml_module_rain.data.preprocessings import add_timesteps, filter_by_season, preprocess_rain, get_loader_from_ds, get_expanded_ds
@@ -72,6 +73,7 @@ class MyDataLoader:
         self.config['feature_height'] = self.feature_height
         self.config['feature_width'] = self.feature_width
         self.config['feature_image_size'] = self.feature_image_size
+
     def harmonize_time(self):
         common_time = [time for time in self.features.time.values if time in self.rain.time.values]
         if len(common_time) == 0:
@@ -81,33 +83,47 @@ class MyDataLoader:
         self.targets = self.targets.sel(time=common_time)
         self.n_samples = self.targets.time.size
 
-    def make_train_val_test_split_datasets(self, ratio=[.7,.15], shuffle_train=True):
-        all_indices = np.arange(self.rain.time.size)
-        total_size = all_indices.size
-        indices_train = all_indices[:int(total_size*ratio[0])]
-        indices_val = all_indices[int(total_size*ratio[0]):int(total_size*(ratio[0]+ratio[1]))]
-        indices_test = all_indices[int(total_size*(ratio[0]+ratio[1])):] 
-        if shuffle_train:
-            np.random.shuffle(indices_train)
-        self.indices_train = indices_train 
-        self.indices_val = indices_val
-        self.indices_test = indices_test
-        self.ds_train = xr.Dataset(dict(features=self.features.isel(time=self.indices_train),
-                               targets=self.targets.isel(time=self.indices_train),
-                               rain=self.rain.isel(time=self.indices_train),
+    def make_train_val_test_split_datasets(self, 
+                                           train_years=slice('1979','2008'), 
+                                           val_years=slice('2009','2016'),
+                                           test_years=slice('2017','2024'),
+                                           shuffle_train=True):
+        # all_indices = np.arange(self.rain.time.size)
+        # total_size = all_indices.size
+        # indices_train = all_indices[:int(total_size*ratio[0])]
+        # indices_val = all_indices[int(total_size*ratio[0]):int(total_size*(ratio[0]+ratio[1]))]
+        # indices_test = all_indices[int(total_size*(ratio[0]+ratio[1])):] 
+        # if shuffle_train:
+        #     np.random.shuffle(indices_train)
+        # self.indices_train = indices_train 
+        # self.indices_val = indices_val
+        # self.indices_test = indices_test
+        
+        ds_train = xr.Dataset(dict(
+                               features=self.features.sel(time=train_years),
+                               targets=self.targets.sel(time=train_years),
+                               rain=self.rain.sel(time=train_years),
                                ))
+        if shuffle_train:
+            times_train = ds_train.time.values
+            np.random.shuffle(times_train)
+            ds_train = ds_train.sel(time=times_train)
+        self.ds_train = ds_train
+        
         if self.config['augment_training_with_noise']:
             self.ds_train = get_expanded_ds(self.ds_train, 
                                             noisy_samples=self.config['num_noisy_samples'], 
                                             noise_scale=self.config['augment_noise_amplitude'], 
                                             shuffle_after_noise=shuffle_train)
-        self.ds_val = xr.Dataset(dict(features=self.features.isel(time=self.indices_val),
-                               targets=self.targets.isel(time=self.indices_val),
-                               rain=self.rain.isel(time=self.indices_val),
+        self.ds_val = xr.Dataset(dict(
+                               features=self.features.sel(time=val_years),
+                               targets=self.targets.sel(time=val_years),
+                               rain=self.rain.sel(time=val_years),
                                ))
-        self.ds_test = xr.Dataset(dict(features=self.features.isel(time=self.indices_test),
-                               targets=self.targets.isel(time=self.indices_test),
-                               rain=self.rain.isel(time=self.indices_test),
+        self.ds_test = xr.Dataset(dict(
+                               features=self.features.sel(time=test_years),
+                               targets=self.targets.sel(time=test_years),
+                               rain=self.rain.sel(time=test_years),
                                ))
             
     def make_data_loaders(self):

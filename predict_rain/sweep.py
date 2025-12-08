@@ -38,18 +38,18 @@ def main_sweep():
     "learning_rate": {"max": 0.01,'min':0.00001, 'distribution':'log_uniform_values'},
     # 'use_skip_connections':{"values":[True, False]}, 
     # 'CNN_downsample_mode':{"values":['maxpool','avgpool','strideconv']}, 
-    'CNN_conv_multiple':{"values":['single', 'double']},
+    # 'CNN_conv_multiple':{"values":['single', 'double']},
     'num_conv_layer':{"values":[3,4,5,6]},
-    'conv1_kernel_number':{"values":[8,16,32,48,64]},
+    'conv1_kernel_number':{"values":[4,8,16,32,48,64]},
     # 'batch_norm_CNN': {"values": [True, False]},
     'dropout_CNN': {"min": 0., "max": 0.5},
-    # 'MLP_hidden_layers_neuron_number': {"values": [[256], [256,256], [256,256,256]]},
+    'MLP_hidden_layers_neuron_number': {"values": [[128], [256]]},
     'dropout_MLP': {"min": 0., "max": 0.5},
     # 'activation_function':{"values":["ReLU","LeakyReLU","GELU"]}
     },
     }
 
-    sweep_id = wandb.sweep(sweep=sweep_configuration, project="Predict-rain-WNorway_v8")
+    sweep_id = wandb.sweep(sweep=sweep_configuration, project="Predict-rain-WNorway_v9")
     wandb.agent(sweep_id, function=main_config, count=100)
 
 if __name__=='__main__':

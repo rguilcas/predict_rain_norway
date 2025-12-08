@@ -136,7 +136,7 @@ def preprocess_rain(ds_rain, config):
 def get_loader_from_ds(ds, batch_size):
     X_bgen = xb.BatchGenerator(
         ds.features,
-        input_dims={'time': batch_size, 'var_name': ds.var_name.size, 'y': ds.features.y.size, 'x': ds.features.x.size},
+        input_dims={'time': batch_size, 'var_name': ds.var_name.size, 'x': ds.features.x.size, 'y': ds.features.y.size},
         preload_batch=True,
     )
     y_bgen = xb.BatchGenerator(
