@@ -25,7 +25,7 @@ class ExtremeRainPredictor(L.LightningModule):
         self.targets_validation = []
         self.predictions_test = []
         self.targets_test = []
-        self.optimizer = optim.Adam(self.parameters(), lr=self.learning_rate, weight_decay=1e-4)
+        self.optimizer = optim.AdamW(self.parameters(), lr=self.learning_rate, weight_decay=3e-4)
         if lr_scheduler=='exponential':
             lr_scheduler = optim.lr_scheduler.ExponentialLR(self.optimizer, gamma=0.9)
         elif lr_scheduler=='step':

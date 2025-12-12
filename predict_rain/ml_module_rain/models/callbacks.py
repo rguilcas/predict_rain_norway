@@ -6,7 +6,7 @@ import numpy as np
 from scipy.stats import pearsonr
 import xarray as xr
 from lightning.pytorch.callbacks import ModelCheckpoint
-from sklearn.metrics import precision_recall_curve, average_precision_score
+from sklearn.metrics import precision_recall_curve, average_precision_score, precision_recall_curve, auc
 
 def get_checkpoint_callback(wandb_logger):
     run_id = wandb_logger.experiment.id 
@@ -178,11 +178,12 @@ class BestF1Callback(Callback):
         preds = torch.sigmoid(torch.stack(pl_module.predictions_test)).cpu().numpy()
         targets = torch.stack(pl_module.targets_test).cpu().numpy()
         targets[targets<1] = 0
-        
-        
+        p,r,threshold = precision_recall_curve(targets.flatten(), preds.flatten())
+        pr_auc = auc(r,p)
+
         # if not self.multi_horizon:
         best_f1, best_thresh = self._compute_best_f1(preds.flatten(), targets.flatten())
-        trainer.logger.log_metrics({"test/best_f1": best_f1, "test/best_threshold": best_thresh})
+        trainer.logger.log_metrics({"test/pr_auc":pr_auc,"test/best_f1": best_f1, "test/best_threshold": best_thresh})
         
         H = preds.shape[1]
         table = wandb.Table(columns=["Horizon", "Best_F1", "Best_Threshold", "PR_AUC"])

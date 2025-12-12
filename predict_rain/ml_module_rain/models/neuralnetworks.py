@@ -10,7 +10,10 @@ def get_neural_network(config):
         else:
             NN_class = CNN_MLP_multiheads
     else:
-        NN_class = CNN_MLP
+        if config['use_gap_in_CNN']:
+            NN_class = CNN_GAP_MLP
+        else:
+            NN_class = CNN_MLP
     NN = NN_class(feature_height=config['feature_height'], 
              feature_width=config['feature_width'],
              input_channels=config['num_channels'],
@@ -23,12 +26,62 @@ def get_neural_network(config):
              dropout_MLP =config['dropout_MLP'],
              use_residuals=config['use_skip_connections'],
              activation_function=config['activation_function'],
-             
-                )
+             )
     return NN
 
 
-
+class CNN_GAP_MLP(nn.Module):
+    def __init__(self, 
+                 feature_height, 
+                 feature_width,
+                 input_channels,
+                 output_neurons,
+                 CNN_number_of_layers=3,
+                 CNN_output_channels_first_layer=16,
+                 CNN_channels_increase_per_layer=2,
+                 CNN_downsample_mode = 'strideconv',
+                 CNN_conv_multiple = 'double',
+                 MLP_hidden_layers_neuron_number = [128,512,512,128],
+                 dropout_MLP = 0.1,
+                 use_residuals=True,
+                 activation_function = 'ReLU',
+                 CNN_use_bn = True,
+                 CNN_p_dropout =0.2
+                 ):
+        super(CNN_GAP_MLP, self).__init__()
+        self.feature_height = feature_height
+        self.feature_width = feature_width
+        self.activation_function = activation_function
+        self.CNN = Encoder(input_channels = input_channels, 
+                           num_layers=CNN_number_of_layers, 
+                           output_channels_first_layer=CNN_output_channels_first_layer,
+                           channels_increase_per_layer=CNN_channels_increase_per_layer,
+                           downsample_mode=CNN_downsample_mode,    # str or list[str]
+                           conv_multiple=CNN_conv_multiple,   
+                           use_residuals=use_residuals,
+                           use_bn=CNN_use_bn,
+                           p_dropout=CNN_p_dropout,
+                           activation_function=self.activation_function)
+        self.gap = GlobalAvgPool() 
+        with torch.no_grad():
+            dummy_input = torch.zeros(1, input_channels, feature_height, feature_width)
+            cnn_output = self.CNN(dummy_input)
+            gap_output = self.gap(cnn_output)
+            linear_size = gap_output.shape[1]
+        
+        self.linear_size = linear_size
+        self.MLP = MLP(self.linear_size, 
+                       output_neurons,
+                       hidden_layers_neuron_number = MLP_hidden_layers_neuron_number,
+                       dropout = dropout_MLP,
+                       activation_function=self.activation_function
+                      )
+        self.flatten = nn.Flatten()
+    def forward(self, x):
+        x = self.CNN(x)
+        x = self.gap(x)
+        x = self.MLP(x)
+        return x
 
 
 class CNN_MLP(nn.Module):
@@ -233,34 +286,75 @@ class Encoder(nn.Module):
     def __init__(self, input_channels, num_layers,
                  output_channels_first_layer=16,
                  channels_increase_per_layer=2,
-                 use_residuals=True,           # bool or list[bool]
-                 downsample_mode="maxpool",    # str or list[str]
-                 conv_multiple='single',       # 'single' or 'double'
-                 use_bn = True,
-                 p_dropout=0.2, 
+                 max_channels=256,                 # <--- new
+                 use_residuals=True,
+                 downsample_mode="maxpool",
+                 conv_multiple='single',
+                 use_bn=True,
+                 p_dropout=0.2,
                  activation_function='ReLU'):
         super().__init__()
         self.num_layers = num_layers
-        
+
+        prev_out_ch = input_channels
         for layer in range(num_layers):
-            
-            in_ch  = output_channels_first_layer * (channels_increase_per_layer ** (layer-1)) if layer > 0 else input_channels
-            out_ch = output_channels_first_layer * (channels_increase_per_layer **  layer)
-            # map legacy names to unified modes
+            out_ch = int(output_channels_first_layer * (channels_increase_per_layer ** layer))
+            if max_channels is not None:
+                out_ch = min(out_ch, max_channels)
+
             Block = ResidualDownBlock if use_residuals else DownBlock
-            module = Block(in_ch, out_ch,
-                           conv_multiple=conv_multiple,
-                           down_mode=downsample_mode,
-                           act=activation_function,
-                           use_bn=use_bn,
-                           p_drop=p_dropout,
-                           conv_down_kernel=2 if downsample_mode == "doubleconv" else 3)
+            module = Block(
+                prev_out_ch, out_ch,
+                conv_multiple=conv_multiple,
+                down_mode=downsample_mode,
+                act=activation_function,
+                use_bn=use_bn,
+                p_drop=p_dropout,
+                conv_down_kernel=2 if downsample_mode == "doubleconv" else 3
+            )
             setattr(self, f"convblock{layer}", module)
 
+            prev_out_ch = out_ch
+            
     def forward(self, x):
         for layer in range(self.num_layers):
             x = getattr(self, f"convblock{layer}")(x)
         return x
+
+# class Encoder(nn.Module):
+#     def __init__(self, input_channels, num_layers,
+#                  output_channels_first_layer=16,
+#                  channels_increase_per_layer=2,
+#                  use_residuals=True,           # bool or list[bool]
+#                  downsample_mode="maxpool",    # str or list[str]
+#                  conv_multiple='single',       # 'single' or 'double'
+#                  use_bn = True,
+#                  p_dropout=0.2, 
+#                  activation_function='ReLU'):
+#         super().__init__()
+#         self.num_layers = num_layers
+        
+#         for layer in range(num_layers):
+            
+#             in_ch  = output_channels_first_layer * (channels_increase_per_layer ** (layer-1)) if layer > 0 else input_channels
+#             out_ch = output_channels_first_layer * (channels_increase_per_layer **  layer)
+#             out_ch = min(out_ch, 256)
+#             in_ch = min(out_ch, 256)
+#             # map legacy names to unified modes
+#             Block = ResidualDownBlock if use_residuals else DownBlock
+#             module = Block(in_ch, out_ch,
+#                            conv_multiple=conv_multiple,
+#                            down_mode=downsample_mode,
+#                            act=activation_function,
+#                            use_bn=use_bn,
+#                            p_drop=p_dropout,
+#                            conv_down_kernel=2 if downsample_mode == "doubleconv" else 3)
+#             setattr(self, f"convblock{layer}", module)
+
+#     def forward(self, x):
+#         for layer in range(self.num_layers):
+#             x = getattr(self, f"convblock{layer}")(x)
+#         return x
 
 # class Encoder(nn.Module):
 #     def __init__(self, input_channels, num_layers,

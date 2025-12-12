@@ -33,23 +33,32 @@ def main_sweep():
     sweep_configuration = {
     "name": "October 15th 2025 sweep with new projection",
     "method": "bayes",
-    "metric": {"goal": "maximize", "name": "test/best_f1"}, 
+    "metric": {"goal": "maximize", "name": "test/pr_auc"}, 
     "parameters": {
-    "learning_rate": {"max": 0.01,'min':0.00001, 'distribution':'log_uniform_values'},
+    "learning_rate": {"max": 3e-3,'min':1e-5, 'distribution':'log_uniform_values'},
+    'num_conv_layer':{"values":[5,6]},
+    'conv1_kernel_number':{"values":[16,24,32,]},
+    # 'CNN_conv_multiple':{"values":['single', 'double']},
+    # 'factor_increase_kernels_per_conv_layer':{"values":[1.5,2]},
+    'dropout_CNN': {"values": [0.0, 0.1, 0.2, 0.3]},
+    'dropout_MLP': {"values": [0.1, 0.2, 0.3, 0.4]},
+    "batch_size": {"values": [128, 256, 512]},
+    # "num_timesteps_predicted": {'values':[5]}
+    # 'MLP_hidden_layers_neuron_number': {"values": 
+    #                                     [
+    #                                     [128,128],
+    #                                     # [256],
+    #                                     # [256, 128],
+    #                                     # [256, 256]
+    #                                     ]},
     # 'use_skip_connections':{"values":[True, False]}, 
     # 'CNN_downsample_mode':{"values":['maxpool','avgpool','strideconv']}, 
-    # 'CNN_conv_multiple':{"values":['single', 'double']},
-    'num_conv_layer':{"values":[3,4,5,6]},
-    'conv1_kernel_number':{"values":[4,8,16,32,48,64]},
     # 'batch_norm_CNN': {"values": [True, False]},
-    'dropout_CNN': {"min": 0., "max": 0.5},
-    'MLP_hidden_layers_neuron_number': {"values": [[128], [256]]},
-    'dropout_MLP': {"min": 0., "max": 0.5},
     # 'activation_function':{"values":["ReLU","LeakyReLU","GELU"]}
     },
     }
 
-    sweep_id = wandb.sweep(sweep=sweep_configuration, project="Predict-rain-WNorway_v9")
+    sweep_id = wandb.sweep(sweep=sweep_configuration, project="Predict-rain-WNorway_v10")
     wandb.agent(sweep_id, function=main_config, count=100)
 
 if __name__=='__main__':
