@@ -4,7 +4,7 @@ batch_size:
   value: 512
 learning_rate:
   desc: Learning rate
-  value: 0.0001
+  value: 0.0002
 
 lr_scheduler:
   desc: Scheduler use for learning rate decay
@@ -106,7 +106,7 @@ factor_increase_kernels_per_conv_layer:
   value: 2
 dropout_CNN:
   desc: Probability of dropout for CNN layers
-  value: 0.3
+  value: 0.2
 batch_norm_CNN:
   desc: Whether to use batchnorm2d for the CNN layers or not
   value: True
@@ -127,7 +127,7 @@ MLP_hidden_layers_neuron_number:
   value: []
 dropout_MLP:
   desc: Probability of dropout between MLP layers
-  value: 0.4
+  value: 0.2
 
 attribute_predictions:
   desc: choose whether to compute attributions or not. Can be 'TP' for true positives, 'all_extr' for all extremes and 'all' for all points. Otherwise 'no'.
