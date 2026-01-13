@@ -29,7 +29,7 @@ activation_function:
 ### In/Out params
 file_name_data_out:
   desc: Path to output data (daily rain data)
-  value: '/Data/gfi/users/rogui7909/data/ERA5/precipitation/pr_era5_daily_westnorway_1940-2024.nc'
+  value: '/Data/gfi/users/rogui7909/data/precip/senorge_westnorway_1979-2014.nc'
 type_prediction:
   desc: Type of prediction done. Either 'regression', 'quantiles', 'three_classes', 'boolean', 'boolean_smooth', 'boolean_smooth_regional'
   value: 'boolean_smooth'

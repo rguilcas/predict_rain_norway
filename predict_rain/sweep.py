@@ -33,7 +33,7 @@ def main_sweep():
     sweep_configuration = {
     "name": "October 15th 2025 sweep with new projection",
     "method": "bayes",
-    "metric": {"goal": "maximize", "name": "test/pr_auc"}, 
+    "metric": {"goal": "maximize", "name": "test/best_f1"}, 
     "parameters": {
     "learning_rate": {"max": 3e-3,'min':1e-5, 'distribution':'log_uniform_values'},
     'num_conv_layer':{"values":[5,6]},
