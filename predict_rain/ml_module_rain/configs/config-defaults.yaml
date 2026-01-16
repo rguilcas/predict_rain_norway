@@ -4,7 +4,7 @@ batch_size:
   value: 512
 learning_rate:
   desc: Learning rate
-  value: 0.0002
+  value: 0.00025
 
 lr_scheduler:
   desc: Scheduler use for learning rate decay
@@ -17,7 +17,7 @@ loss_function:
   value: 'BCEwithlogits'
 loss_weights:
   desc: weights for the loss function if BCEwithlogits
-  value: 19.
+  value: 9.
 focal_gamma: 
   desc: Gamma value for focal loss. >1 means more emphasis on uncertain results
   value: 2.0
@@ -35,7 +35,7 @@ type_prediction:
   value: 'boolean_smooth'
 quantile_extreme:
   desc: What is defined as extreme in terms of quantiles.
-  value: .95
+  value: .9
 quantile_extreme_based_on_rainy_days:
   desc: If the quantile is computed based on rainy days only or on all days.
   value: False
@@ -127,7 +127,7 @@ MLP_hidden_layers_neuron_number:
   value: []
 dropout_MLP:
   desc: Probability of dropout between MLP layers
-  value: 0.2
+  value: 0.4
 
 attribute_predictions:
   desc: choose whether to compute attributions or not. Can be 'TP' for true positives, 'all_extr' for all extremes and 'all' for all points. Otherwise 'no'.

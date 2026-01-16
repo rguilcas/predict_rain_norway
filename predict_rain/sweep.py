@@ -37,11 +37,11 @@ def main_sweep():
     "parameters": {
     "learning_rate": {"max": 3e-3,'min':1e-5, 'distribution':'log_uniform_values'},
     'num_conv_layer':{"values":[5,6]},
-    'conv1_kernel_number':{"values":[16,24,32,]},
+    'conv1_kernel_number':{"values":[8, 16,24,32,]},
     # 'CNN_conv_multiple':{"values":['single', 'double']},
     # 'factor_increase_kernels_per_conv_layer':{"values":[1.5,2]},
     'dropout_CNN': {"values": [0.0, 0.1, 0.2, 0.3]},
-    'dropout_MLP': {"values": [0.1, 0.2, 0.3, 0.4]},
+    # 'dropout_MLP': {"values": [0.1, 0.2, 0.3, 0.4]},
     "batch_size": {"values": [128, 256, 512]},
     # "num_timesteps_predicted": {'values':[5]}
     # 'MLP_hidden_layers_neuron_number': {"values": 
@@ -58,7 +58,7 @@ def main_sweep():
     },
     }
 
-    sweep_id = wandb.sweep(sweep=sweep_configuration, project="Predict-rain-WNorway_v10")
+    sweep_id = wandb.sweep(sweep=sweep_configuration, project="Predict-rain-WNorway_v11")
     wandb.agent(sweep_id, function=main_config, count=100)
 
 if __name__=='__main__':

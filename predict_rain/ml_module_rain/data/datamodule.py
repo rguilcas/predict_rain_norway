@@ -87,7 +87,7 @@ class MyDataLoader:
                                            train_years=slice('1979','2008'), 
                                            val_years=slice('2009','2016'),
                                            test_years=slice('2017','2024'),
-                                           shuffle_train=True):
+                                           shuffle_train=False):
         # all_indices = np.arange(self.rain.time.size)
         # total_size = all_indices.size
         # indices_train = all_indices[:int(total_size*ratio[0])]
