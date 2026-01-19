@@ -109,13 +109,16 @@ class DownBlock(nn.Module):
         self.convolution = feat(in_ch, out_ch, act=act, use_bn=use_bn, p_drop=p_drop)
         self.down = Downsample(out_ch, mode=down_mode, conv_kernel=conv_down_kernel,
                                ceil=ceil, use_bn=use_bn, act=act)
-        self.activation = get_act(act)
-        self.batchnorm= get_norm(use_bn, out_ch)
+        self.down_mode = down_mode
+        # if self.down_mode == 'strideconv':
+        #     self.activation = get_act(act)
+        #     self.batchnorm= get_norm(use_bn, out_ch)
     def forward(self, x):
         x = self.convolution(x)
         x = self.down(x)
-        x = self.batchnorm(x)
-        x = self.activation(x)
+        # if self.down_mode == 'strideconv':
+        #     x = self.batchnorm(x)
+        #     x = self.activation(x)
         return x
 
 class ResidualDownBlock(nn.Module):
@@ -406,5 +409,4 @@ class MLP(nn.Module):
     def forward(self, x):
         for i in range(1, self.number_layers+1):
             x = getattr(self, f"fc{i}" )(x)
-        
         return x

@@ -4,7 +4,7 @@ batch_size:
   value: 512
 learning_rate:
   desc: Learning rate
-  value: 0.00025
+  value: 0.0002
 
 lr_scheduler:
   desc: Scheduler use for learning rate decay
@@ -17,7 +17,7 @@ loss_function:
   value: 'BCEwithlogits'
 loss_weights:
   desc: weights for the loss function if BCEwithlogits
-  value: 9.
+  value: 19.
 focal_gamma: 
   desc: Gamma value for focal loss. >1 means more emphasis on uncertain results
   value: 2.0
@@ -29,13 +29,13 @@ activation_function:
 ### In/Out params
 file_name_data_out:
   desc: Path to output data (daily rain data)
-  value: '/Data/gfi/users/rogui7909/data/precip/senorge_westnorway_1979-2014.nc'
+  value: '/Data/gfi/users/rogui7909/data/ERA5/precipitation/pr_era5_daily_westnorway_1940-2024.nc'
 type_prediction:
   desc: Type of prediction done. Either 'regression', 'quantiles', 'three_classes', 'boolean', 'boolean_smooth', 'boolean_smooth_regional'
   value: 'boolean_smooth'
 quantile_extreme:
   desc: What is defined as extreme in terms of quantiles.
-  value: .9
+  value: .95
 quantile_extreme_based_on_rainy_days:
   desc: If the quantile is computed based on rainy days only or on all days.
   value: False

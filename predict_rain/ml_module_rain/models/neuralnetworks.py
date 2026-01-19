@@ -309,7 +309,7 @@ class Encoder(nn.Module):
                 down_mode=downsample_mode,
                 act=activation_function,
                 use_bn=use_bn,
-                p_drop=p_dropout,
+                p_drop=p_dropout if layer>=2 else 0.0,  # no dropout in first layers
                 conv_down_kernel=2 if downsample_mode == "doubleconv" else 3
             )
             setattr(self, f"convblock{layer}", module)
