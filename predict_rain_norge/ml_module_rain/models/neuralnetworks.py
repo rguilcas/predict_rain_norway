@@ -2,6 +2,28 @@ import torch.nn as nn
 from collections import OrderedDict
 
 
+
+
+def get_neural_network(config):
+    NN = CNN_MLP(
+            config['CNN_num_conv_layers'], 
+            config['CNN_first_in_ch'], 
+            config['CNN_first_out_channels'], 
+            config['CNN_channels_increase_per_layer'], 
+            config['activation_function'], 
+            config['CNN_max_channels'],
+            config['use_bn'], 
+            config['CNN_dropout'], 
+            config['CNN_dropout_start_after_layer'],
+            config['MLP_output_neurons'],
+            config['MLP_hidden_layers_neuron_number'] ,
+            config['MLP_dropout'] 
+            )
+    return NN
+
+
+# -------------- Helpers
+
 def get_activation(name: str):
     activations = {"ReLU": nn.ReLU(inplace=False),
                    "LeakyReLU": nn.LeakyReLU(inplace=False),
@@ -11,12 +33,49 @@ def get_activation(name: str):
 def get_batch_norm(use_bn: bool, C: int):
     return nn.BatchNorm2d(C) if use_bn else nn.Identity()
 
-# def pad_to_even(x):
-#     # right/bottom pad to mimic ceil-style downsampling on odd H/W
-#     ph = x.shape[-2] & 1
-#     pw = x.shape[-1] & 1
-#     return F.pad(x, (0, pw, 0, ph)) if (ph or pw) else x
+# -------------- NN Classes
 
+class CNN_MLP(nn.Module):
+    def __init__(self,
+                 CNN_num_conv_layers, 
+                 CNN_first_in_ch, 
+                 CNN_first_out_channels, 
+                 CNN_channels_increase_per_layer, 
+                 activation_function="ReLU", 
+                 CNN_max_channels=256,
+                 use_bn=True, 
+                 CNN_p_drop=0.0, 
+                 CNN_drop_out_start_after_layer=0,
+                 MLP_output_neurons=7,
+                 MLP_hidden_layers_neuron_number = [128,128],
+                 MLP_dropout = 0):
+        super(CNN_MLP, self).__init__()
+        self.cnn = CNN(num_conv_layers=CNN_num_conv_layers, 
+                       first_in_ch=CNN_first_in_ch, 
+                       first_out_channels=CNN_first_out_channels, 
+                       channels_increase_per_layer=CNN_channels_increase_per_layer, 
+                       max_channels=CNN_max_channels,
+                       act=activation_function, 
+                       use_bn=use_bn, 
+                       p_drop=CNN_p_drop, 
+                       drop_out_start_after_layer=CNN_drop_out_start_after_layer)
+        self.flatten = nn.Flatten()
+        self.cnn_out_image_size =(128/(2**self.cnn.num_conv_layers))**2   # Assuming input size is 128x128
+        self.cnn_out_channels = getattr(self.cnn, f"convlayer{self.cnn.num_conv_layers}" ).convolution.out_channels
+        self.linear_size = int(self.cnn_out_channels*self.cnn_out_image_size)
+        self.mlp = MLP(self.linear_size, 
+                       MLP_output_neurons,
+                       hidden_layers_neuron_number = MLP_hidden_layers_neuron_number,
+                       dropout = MLP_dropout,
+                       activation_function=activation_function,)
+
+    def forward(self, x):
+        x = self.cnn(x)
+        x = self.flatten(x)
+        x = self.mlp(x)
+        return x
+
+# -------------- Individual blocks
 
 class ConvolutionLayer(nn.Module):
     def __init__(self, 
@@ -98,43 +157,3 @@ class MLP(nn.Module):
             x = getattr(self, f"fc{i}" )(x)
         return x
 
-
-class CNN_MLP(nn.Module):
-    def __init__(self,
-                 CNN_num_conv_layers, 
-                 CNN_first_in_ch, 
-                 CNN_first_out_channels, 
-                 CNN_channels_increase_per_layer, 
-                 activation_function="ReLU", 
-                 CNN_max_channels=256,
-                 use_bn=True, 
-                 CNN_p_drop=0.0, 
-                 CNN_drop_out_start_after_layer=0,
-                 MLP_output_neurons=7,
-                 MLP_hidden_layers_neuron_number = [128,128],
-                 MLP_dropout = 0):
-        super(CNN_MLP, self).__init__()
-        self.cnn = CNN(num_conv_layers=CNN_num_conv_layers, 
-                       first_in_ch=CNN_first_in_ch, 
-                       first_out_channels=CNN_first_out_channels, 
-                       channels_increase_per_layer=CNN_channels_increase_per_layer, 
-                       max_channels=CNN_max_channels,
-                       act=activation_function, 
-                       use_bn=use_bn, 
-                       p_drop=CNN_p_drop, 
-                       drop_out_start_after_layer=CNN_drop_out_start_after_layer)
-        self.flatten = nn.Flatten()
-        self.cnn_out_image_size =(128/(2**self.cnn.num_conv_layers))**2   # Assuming input size is 128x128
-        self.cnn_out_channels = getattr(self.cnn, f"convlayer{self.cnn.num_conv_layers}" ).convolution.out_channels
-        self.linear_size = int(self.cnn_out_channels*self.cnn_out_image_size)
-        self.mlp = MLP(self.linear_size, 
-                       MLP_output_neurons,
-                       hidden_layers_neuron_number = MLP_hidden_layers_neuron_number,
-                       dropout = MLP_dropout,
-                       activation_function=activation_function,)
-
-    def forward(self, x):
-        x = self.cnn(x)
-        x = self.flatten(x)
-        x = self.mlp(x)
-        return x

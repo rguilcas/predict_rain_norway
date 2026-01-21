@@ -43,7 +43,7 @@ class MyDataLoader:
                 self.config['prediction_per_timestep'] = 10
             case _:
                 raise ValueError("type_predictions must be 'boolean','boolean_smooth', 'boolean_smooth_regional', 'three_classes', 'quantiles' or 'regression'")
-        self.config['num_classes'] = self.config['prediction_per_timestep']*self.config['num_timesteps_predicted']
+        self.config['MLP_output_neurons'] = self.config['prediction_per_timestep']*self.config['num_timesteps_predicted']
         # self.rain = ds_rain
 
     def load_atmospheric_features(self,load=True):
@@ -54,13 +54,7 @@ class MyDataLoader:
         ds_std = ds_atm.data_std.sel(var_name = input_variables)
         ds_atm = ds_atm[input_variables].to_array('var_name')
         ds_atm = (ds_atm-ds_mean)/ds_std
-        # ds_atm = ds_atm.data_normed.sel(var_name =input_variables )
-        ds_atm = ds_atm.transpose('time','var_name','x','y')#.isel(x=slice(0,100), y=slice(0,100))
-        # lon_min, lon_max, lat_min, lat_max = self.config['spatial_extent']
-        # if ds_atm.latitude.diff('latitude')[0]<0:
-        #     lat_min, lat_max = lat_max, lat_min
-        # ds_atm = ds_atm.sel(longitude=slice(lon_min, lon_max), latitude=slice(lat_min, lat_max))
-        # ds_atm = ds_atm-ds_atm.mean(['longitude','latitude'])
+        ds_atm = ds_atm.transpose('time','var_name','x','y')
         if load:
             self.features = ds_atm.astype('float32').load()
         else:
@@ -69,10 +63,8 @@ class MyDataLoader:
         self.feature_height = self.features.y.size
         self.feature_width = self.features.x.size
         self.feature_image_size = self.feature_height*self.feature_width
-        self.config['num_channels'] = len(self.config['input_variables'])
-        self.config['feature_height'] = self.feature_height
-        self.config['feature_width'] = self.feature_width
-        self.config['feature_image_size'] = self.feature_image_size
+        self.config['CNN_first_in_ch'] = len(self.config['input_variables'])
+
 
     def harmonize_time(self):
         common_time = [time for time in self.features.time.values if time in self.rain.time.values]
@@ -88,17 +80,6 @@ class MyDataLoader:
                                            val_years=slice('2009','2016'),
                                            test_years=slice('2017','2024'),
                                            shuffle_train=False):
-        # all_indices = np.arange(self.rain.time.size)
-        # total_size = all_indices.size
-        # indices_train = all_indices[:int(total_size*ratio[0])]
-        # indices_val = all_indices[int(total_size*ratio[0]):int(total_size*(ratio[0]+ratio[1]))]
-        # indices_test = all_indices[int(total_size*(ratio[0]+ratio[1])):] 
-        # if shuffle_train:
-        #     np.random.shuffle(indices_train)
-        # self.indices_train = indices_train 
-        # self.indices_val = indices_val
-        # self.indices_test = indices_test
-        
         ds_train = xr.Dataset(dict(
                                features=self.features.sel(time=train_years),
                                targets=self.targets.sel(time=train_years),
@@ -110,11 +91,6 @@ class MyDataLoader:
             ds_train = ds_train.sel(time=times_train)
         self.ds_train = ds_train
         
-        if self.config['augment_training_with_noise']:
-            self.ds_train = get_expanded_ds(self.ds_train, 
-                                            noisy_samples=self.config['num_noisy_samples'], 
-                                            noise_scale=self.config['augment_noise_amplitude'], 
-                                            shuffle_after_noise=shuffle_train)
         self.ds_val = xr.Dataset(dict(
                                features=self.features.sel(time=val_years),
                                targets=self.targets.sel(time=val_years),
@@ -142,63 +118,4 @@ class MyDataLoader:
         print(f"    {self.config['num_timesteps_predicted']} Predicted timesteps for future rainfall")
         print(f"    Prediction type: {self.config['type_prediction']}")
         print(f"    What quantile is considered extreme: {self.config['quantile_extreme']*100:.0f}th of {'all' if not self.config['quantile_extreme_based_on_rainy_days']  else 'rainy'} days")
-
-    def attribute_integrated_gradients(self, model, ds_features, predictions, targets, samples_to_attribute='TP'):
-        ds_predictions = xr.DataArray(predictions, dims=['time','timestep'], coords = dict(time=ds_features.time[:predictions.shape[0]], timestep=range(1,5)))
-        ds_targets = xr.DataArray(targets, dims=['time','timestep'], coords = dict(time=ds_features.time[:targets.shape[0]], timestep=range(1,5)))
-        ds_results = xr.Dataset(dict(predictions=ds_predictions, targets=ds_targets))                             
-        self.ds_results = ds_results
-
-        series_targets = ds_targets.to_series()
-        series_predictions = ds_predictions.to_series()
-
-        all_preds = ((series_predictions == series_targets)&(series_targets==2)).reset_index()
-        all_preds.columns = ['time_of_prediction','timestep','TP_extreme']
-        all_preds['time_of_event'] = all_preds.time_of_prediction + all_preds.timestep*pd.Timedelta(1,'D')
-        extreme_events_predictions = all_preds.groupby('time_of_event').TP_extreme.sum()
-
-        all_targets = ((series_targets==2)).reset_index()
-        all_targets.columns = ['time_of_prediction','timestep','extreme']
-        all_targets['time_of_event'] = all_targets.time_of_prediction + all_targets.timestep*pd.Timedelta(1,'D')
-        extreme_events = all_targets.groupby('time_of_event').extreme.sum()
-
-        extreme_events_predictions = extreme_events_predictions.loc[extreme_events[extreme_events==4].index]
-        
-        match samples_to_attribute:
-            case 'TP':
-                time_TP_extreme = extreme_events_predictions.loc[extreme_events_predictions==4].index
-                self.time_of_TP_extremes = time_TP_extreme
-            case 'all_extr':
-                pass 
-            case 'all':
-                time_TP_extreme = extreme_events_predictions.index
-        # else:
-        #     time_TP_extreme = extreme_events_predictions.loc[extreme_events_predictions==4].index
-        #     self.time_of_TP_extremes = time_TP_extreme
-        steps = 4
-        start_times = time_TP_extreme -  pd.Timedelta(steps-1,'D')
-        self.first_time_prediction_of_TP_extremes = start_times
-
-        method = IntegratedGradients(model.model)
-        all_multi_attrs = []
-        all_multi_sens = []
-        print('Attributing true positive extremes ...')
-        for k in tqdm(range(len(time_TP_extreme))):
-            start = start_times[k].strftime("%Y-%m-%d %H:%M:%S")
-            end = time_TP_extreme[k].strftime("%Y-%m-%d %H:%M:%S")
-            # print(start,end)
-            ds_test_extract = ds_features.sel(time=slice(start ,end))
-            tensor_in = torch.Tensor(ds_test_extract.features.values)
-            tensor_out = torch.Tensor(ds_test_extract.targets.values)
-            attrs = method.attribute(tensor_in, baselines=torch.Tensor([0]),target=[3*(steps-k)-1 for k in range(steps)]) 
-            da_attrs = xr.DataArray(attrs, dims = ['timestep','var_name','x','y'], 
-                                    coords= dict(timestep=np.arange(1,steps+1),var_name=ds_test_extract.var_name, x=ds_test_extract.x, y=ds_test_extract.y))
-            all_multi_attrs.append(da_attrs.assign_coords(time=time_TP_extreme[k]))
-            sens = da_attrs/ds_test_extract.features.rename(time='timestep').assign_coords(timestep=da_attrs.timestep)
-            all_multi_sens.append(sens.assign_coords(time=time_TP_extreme[k]))
-        ds_attributions = xr.concat(all_multi_attrs, dim='time')
-        ds_sens = xr.concat(all_multi_sens, dim='time')
-        final_ds = xr.Dataset(dict(attributions = ds_attributions, sensitivity=ds_sens))
-        self.ds_attribution = final_ds
-
 
