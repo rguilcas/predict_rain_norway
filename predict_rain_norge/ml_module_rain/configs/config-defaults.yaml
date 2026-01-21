@@ -19,7 +19,7 @@ loss_weights:
 #### Model hyperparameters
 CNN_num_conv_layers:
   desc: Number of convolution layers in the CNN
-  value: 4
+  value: 6
 CNN_first_out_channels:
   desc: Number of channels after the first conv layer
   value: 16

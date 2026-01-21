@@ -1,5 +1,4 @@
 import lightning as L
-from ml_module_rain.utils.losses import DistribLoss
 from torch import optim
 from captum.attr import IntegratedGradients, NoiseTunnel
 from torch.utils.data import DataLoader, TensorDataset
@@ -13,7 +12,7 @@ import pandas as pd
 class ExtremeRainPredictor(L.LightningModule):
     def __init__(self, model=None, 
                  learning_rate=1e-3,
-                 loss_fn=DistribLoss(), 
+                 loss_fn=None, 
                  lr_scheduler = 'exponential', 
                  init_config=dict()):
         super().__init__()

@@ -15,7 +15,7 @@ import argparse
 from ml_module_rain.models.neuralnetworks import get_neural_network
 from ml_module_rain.data.datamodule import MyDataLoader
 from ml_module_rain.models.lightning import ExtremeRainPredictor
-from ml_module_rain.models.losses import get_loss
+from ml_module_rain.utils.losses import get_loss
 from ml_module_rain.models.callbacks import get_checkpoint_callback, BestF1Callback
 from ml_module_rain.utils.config import load_config
 
@@ -50,9 +50,10 @@ def main(config_path=None):
                       accelerator=accelerator, devices=1)
 
     loss = get_loss(config)
-    lightning_model = ExtremeRainPredictor(NN, 
+    lightning_model = ExtremeRainPredictor(
+                            NN, 
                             learning_rate=config['learning_rate'], 
-                            lr_scheduler =config['lr_scheduler'],
+                            lr_scheduler ='step',
                             loss_fn = loss,
                             init_config=init_config)
     trainer.fit(lightning_model,dataloader.train_loader, dataloader.val_loader)
