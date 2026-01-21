@@ -6,6 +6,7 @@ os.environ["MKL_THREADING_LAYER"] = "GNU"
 import wandb
 import torch # long
 from lightning.pytorch import loggers, seed_everything
+from lightning import Trainer
 import xarray as xr
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 import argparse
@@ -13,8 +14,8 @@ import argparse
 
 from ml_module_rain.models.neuralnetworks import get_neural_network
 from ml_module_rain.data.datamodule import MyDataLoader
-# from ml_module_rain.models.lightning import ExtremeRainPredictor, AttributableTrainer
-# from ml_module_rain.models.losses import get_loss
+from ml_module_rain.models.lightning import ExtremeRainPredictor
+from ml_module_rain.models.losses import get_loss
 from ml_module_rain.models.callbacks import get_checkpoint_callback, BestF1Callback
 from ml_module_rain.utils.config import load_config
 
@@ -39,27 +40,27 @@ def main(config_path=None):
                get_checkpoint_callback(wandb_logger),
                BestF1Callback(multi_horizon=True)
                ]
-    # accelerator = 'gpu' if torch.cuda.is_available() else 'cpu'
+    accelerator = 'gpu' if torch.cuda.is_available() else 'cpu'
     
-    # trainer = AttributableTrainer(limit_train_batches=100, 
-    #                             max_epochs=config['num_epochs'], 
-    #                             logger=wandb_logger, 
-    #                             log_every_n_steps=1, default_root_dir="/Data/gfi/users/rogui7909/lightning_checkpoint/",
-    #                             callbacks=callbacks, deterministic=True,
-    #                             accelerator=accelerator, devices=1)
+    trainer = Trainer(limit_train_batches=100, 
+                      max_epochs=config['num_epochs'], 
+                      logger=wandb_logger, 
+                      log_every_n_steps=1, default_root_dir="/Data/gfi/users/rogui7909/lightning_checkpoint/",
+                      callbacks=callbacks, deterministic=True,
+                      accelerator=accelerator, devices=1)
 
-    # loss = get_loss(config)
-    # lightning_model = ExtremeRainPredictor(NN, 
-    #                         learning_rate=config['learning_rate'], 
-    #                         lr_scheduler =config['lr_scheduler'],
-    #                         loss_fn = loss,
-    #                         init_config=init_config)
-    # trainer.fit(lightning_model,dataloader.train_loader, dataloader.val_loader)
-    # lightning_model.eval()
-    # lightning_model.model.eval()
-    # with torch.no_grad():
-    #     trainer.test(lightning_model, dataloaders=dataloader.val_loader)
-    # wandb.finish()
+    loss = get_loss(config)
+    lightning_model = ExtremeRainPredictor(NN, 
+                            learning_rate=config['learning_rate'], 
+                            lr_scheduler =config['lr_scheduler'],
+                            loss_fn = loss,
+                            init_config=init_config)
+    trainer.fit(lightning_model,dataloader.train_loader, dataloader.val_loader)
+    lightning_model.eval()
+    lightning_model.model.eval()
+    with torch.no_grad():
+        trainer.test(lightning_model, dataloaders=dataloader.val_loader)
+    wandb.finish()
 
 
 if __name__ == "__main__":

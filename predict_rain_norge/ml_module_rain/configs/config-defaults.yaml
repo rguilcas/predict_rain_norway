@@ -5,19 +5,29 @@ batch_size:
 learning_rate:
   desc: Learning rate
   value: 0.000036
+num_epochs:
+  desc: Number of training epochs
+  value: 100
+loss_function:
+  desc: choice of loss function
+  value: 'BCEwithlogits'
+loss_weights:
+  desc: weights for the loss function if BCEwithlogits
+  value: 19.
+
 
 #### Model hyperparameters
 CNN_num_conv_layers:
-  desc: This is a test
+  desc: Number of convolution layers in the CNN
   value: 4
 CNN_first_out_channels:
-  desc: This is a test
+  desc: Number of channels after the first conv layer
   value: 16
 CNN_channels_increase_per_layer:
-  desc: This is a test
+  desc: Channel increase after the first layer
   value: 2
 CNN_max_channels:
-  desc: This is a test
+  desc: Maximum number of channels
   value: 256
 activation_function:
   desc: This is a test
@@ -25,7 +35,7 @@ activation_function:
 CNN_dropout:
   desc: This is a test
   value: 0
-CNN_drop_out_start_after_layer:
+CNN_dropout_start_after_layer:
   desc: This is a test
   value: 0 
 use_bn:
