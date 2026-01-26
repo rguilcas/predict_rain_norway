@@ -1,10 +1,10 @@
 #### Training hyperparameters
 batch_size:
   desc: Size of each mini-batch
-  value: 128
+  value: 512
 learning_rate:
   desc: Learning rate
-  value: 0.000036
+  value: 0.00015226
 num_epochs:
   desc: Number of training epochs
   value: 100
@@ -19,7 +19,7 @@ loss_weights:
 #### Model hyperparameters
 CNN_num_conv_layers:
   desc: Number of convolution layers in the CNN
-  value: 6
+  value: 4
 CNN_first_out_channels:
   desc: Number of channels after the first conv layer
   value: 16
@@ -33,20 +33,20 @@ activation_function:
   desc: This is a test
   value: "ReLU"
 CNN_dropout:
-  desc: This is a test
-  value: 0
+  desc: Dropout in CNN layers
+  value: 0.3
 CNN_dropout_start_after_layer:
   desc: This is a test
-  value: 0 
+  value: 2
 use_bn:
-  desc: This is a test
+  desc: Use batch norm in CNN
   value: True
 MLP_hidden_layers_neuron_number:
   desc: This is a test
-  value: [128,128]
+  value: [128]
 MLP_dropout:
   desc: This is a test
-  value: 0
+  value: 0.4
 
 #### Dataloader config
 file_name_data_in:
